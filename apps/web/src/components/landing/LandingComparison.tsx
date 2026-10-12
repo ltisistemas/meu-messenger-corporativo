@@ -1,5 +1,4 @@
-import React from 'react';
-import { XCircle, CheckCircle2, AlertTriangle, ShieldCheck, Flame } from 'lucide-react';
+import { XCircle, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export const LandingComparison: React.FC = () => {
   const comparisonRows = [

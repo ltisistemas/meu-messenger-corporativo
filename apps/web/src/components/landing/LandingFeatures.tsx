@@ -6,7 +6,6 @@ import {
   BarChart3,
   FileCheck2,
   ExternalLink,
-  ShieldAlert,
   Sparkles,
   Zap,
 } from 'lucide-react';
