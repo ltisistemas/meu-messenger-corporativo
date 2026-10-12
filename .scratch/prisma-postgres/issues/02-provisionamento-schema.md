@@ -5,10 +5,10 @@ Execução do provisionamento estrutural das tabelas relacionais do NextMsg na i
 
 **Blocked by:** 01: Sincronização de Ambiente e Resolução de Variáveis
 
-**Status:** ready-for-agent
+**Status:** closed (resolved)
 
-- [ ] Execução bem-sucedida de `pnpm --filter @corpchat/api db:push` contra a instância remota do Prisma Postgres
-- [ ] Criação de todas as tabelas públicas do schema relacional verificadas no banco de dados
-- [ ] Criação dos tipos enumerados do PostgreSQL (`user_role`, `conversation_type`, `file_storage_type`, `signature_status`, etc.)
-- [ ] Índices de performance e chaves estrangeiras validados de forma idempotente
-- [ ] Nenhuma alteração destrutiva em esquemas existentes
+- [x] Execução bem-sucedida de `pnpm --filter @corpchat/api db:migrate` / `db:push` contra a instância remota do Prisma Postgres
+- [x] Criação de todas as tabelas públicas do schema relacional verificadas no banco de dados (18 tabelas ativas)
+- [x] Criação dos tipos enumerados do PostgreSQL (`user_role`, `conversation_type`, `file_storage_type`, `signature_status`, etc.)
+- [x] Índices de performance e chaves estrangeiras validados de forma idempotente
+- [x] Nenhuma alteração destrutiva em esquemas existentes
