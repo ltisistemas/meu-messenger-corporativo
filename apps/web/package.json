@@ -13,6 +13,7 @@
   "dependencies": {
     "@corpchat/shared": "workspace:*",
     "@tanstack/react-query": "^5.66.9",
+    "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
