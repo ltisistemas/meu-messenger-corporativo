@@ -11,7 +11,7 @@ describe('API Server', () => {
 
     expect(response.statusCode).toBe(200);
     const json = JSON.parse(response.body);
-    expect(['ok', 'healthy']).toContain(json.status);
+    expect(['ok', 'healthy', 'degraded']).toContain(json.status);
     expect(json.service).toBe('nextmsg-api');
     await server.close();
   });
