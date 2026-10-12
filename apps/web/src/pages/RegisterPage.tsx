@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   MessageSquare,
   Building,
@@ -20,9 +19,14 @@ import { useAuthStore } from '../stores/auth.store';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { register, isLoading, error, clearError } = useAuthStore();
 
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>('pro');
+  const queryPlan = searchParams.get('plan') as PlanType | null;
+  const initialPlan: PlanType = queryPlan && ['free', 'pro', 'enterprise'].includes(queryPlan)
+    ? queryPlan
+    : 'pro';
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>(initialPlan);
   const [accountName, setAccountName] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,7 +56,7 @@ export const RegisterPage: React.FC = () => {
         password,
         plan: selectedPlan,
       });
-      navigate('/');
+      navigate('/chat');
     } catch {
       // Error handled in store
     }

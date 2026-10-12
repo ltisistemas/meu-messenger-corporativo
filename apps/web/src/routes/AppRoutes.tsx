@@ -6,6 +6,7 @@ import { RegisterPage } from '../pages/RegisterPage';
 import { AcceptInvitePage } from '../pages/AcceptInvitePage';
 import { ChatPage } from '../pages/ChatPage';
 import { AccountPage } from '../pages/AccountPage';
+import { LandingPage } from '../pages/LandingPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -21,7 +22,7 @@ const PublicOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const { isAuthenticated } = useAuthStore();
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   return <>{children}</>;
@@ -30,6 +31,15 @@ const PublicOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) 
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <ChatPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/login"
         element={
@@ -47,14 +57,6 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route path="/invite/:token" element={<AcceptInvitePage />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <ChatPage />
-          </ProtectedRoute>
-        }
-      />
       <Route
         path="/account"
         element={

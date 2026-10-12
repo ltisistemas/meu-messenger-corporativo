@@ -25,7 +25,7 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login({ email: email.trim(), password });
-      navigate('/');
+      navigate('/chat');
     } catch {
       // Error handled in store
     }
