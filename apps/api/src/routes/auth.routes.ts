@@ -59,6 +59,22 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (
           refreshToken,
         });
       } catch (err: any) {
+        const isDbError =
+          err.message?.includes('ECONNREFUSED') ||
+          err.message?.includes('connect') ||
+          err.message?.includes('timeout') ||
+          err.code === 'ECONNREFUSED';
+
+        if (isDbError) {
+          fastify.log.error(err);
+          return reply.status(503).send({
+            statusCode: 503,
+            error: 'Service Unavailable',
+            message:
+              'Banco de dados indisponível ou não configurado. Verifique a variável DATABASE_URL na Vercel.',
+          });
+        }
+
         return reply.status(400).send({
           statusCode: 400,
           error: 'Bad Request',
@@ -108,6 +124,22 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (
         refreshToken,
       });
     } catch (err: any) {
+      const isDbError =
+        err.message?.includes('ECONNREFUSED') ||
+        err.message?.includes('connect') ||
+        err.message?.includes('timeout') ||
+        err.code === 'ECONNREFUSED';
+
+      if (isDbError) {
+        fastify.log.error(err);
+        return reply.status(503).send({
+          statusCode: 503,
+          error: 'Service Unavailable',
+          message:
+            'Banco de dados indisponível ou não configurado. Verifique a variável DATABASE_URL na Vercel.',
+        });
+      }
+
       return reply.status(401).send({
         statusCode: 401,
         error: 'Unauthorized',
