@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ChatPage } from '../pages/ChatPage';
 import { App } from '../App';
@@ -178,5 +178,94 @@ describe('Corporate Messenger App & ChatPage (T-11 / T-12 / T-13 / T-14)', () =>
   it('renders App router in authenticated state', () => {
     render(<App />);
     expect(screen.getByText('Tech Corp')).toBeInTheDocument();
+  });
+
+  it('triggers send message and typing interactions in ChatPage', async () => {
+    const sendMessageMock = vi.fn().mockResolvedValue({});
+    const sendTypingMock = vi.fn();
+    useChatStore.setState({
+      sendMessage: sendMessageMock,
+      sendTyping: sendTypingMock,
+    });
+
+    render(
+      <BrowserRouter>
+        <ChatPage />
+      </BrowserRouter>
+    );
+
+    const input = screen.getByPlaceholderText(/Digite uma mensagem segura/i);
+    fireEvent.change(input, { target: { value: 'Olá squad!' } });
+    expect(sendTypingMock).toHaveBeenCalled();
+
+    fireEvent.submit(input.closest('form')!);
+    expect(sendMessageMock).toHaveBeenCalledWith('Olá squad!', 'text');
+  });
+
+  it('navigates to settings and switches tabs in ChatPage', () => {
+    render(
+      <BrowserRouter>
+        <ChatPage />
+      </BrowserRouter>
+    );
+
+    const settingsBtn = screen.getByTitle('Configurações');
+    fireEvent.click(settingsBtn);
+
+    const broadcastNav = screen.getByTitle('Transmissão');
+    fireEvent.click(broadcastNav);
+
+    const contactsNav = screen.getByTitle('Contatos');
+    fireEvent.click(contactsNav);
+  });
+
+  it('creates group and direct conversation through NewChatModal in ChatPage', async () => {
+    const createGroupMock = vi.fn().mockResolvedValue('new-g');
+    const createDirectMock = vi.fn().mockResolvedValue('new-d');
+    useChatStore.setState({
+      createGroupConversation: createGroupMock,
+      createDirectConversation: createDirectMock,
+    });
+
+    render(
+      <BrowserRouter>
+        <ChatPage />
+      </BrowserRouter>
+    );
+
+    // Create group
+    const newBtn = screen.getByText('Novo');
+    fireEvent.click(newBtn);
+
+    const groupInput = screen.getByPlaceholderText(/Ex: Engenharia/i);
+    fireEvent.change(groupInput, { target: { value: 'Squad Beta' } });
+    fireEvent.click(screen.getByRole('button', { name: /Criar Grupo/i }));
+
+    await waitFor(() => {
+      expect(createGroupMock).toHaveBeenCalledWith('Squad Beta', [], 24);
+    });
+
+    // Create direct
+    fireEvent.click(screen.getByText('Novo'));
+    fireEvent.click(screen.getByText(/Direto 1:1/i));
+    const directInput = screen.getByPlaceholderText(/Ex: colaborador@empresa.com/i);
+    fireEvent.change(directInput, { target: { value: 'user-direct-99' } });
+    fireEvent.click(screen.getByRole('button', { name: /Iniciar Conversa/i }));
+
+    await waitFor(() => {
+      expect(createDirectMock).toHaveBeenCalledWith('user-direct-99');
+    });
+  });
+
+  it('renders App router in unauthenticated state redirecting to public routes', () => {
+    useAuthStore.setState({
+      user: null,
+      account: null,
+      accessToken: null,
+      isAuthenticated: false,
+    });
+
+    render(<App />);
+    expect(screen.getByText('Acesse sua conta')).toBeInTheDocument();
   });
 });

@@ -359,6 +359,33 @@ describe('Groups, Broadcast & Polls Frontend System (T-27)', () => {
       });
     });
 
+    it('renders PollCard as isSelf with creator close action and multi-choice', async () => {
+      const closePollMock = vi.fn(async () => ({ ...mockPoll, status: 'closed' as const }));
+      useChatStore.setState({ closePoll: closePollMock });
+
+      const multiPoll: PollDetailsResponse = {
+        ...mockPoll,
+        allowMultiple: true,
+        creatorId: 'user-admin-1', // current user is creator
+      };
+
+      const { rerender } = render(<PollCard poll={multiPoll} isSelf={true} />);
+
+      expect(screen.getByText('Múltipla Escolha')).toBeInTheDocument();
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const closeBtn = screen.getByRole('button', { name: /Encerrar/i });
+      fireEvent.click(closeBtn);
+
+      await waitFor(() => {
+        expect(closePollMock).toHaveBeenCalledWith('poll-123');
+      });
+      confirmSpy.mockRestore();
+
+      // Test closed state
+      rerender(<PollCard poll={{ ...multiPoll, status: 'closed' }} isSelf={false} />);
+      expect(screen.getByText('Votação Encerrada')).toBeInTheDocument();
+    });
+
     it('renders CreatePollModal, validates minimum 2 options, and calls createPoll', async () => {
       const createPollMock = vi.fn(async () => mockPoll);
       useChatStore.setState({ createPoll: createPollMock });

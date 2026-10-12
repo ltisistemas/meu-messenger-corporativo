@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AccountOverviewCard } from '../components/account/AccountOverviewCard';
 import { QuotaWarningBanner } from '../components/account/QuotaWarningBanner';
@@ -9,6 +9,7 @@ import { UpgradeCheckoutModal } from '../components/account/UpgradeCheckoutModal
 import { InvoicesHistorySection } from '../components/account/InvoicesHistorySection';
 import { AccountPage } from '../pages/AccountPage';
 import { useAuthStore } from '../stores/auth.store';
+import { useAccountStore } from '../stores/account.store';
 import { api } from '../services/api';
 
 vi.mock('../services/api', () => ({
@@ -267,6 +268,39 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
 
       expect(onUpdateStatus).toHaveBeenCalledWith('33333333-3333-3333-3333-333333333333', 'inactive');
     });
+
+    it('calls onUpdateStatus to activate an inactive member and renders error when update fails', async () => {
+      const onUpdateStatus = vi.fn().mockRejectedValueOnce(new Error('Erro ao alterar status'));
+      const inactiveMembers = [
+        {
+          id: 'm-inactive',
+          name: 'Julia Inativa',
+          email: 'julia@empresa.com',
+          role: 'member' as const,
+          status: 'inactive' as const,
+          joinedAt: new Date().toISOString(),
+        },
+      ];
+
+      render(
+        <MemberManagementSection
+          members={inactiveMembers}
+          currentUserRole="owner"
+          currentUserId="admin-id"
+          onUpdateStatus={onUpdateStatus}
+          onUpdateRole={vi.fn()}
+          onOpenInviteModal={vi.fn()}
+        />
+      );
+
+      const activateBtn = screen.getByRole('button', { name: /Ativar/i });
+      fireEvent.click(activateBtn);
+
+      expect(onUpdateStatus).toHaveBeenCalledWith('m-inactive', 'active');
+      await waitFor(() => {
+        expect(screen.getByText('Erro ao alterar status')).toBeInTheDocument();
+      });
+    });
   });
 
   describe('PlansComparisonSection Component', () => {
@@ -397,7 +431,9 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
   });
 
   describe('AccountPage Complete Integration', () => {
-    it('renders AccountPage, loads data and switches tabs between Membros, Planos, and Faturas', async () => {
+    it('renders AccountPage, loads data and switches tabs between Membros, Planos, Faturas, and Privacidade', async () => {
+      window.confirm = vi.fn(() => true);
+
       render(
         <BrowserRouter>
           <AccountPage />
@@ -413,14 +449,64 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
       // Switch to Plans Tab
       const plansTab = screen.getByText(/Comparativo de Planos & Upgrade/i);
       fireEvent.click(plansTab);
-
       expect(screen.getByText(/Planos Flexíveis para a sua Empresa/i)).toBeInTheDocument();
+
+      // Open Upgrade Modal from Plans tab
+      const upgradeProBtn = screen.getByRole('button', { name: /Fazer Upgrade para Pro/i });
+      fireEvent.click(upgradeProBtn);
+      expect(screen.getByText(/Assinatura Plano Pro/i)).toBeInTheDocument();
+      const cancelUpgradeBtn = screen.getByRole('button', { name: /Cancelar/i });
+      fireEvent.click(cancelUpgradeBtn);
+
+      // Test downgrade to free when on Pro plan
+      act(() => {
+        useAccountStore.setState({
+          accountDetails: { ...mockAccountDetails, plan: 'pro' },
+        });
+      });
+      const downgradeBtn = await screen.findByRole('button', { name: /Mudar para Free/i });
+      fireEvent.click(downgradeBtn);
+      expect(window.confirm).toHaveBeenCalled();
 
       // Switch to Invoices Tab
       const invoicesTab = screen.getByText(/Faturas & Assinatura/i);
       fireEvent.click(invoicesTab);
-
       expect(screen.getByText(/Histórico de Faturas/i)).toBeInTheDocument();
+
+      // Switch to Privacy Tab
+      const privacyTab = screen.getByText(/Privacidade & LGPD/i);
+      fireEvent.click(privacyTab);
+      expect(screen.getByText(/Proteção de Dados & LGPD/i)).toBeInTheDocument();
+
+      // Switch back to Members Tab
+      const membersTab = screen.getByText(/Membros da Equipe/i);
+      fireEvent.click(membersTab);
+      expect(screen.getAllByText('Carlos Proprietário')[0]).toBeInTheDocument();
+
+      // Open invite modal via overview card button (ensure status is active so button is enabled)
+      act(() => {
+        useAccountStore.setState({
+          accountDetails: {
+            ...mockAccountDetails,
+            plan: 'pro',
+            status: 'active',
+            isOverQuota: false,
+            activeUsersCount: 5,
+            maxUsers: 20,
+          },
+        });
+      });
+      const inviteBtn = screen.getByRole('button', { name: /Convidar Membro/i });
+      fireEvent.click(inviteBtn);
+      expect(screen.getByText(/Convidar Novo Membro/i)).toBeInTheDocument();
+
+      // Close invite modal
+      const closeBtn = screen.getByRole('button', { name: /Fechar/i });
+      fireEvent.click(closeBtn);
+
+      // Test Voltar ao Chat navigation
+      const backBtn = screen.getByRole('button', { name: /Voltar ao Chat/i });
+      fireEvent.click(backBtn);
     });
   });
 });

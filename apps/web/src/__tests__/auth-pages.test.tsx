@@ -196,5 +196,60 @@ describe('Auth Pages & Flows (T-12)', () => {
         });
       });
     });
+
+    it('validates password requirements and mismatch', async () => {
+      vi.spyOn(api, 'get').mockResolvedValueOnce({
+        id: 'inv-123',
+        email: 'beatriz@empresa.com',
+        role: 'member',
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 86400000).toISOString(),
+        account: { id: 'acc-1', name: 'Empresa Alpha', plan: 'pro' },
+      });
+
+      const { container } = render(
+        <MemoryRouter initialEntries={['/invite/inv-tok-1']}>
+          <Routes>
+            <Route path="/invite/:token" element={<AcceptInvitePage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByText('Empresa Alpha')).toBeInTheDocument();
+      const form = container.querySelector('form')!;
+
+      // 1. Empty fields via form submit
+      fireEvent.submit(form);
+      expect(screen.getByText(/Preencha seu nome e defina sua senha de acesso/i)).toBeInTheDocument();
+
+      // 2. Short password
+      fireEvent.change(screen.getByPlaceholderText('Ex: Beatriz Lima'), { target: { value: 'Beatriz' } });
+      const passwordInputs = screen.getAllByPlaceholderText('••••••••');
+      fireEvent.change(passwordInputs[0], { target: { value: '123' } });
+      fireEvent.change(passwordInputs[1], { target: { value: '123' } });
+      fireEvent.submit(form);
+      expect(screen.getByText(/A senha deve ter pelo menos 8 caracteres/i)).toBeInTheDocument();
+
+      // 3. Mismatch
+      fireEvent.change(passwordInputs[0], { target: { value: 'password123' } });
+      fireEvent.change(passwordInputs[1], { target: { value: 'password999' } });
+      fireEvent.submit(form);
+      expect(screen.getByText(/As senhas digitadas não coincidem/i)).toBeInTheDocument();
+    });
+
+    it('renders error state when invitation fetch fails', async () => {
+      vi.spyOn(api, 'get').mockRejectedValueOnce(new Error('Token expirado'));
+
+      render(
+        <MemoryRouter initialEntries={['/invite/invalid-token']}>
+          <Routes>
+            <Route path="/invite/:token" element={<AcceptInvitePage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByText(/Convite inválido, expirado ou já utilizado/i)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /Ir para o Login/i })).toBeInTheDocument();
+    });
   });
 });

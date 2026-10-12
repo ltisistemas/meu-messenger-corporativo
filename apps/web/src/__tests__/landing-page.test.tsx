@@ -206,4 +206,54 @@ describe('Landing Page de Alta Conversão (PLG & Conversão B2B)', () => {
     expect(screen.getByTitle('Conversas')).toBeInTheDocument();
     expect(screen.getByTitle('NextMsg')).toBeInTheDocument();
   });
+
+  it('9. Abre e fecha o menu mobile da Navbar e navega para seções', () => {
+    // Mock scrollIntoView
+    const scrollMock = vi.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollMock;
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <AppRoutes />
+      </MemoryRouter>
+    );
+
+    const menuBtn = screen.getByLabelText('Abrir menu');
+    expect(menuBtn).toBeInTheDocument();
+
+    // Open mobile drawer
+    fireEvent.click(menuBtn);
+    const faqElements = screen.getAllByText('Perguntas Frequentes');
+    expect(faqElements.length).toBeGreaterThan(0);
+
+    // Click section in mobile menu
+    fireEvent.click(faqElements[0]);
+
+    // Close menu
+    fireEvent.click(menuBtn);
+  });
+
+  it('10. Alterna accordion de Perguntas Frequentes para questões adicionais', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <AppRoutes />
+      </MemoryRouter>
+    );
+
+    const q3Button = screen.getByText(
+      'Como funciona o envio de arquivos no Plano Free sem salvar nada?'
+    );
+    fireEvent.click(q3Button);
+
+    // Answer should be visible
+    expect(
+      screen.getByText(
+        /No Plano Free \(até 12 usuários\), implementamos a arquitetura de "Relay em Memória"/i
+      )
+    ).toBeInTheDocument();
+
+    // Click again to collapse
+    fireEvent.click(q3Button);
+  });
 });
+

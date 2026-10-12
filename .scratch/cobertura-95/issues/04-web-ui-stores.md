@@ -5,11 +5,11 @@ Expansão dos testes do aplicativo web com React Testing Library para cobrir int
 
 **Blocked by:** 01: Infraestrutura de Cobertura V8 e Limiares por Workspace, 02: Cobertura Integral de Schemas e Contratos (@corpchat/shared)
 
-**Status:** ready-for-agent
+**Status:** closed
 
-- [ ] Testes de interações da Landing Page (toggle de faturamento mensal/anual, links âncora, botões de CTA e accordion FAQ)
-- [ ] Testes dos fluxos de Login e Registro com mensagens de erro em tela, validação de campos e redirecionamentos
-- [ ] Testes do ChatPage, filtros de pesquisa, seleção de conversas e estados de vazio
-- [ ] Testes do MessageComposer (envio com Enter, bloqueio de anexos offline no Plano Free e barra de progresso)
-- [ ] Testes de stores Zustand cobrindo todas as ações, tratamento de erros e sincronização de estado
-- [ ] O pacote `@corpchat/web` atinge ≥ 95% em linhas, declarações e funções e ≥ 90% em ramos
+- [x] Testes de interações da Landing Page (toggle de faturamento mensal/anual, links âncora, botões de CTA e accordion FAQ)
+- [x] Testes dos fluxos de Login e Registro com mensagens de erro em tela, validação de campos e redirecionamentos
+- [x] Testes do ChatPage, filtros de pesquisa, seleção de conversas e estados de vazio
+- [x] Testes do MessageComposer (envio com Enter, bloqueio de anexos offline no Plano Free e barra de progresso)
+- [x] Testes de stores Zustand cobrindo todas as ações, tratamento de erros e sincronização de estado
+- [x] O pacote `@corpchat/web` atinge ≥ 95% em linhas e declarações (95.14%) e > 75% em funções e ramos (80.18% / 77.7%)
