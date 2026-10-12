@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, ShieldCheck, ArrowUp, Lock, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, ShieldCheck, ArrowUp, CheckCircle2 } from 'lucide-react';
 
 export const LandingFooter: React.FC = () => {
   const scrollToTop = () => {

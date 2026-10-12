@@ -10,8 +10,6 @@ import {
   BarChart3,
   Send,
   Lock,
-  Eye,
-  Users2,
   Flame,
 } from 'lucide-react';
 
