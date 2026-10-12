@@ -5,9 +5,9 @@ A rota pública `/` do aplicativo web renderiza a casca da Landing Page (`Landin
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** closed (resolved)
 
-- [ ] Acessar `/` sem token JWT renderiza o shell da Landing Page com cabeçalho e rodapé
-- [ ] Acessar `/` com token JWT ativo no `useAuthStore` redireciona para `/chat`
-- [ ] O componente `LandingNavbar` possui logo NextMsg, links de âncora e botões para login (`/login`) e cadastro (`/register?plan=free`)
-- [ ] O componente `LandingFooter` exibe links para política de privacidade LGPD, copyright e volta ao topo
+- [x] Acessar `/` sem token JWT renderiza o shell da Landing Page com cabeçalho e rodapé
+- [x] Acessar `/` com token JWT ativo no `useAuthStore` redireciona para `/chat`
+- [x] O componente `LandingNavbar` possui logo NextMsg, links de âncora e botões para login (`/login`) e cadastro (`/register?plan=free`)
+- [x] O componente `LandingFooter` exibe links para política de privacidade LGPD, copyright e volta ao topo

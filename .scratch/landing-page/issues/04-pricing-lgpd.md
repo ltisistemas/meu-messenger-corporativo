@@ -5,10 +5,10 @@ Tabela de preços interativa com alternador Mensal/Anual (com desconto de -17%),
 
 **Blocked by:** 02: Hero Section com Mockup Interativo e Barra de Métricas
 
-**Status:** ready-for-agent
+**Status:** closed (resolved)
 
-- [ ] Toggle para alternar entre faturamento Mensal e Anual com badge de economia
-- [ ] Card Free com limites (12 membros, 5 MB, relay online) e CTA para `/register?plan=free`
-- [ ] Card Pro destacado como "Mais Popular" com limites (80 membros, 25 MB, 5 dias, enquetes, comunicados) e CTA para `/register?plan=pro&trial=true`
-- [ ] Card Enterprise (ilimitado, assinaturas digitais) com CTA de contato comercial
-- [ ] Painel explicativo de garantias da LGPD (Art. 18: exportação e anonimização/eliminação)
+- [x] Toggle para alternar entre faturamento Mensal e Anual com badge de economia
+- [x] Card Free com limites (12 membros, 5 MB, relay online) e CTA para `/register?plan=free`
+- [x] Card Pro destacado como "Mais Popular" com limites (80 membros, 25 MB, 5 dias, enquetes, comunicados) e CTA para `/register?plan=pro&trial=true`
+- [x] Card Enterprise (ilimitado, assinaturas digitais) com CTA de contato comercial
+- [x] Painel explicativo de garantias da LGPD (Art. 18: exportação e anonimização/eliminação)

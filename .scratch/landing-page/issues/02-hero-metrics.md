@@ -5,10 +5,10 @@ A primeira dobra da Landing Page apresenta a Proposta Única de Valor ("Comunica
 
 **Blocked by:** 01: Roteamento Base e Shell da Landing Page (Navbar & Footer)
 
-**Status:** ready-for-agent
+**Status:** closed (resolved)
 
-- [ ] Hero exibe headline persuasiva, subheadline e badges ("14 dias grátis", "Sem cartão de crédito", "100% LGPD")
-- [ ] Botão primário do Hero direciona para `/register?plan=pro&trial=true`
-- [ ] Botão secundário faz rolagem suave até a seção de recursos/planos
-- [ ] Mockup da interface exibe balões de chat realistas (comunicado oficial, status lido/entregue e link seguro)
-- [ ] Barra de métricas apresenta indicadores de produtividade, disponibilidade e zero retenção no Free
+- [x] Hero exibe headline persuasiva, subheadline e badges ("14 dias grátis", "Sem cartão de crédito", "100% LGPD")
+- [x] Botão primário do Hero direciona para `/register?plan=pro&trial=true`
+- [x] Botão secundário faz rolagem suave até a seção de recursos/planos
+- [x] Mockup da interface exibe balões de chat realistas (comunicado oficial, status lido/entregue e link seguro)
+- [x] Barra de métricas apresenta indicadores de produtividade, disponibilidade e zero retenção no Free
