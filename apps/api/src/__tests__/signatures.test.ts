@@ -754,4 +754,211 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       expect(data.message).toContain('Assinatura de webhook Clicksign inválida');
     });
   });
+
+  describe('5. SignatureService Edge & Verification Branches', () => {
+    it('downloadSignedDocument rejects documents that are not closed', async () => {
+      vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValueOnce({
+        id: 'sig-not-closed',
+        status: 'pending',
+      } as any);
+
+      await expect(
+        signatureService.downloadSignedDocument('acc-1', 'sig-not-closed')
+      ).rejects.toThrow('O documento ainda não foi finalizado por todos os signatários.');
+    });
+
+    it('simulateSign throws error when request, signer or status is invalid', async () => {
+      // 1. Missing request
+      vi.spyOn(db, 'select').mockImplementationOnce(() => ({
+        from: () => ({
+          where: () => ({
+            limit: () => [],
+          }),
+        }),
+      }) as any);
+      await expect(
+        signatureService.simulateSign('acc-1', 'missing-sig', 's-1', {})
+      ).rejects.toThrow('Solicitação de assinatura não encontrada.');
+
+      // 2. Missing signer
+      vi.spyOn(db, 'select')
+        .mockImplementationOnce(() => ({
+          from: () => ({
+            where: () => ({
+              limit: () => [{ id: 'sig-1', externalDocumentKey: 'doc_1' }],
+            }),
+          }),
+        }) as any)
+        .mockImplementationOnce(() => ({
+          from: () => ({
+            where: () => ({
+              limit: () => [],
+            }),
+          }),
+        }) as any);
+      await expect(
+        signatureService.simulateSign('acc-1', 'sig-1', 'missing-signer', {})
+      ).rejects.toThrow('Signatário não encontrado.');
+
+      // 3. Already signed
+      vi.spyOn(db, 'select')
+        .mockImplementationOnce(() => ({
+          from: () => ({
+            where: () => ({
+              limit: () => [{ id: 'sig-1', externalDocumentKey: 'doc_1' }],
+            }),
+          }),
+        }) as any)
+        .mockImplementationOnce(() => ({
+          from: () => ({
+            where: () => ({
+              limit: () => [{ id: 's-1', status: 'signed' }],
+            }),
+          }),
+        }) as any);
+      await expect(
+        signatureService.simulateSign('acc-1', 'sig-1', 's-1', {})
+      ).rejects.toThrow('Este signatário já realizou a assinatura.');
+    });
+
+    it('verifyDocumentHash handles missing input, base64 computation and signed match', async () => {
+      vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValue({
+        id: 'sig-1',
+        documentName: 'contrato.pdf',
+        originalSha256: 'original-hash-123',
+        signedSha256: 'signed-hash-456',
+      } as any);
+
+      // 1. Missing both sha256 and contentBase64
+      await expect(
+        signatureService.verifyDocumentHash('acc-1', 'sig-1', {})
+      ).rejects.toThrow('Informe o hash SHA-256 ou o conteúdo base64 para verificação.');
+
+      // 2. Matches signed hash
+      const resSigned = await signatureService.verifyDocumentHash('acc-1', 'sig-1', {
+        sha256: 'signed-hash-456',
+      });
+      expect(resSigned.matchesSigned).toBe(true);
+      expect(resSigned.matchesOriginal).toBe(false);
+
+      // 3. Computes sha256 from contentBase64
+      const resBase64 = await signatureService.verifyDocumentHash('acc-1', 'sig-1', {
+        contentBase64: 'base64content',
+      });
+      expect(resBase64.providedSha256).toBeDefined();
+
+      // 4. Generate certificate when closedAt is null (pending)
+      vi.spyOn(signatureService, 'getEvidenceReport').mockResolvedValueOnce({
+        documentName: 'doc.pdf',
+        documentKey: 'k-1',
+        originalDocSha256: 'orig',
+        signedDocSha256: 'signed',
+        status: 'running',
+        createdAt: '2026-10-12',
+        closedAt: null,
+        legalFramework: 'MP 2200-2',
+        events: [],
+      });
+      const cert = await signatureService.generateEvidenceCertificatePdf('acc-1', 'sig-1');
+      expect(cert.buffer).toBeInstanceOf(Buffer);
+
+      // 5. VerifyDocumentHash when signedSha256 is null/undefined
+      vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValueOnce({
+        id: 'sig-1',
+        documentName: 'contrato.pdf',
+        originalSha256: 'original-hash-123',
+        signedSha256: null,
+      } as any);
+      const resNullSigned = await signatureService.verifyDocumentHash('acc-1', 'sig-1', {
+        sha256: 'other-hash',
+      });
+      expect(resNullSigned.matchesSigned).toBe(false);
+      expect(resNullSigned.isValid).toBe(false);
+    });
+
+    it('downloadSignedDocument validates status and handles webhook cancel', async () => {
+      // 1. Throws when status is not closed
+      vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValueOnce({
+        id: 'sig-1',
+        status: 'running',
+        externalDocumentKey: 'doc-key',
+      } as any);
+      await expect(
+        signatureService.downloadSignedDocument('acc-1', 'sig-1')
+      ).rejects.toThrow('O documento ainda não foi finalizado por todos os signatários.');
+
+      // 2. Returns document when status is closed
+      vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValueOnce({
+        id: 'sig-1',
+        status: 'closed',
+        externalDocumentKey: 'doc-key',
+      } as any);
+      vi.spyOn(clicksignService, 'downloadSignedDocument').mockResolvedValueOnce({
+        buffer: Buffer.from('PDF'),
+        contentType: 'application/pdf',
+        filename: 'contrato_assinado.pdf',
+        sha256: 'abc123',
+      });
+      const doc = await signatureService.downloadSignedDocument('acc-1', 'sig-1');
+      expect(doc.filename).toBe('contrato_assinado.pdf');
+
+      // 3. Webhook document.canceled
+      vi.spyOn(db, 'select').mockReturnValue({
+        from: () => ({
+          where: () => ({
+            limit: () => [{
+              id: 'sig-1',
+              accountId: 'acc-1',
+              conversationId: 'conv-1',
+              externalDocumentKey: 'doc-key',
+              status: 'running',
+            }],
+          }),
+        }),
+      } as any);
+      vi.spyOn(db, 'update').mockReturnValue({
+        set: () => ({
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      } as any);
+      vi.spyOn(db, 'insert').mockReturnValue({
+        values: vi.fn().mockResolvedValue([]),
+      } as any);
+      vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValueOnce({
+        id: 'sig-1',
+        status: 'canceled',
+      } as any);
+      vi.spyOn(clicksignService, 'verifyWebhookSignature').mockReturnValue(true);
+
+      const cancelRes = await signatureService.handleClicksignWebhook(
+        JSON.stringify({
+          event: { name: 'document.canceled' },
+          document: { key: 'doc-key' },
+        }),
+        'mock-valid-signature'
+      );
+      expect(cancelRes.handled).toBe(true);
+
+      // 4. CreateSignatureRequest when account is over_quota
+      vi.spyOn(db, 'select').mockReturnValueOnce({
+        from: () => ({
+          where: () => ({
+            limit: () => [{
+              id: 'acc-oq',
+              plan: 'enterprise',
+              status: 'over_quota',
+            }],
+          }),
+        }),
+      } as any);
+      await expect(
+        signatureService.createSignatureRequest('acc-oq', 'user-1', {
+          conversationId: 'conv-1',
+          documentName: 'doc.pdf',
+          fileBase64: 'base64',
+          signers: [],
+        })
+      ).rejects.toThrow('limite de membros excedido');
+    });
+  });
 });

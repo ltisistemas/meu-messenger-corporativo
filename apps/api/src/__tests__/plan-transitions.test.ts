@@ -544,5 +544,45 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
       const body = JSON.parse(response.body);
       expect(body.suspendedCount).toBeDefined();
     });
+
+    it('updateMemberRole and processTrialExpirations handle missing user and suspended accounts', async () => {
+      // 1. updateMemberRole user not found
+      const mockDbMissing: any = {
+        query: {
+          users: { findFirst: vi.fn().mockResolvedValue(null) },
+        },
+      };
+      const customAccountService = new AccountService(mockDbMissing);
+      await expect(
+        customAccountService.updateMemberRole('acc-test-id', 'caller-1', 'owner', 'missing-user-id', 'admin')
+      ).rejects.toThrow('Membro não encontrado nesta organização.');
+
+      // 2. processTrialExpirations for suspended and over_quota accounts
+      const mockDb: any = {
+        query: {
+          accounts: {
+            findMany: vi.fn().mockResolvedValue([
+              { id: 'acc-susp', plan: 'pro', status: 'suspended', trialUntil: new Date(Date.now() - 1000) },
+              { id: 'acc-over', plan: 'pro', status: 'active', trialUntil: new Date(Date.now() - 1000) },
+            ]),
+          },
+          subscriptions: {
+            findFirst: vi.fn().mockResolvedValue(null),
+          },
+          users: {
+            findMany: vi.fn().mockResolvedValue(Array(15).fill({ status: 'active' })),
+          },
+        },
+        update: vi.fn(() => ({
+          set: vi.fn(() => ({
+            where: vi.fn().mockResolvedValue(undefined),
+          })),
+        })),
+      };
+
+      const svc = new AccountService(mockDb);
+      const result = await svc.processTrialExpirations();
+      expect(result.processedCount).toBe(2);
+    });
   });
 });

@@ -426,5 +426,32 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
 
       await app.close();
     });
+
+    it('getBroadcastReport rejects missing messages or non-broadcast conversations', async () => {
+      const mockDb: any = {
+        query: {
+          messages: {
+            findFirst: vi.fn(),
+          },
+        },
+      };
+
+      const broadcastService = new BroadcastService(mockDb);
+
+      // 1. Message not found
+      mockDb.query.messages.findFirst.mockResolvedValueOnce(null);
+      await expect(
+        broadcastService.getBroadcastReport(proAccountId, adminUserId, 'admin', 'missing-msg')
+      ).rejects.toThrow('Mensagem de transmissão não encontrada.');
+
+      // 2. Not a broadcast conversation
+      mockDb.query.messages.findFirst.mockResolvedValueOnce({
+        id: 'msg-direct',
+        conversation: { accountId: proAccountId, type: 'direct' },
+      });
+      await expect(
+        broadcastService.getBroadcastReport(proAccountId, adminUserId, 'admin', 'msg-direct')
+      ).rejects.toThrow('Esta mensagem não é um comunicado de transmissão desta organização.');
+    });
   });
 });

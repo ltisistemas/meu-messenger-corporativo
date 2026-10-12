@@ -160,6 +160,34 @@ describe('Conversations & Multi-tenant Isolation (T-08)', () => {
         })
       ).rejects.toThrow('Um ou mais membros selecionados não pertencem a esta organização.');
     });
+
+    it('getConversationDetails handles not found and non-member access denied', async () => {
+      const mockDb: any = {
+        query: {
+          conversations: {
+            findFirst: vi.fn(),
+          },
+        },
+      };
+
+      const service = new ConversationService(mockDb);
+
+      // 1. Not found
+      mockDb.query.conversations.findFirst.mockResolvedValueOnce(null);
+      await expect(
+        service.getConversationDetails(accountIdA, userA1.id, 'missing-conv')
+      ).rejects.toThrow('Conversa não encontrada.');
+
+      // 2. Not a member
+      mockDb.query.conversations.findFirst.mockResolvedValueOnce({
+        id: 'c-1',
+        accountId: accountIdA,
+        members: [{ userId: 'other-user' }],
+      });
+      await expect(
+        service.getConversationDetails(accountIdA, userA1.id, 'c-1')
+      ).rejects.toThrow('Acesso negado a esta conversa.');
+    });
   });
 
   describe('HTTP Routes Integration', () => {

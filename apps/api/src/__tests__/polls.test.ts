@@ -446,5 +446,35 @@ describe('Polls System & Real-time Voting (T-26)', () => {
 
       await app.close();
     });
+
+    it('closePoll enforces ownership, role permissions and tenant boundary', async () => {
+      const mockDb = createMockDb() as any;
+      const pollService = new PollService(mockDb, mockPresenceService, mockIo);
+
+      const poll = await pollService.createPoll(proAccountId, user1Id, {
+        conversationId: mockConvId,
+        question: 'Enquete Fechamento',
+        options: ['Opção 1', 'Opção 2'],
+      });
+
+      // 1. Poll not found
+      await expect(
+        pollService.closePoll(proAccountId, user1Id, 'admin', 'non-existent-poll')
+      ).rejects.toThrow('Enquete não encontrada.');
+
+      // 2. Wrong account ID
+      await expect(
+        pollService.closePoll('other-acc-id', user1Id, 'admin', poll.id)
+      ).rejects.toThrow('Enquete não pertence a esta organização.');
+
+      // 3. User is neither creator nor admin
+      await expect(
+        pollService.closePoll(proAccountId, user2Id, 'member', poll.id)
+      ).rejects.toThrow('Apenas o criador da enquete ou administradores podem encerrá-la.');
+
+      // 4. Creator or admin can close successfully
+      const closed = await pollService.closePoll(proAccountId, user1Id, 'member', poll.id);
+      expect(closed.status).toBe('closed');
+    });
   });
 });

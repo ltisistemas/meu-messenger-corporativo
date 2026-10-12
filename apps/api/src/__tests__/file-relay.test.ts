@@ -395,6 +395,26 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
       expect(insertedReceipts.length).toBe(4);
       expect(insertedReceipts.map((r) => r.userId).sort()).toEqual(['u1', 'u2', 'u3', 'u4']);
     });
-  });
 
+    it('cancelOrErrorRelay, getSession and getActiveSessionsCount handle session lifecycle and errors', async () => {
+      // 1. cancel non-existent session
+      fileRelayService.cancelOrErrorRelay('non-existent');
+
+      // 2. initialize session
+      (fileRelayService as any).sessions.set('sess-cancel-1', {
+        transferId: 'sess-cancel-1',
+        senderSocketId: 'socket-snd',
+        recipientUserIds: [onlineRecipientId],
+      });
+
+      expect(fileRelayService.getActiveSessionsCount()).toBeGreaterThanOrEqual(1);
+      expect(fileRelayService.getSession('sess-cancel-1')).toBeDefined();
+
+      // 3. cancel existing session
+      fileRelayService.cancelOrErrorRelay('sess-cancel-1', senderId, 'User cancelled');
+      expect(fileRelayService.getSession('sess-cancel-1')).toBeUndefined();
+      expect(mockIo.to).toHaveBeenCalledWith('socket-snd');
+      expect(mockIo.to).toHaveBeenCalledWith(`user:${onlineRecipientId}`);
+    });
+  });
 });

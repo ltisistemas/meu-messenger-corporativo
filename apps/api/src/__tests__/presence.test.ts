@@ -125,4 +125,24 @@ describe('Presence Online/Offline System (T-07)', () => {
     expect(result['user-1']).toBe(true);
     expect(result['user-2']).toBe(false);
   });
+
+  it('getOnlineUsers and getUsersPresence error branches', async () => {
+    // 1. getOnlineUsers success
+    const users = await presenceService.getOnlineUsers(accountId);
+    expect(Array.isArray(users)).toBe(true);
+
+    // 2. getOnlineUsers error catch
+    mockRedis.smembers.mockRejectedValueOnce(new Error('Redis fail'));
+    expect(await presenceService.getOnlineUsers(accountId)).toEqual([]);
+
+    // 3. getUsersPresence empty array
+    expect(await presenceService.getUsersPresence([])).toEqual({});
+
+    // 4. getUsersPresence error catch
+    mockRedis.pipeline.mockImplementationOnce(() => {
+      throw new Error('Pipeline fail');
+    });
+    const errBatch = await presenceService.getUsersPresence(['u-err-1']);
+    expect(errBatch['u-err-1']).toBe(false);
+  });
 });

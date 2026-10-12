@@ -288,6 +288,26 @@ describe('Group File Transfer Pending Counter & Last Recipient Deletion (T-21)',
       expect(json.totalRecipientsCount).toBe(4);
       expect(json.pendingDownloadsCount).toBe(4);
       expect(json.isAvailable).toBe(true);
+
+      // 404 Transfer Not Found
+      await expect(
+        fileService.getTransferStatus(accountId, member1Id, 'd0000000-0000-0000-0000-000000000099')
+      ).rejects.toThrow('Transferência de arquivo não encontrada.');
+
+      // 403 Forbidden File Access
+      const nonMemberRes = await app.inject({
+        method: 'GET',
+        url: `/api/files/${transferId}/status`,
+        headers: {
+          Authorization: `Bearer ${app.jwt.sign({
+            userId: 'usr-stranger',
+            accountId,
+            role: 'member',
+            email: 'stranger@corp.com',
+          })}`,
+        },
+      });
+      expect(nonMemberRes.statusCode).toBe(403);
     });
   });
 });
