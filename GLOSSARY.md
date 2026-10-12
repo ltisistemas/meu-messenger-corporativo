@@ -35,3 +35,11 @@ _Avoid_: Grupo de avisos, lista de transmissão comum
 **Grupo Temporário**:
 Conversa coletiva com data e hora de expiração programadas na criação, transicionando automaticamente para arquivamento e somente leitura ao expirar.
 _Avoid_: Chat efêmero, grupo autodestrutivo
+
+**Limiar de Cobertura (Coverage Threshold)**:
+Metas numéricas mínimas e inegociáveis de execução de testes automatizados (95% em linhas, declarações e funções; 90% em ramos) aplicadas por pacote do monorepo, cujo descumprimento bloqueia a compilação e a integração contínua.
+_Avoid_: Meta de testes, porcentagem de código
+
+**Superfície Testável (Testable Surface)**:
+Conjunto de módulos, serviços, rotas, componentes, hooks, stores e utilitários que contêm lógica de negócio ativa da aplicação, excluindo arquivos de configuração de ferramentas, tipos puros declarativos e migrações geradas por ORM.
+_Avoid_: Código testável, escopo de teste
