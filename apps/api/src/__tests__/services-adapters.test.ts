@@ -255,7 +255,7 @@ describe('Jobs & DB Connection Deep Coverage', () => {
     const origRedisUrl = process.env.REDIS_URL;
     process.env.REDIS_URL = 'redis://:mypassword@cache.internal:6380';
 
-    const opts = getRedisConnectionOptions();
+    const opts: any = getRedisConnectionOptions();
     expect(opts.host).toBe('cache.internal');
     expect(opts.port).toBe(6380);
     expect(opts.password).toBe('mypassword');

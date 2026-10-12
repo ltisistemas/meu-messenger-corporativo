@@ -274,11 +274,12 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
       const inactiveMembers = [
         {
           id: 'm-inactive',
+          accountId: 'acc-1',
           name: 'Julia Inativa',
           email: 'julia@empresa.com',
           role: 'member' as const,
           status: 'inactive' as const,
-          joinedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
         },
       ];
 

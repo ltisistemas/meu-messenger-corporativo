@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
 import { CloudLinkCard } from '../components/chat/CloudLinkCard';
 import { LgpdPrivacySection } from '../components/account/LgpdPrivacySection';
 import { InvoicesHistorySection } from '../components/account/InvoicesHistorySection';
 import { QuotaWarningBanner } from '../components/account/QuotaWarningBanner';
 import { api } from '../services/api';
 import { useAuthStore } from '../stores/auth.store';
-import { CloudLinkPreview, BillingSummaryResponse } from '@corpchat/shared';
 
 vi.mock('../services/api', () => ({
   api: {
@@ -30,7 +28,7 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
 
   describe('CloudLinkCard Provider & Resource Variations', () => {
     it('renders google-drive provider with various resource types', () => {
-      const gDriveFolder: CloudLinkPreview = {
+      const gDriveFolder: any = {
         url: 'https://drive.google.com/drive/folders/123',
         provider: 'google-drive',
         domain: 'drive.google.com',
@@ -63,7 +61,7 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
     });
 
     it('renders onedrive / sharepoint provider', () => {
-      const oneDriveDoc: CloudLinkPreview = {
+      const oneDriveDoc: any = {
         url: 'https://company.sharepoint.com/:w:/r/doc1',
         provider: 'onedrive',
         domain: 'company.sharepoint.com',
@@ -78,7 +76,7 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
     });
 
     it('renders dropbox and box providers with archive and image resources', () => {
-      const dropboxArchive: CloudLinkPreview = {
+      const dropboxArchive: any = {
         url: 'https://dropbox.com/s/xyz/assets.zip',
         provider: 'dropbox',
         domain: 'dropbox.com',
@@ -90,7 +88,7 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
       expect(screen.getByText('Dropbox')).toBeInTheDocument();
       expect(screen.getByText('assets.zip')).toBeInTheDocument();
 
-      const boxImage: CloudLinkPreview = {
+      const boxImage: any = {
         url: 'https://app.box.com/s/xyz/photo.png',
         provider: 'box',
         domain: 'app.box.com',
@@ -100,7 +98,7 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
       rerender(<CloudLinkCard link={boxImage} isSelf={false} />);
       expect(screen.getByText('Box')).toBeInTheDocument();
 
-      const genericFile: CloudLinkPreview = {
+      const genericFile: any = {
         url: 'https://externo.com/doc.pdf',
         provider: 'generic',
         domain: 'externo.com',
@@ -205,9 +203,9 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
     });
 
     it('renders generic cloud link and additional resource types', () => {
-      const genericLink: CloudLinkPreview = {
+      const genericLink: any = {
         url: 'https://externo.com/doc',
-        provider: 'generic' as any,
+        provider: 'generic',
         providerName: 'Servidor Externo',
         domain: 'externo.com',
         title: 'Arquivo Zip & Design',
@@ -245,8 +243,8 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
   describe('InvoicesHistorySection & QuotaWarningBanner Edge Cases', () => {
     it('renders empty invoices list and different invoice statuses', () => {
       const onCancelSubscription = vi.fn();
-      const emptySummary: BillingSummaryResponse = {
-        activeSubscription: null,
+      const emptySummary: any = {
+        subscription: null,
         invoices: [],
       };
 
@@ -260,11 +258,11 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
       expect(screen.getByText(/Nenhuma fatura registrada/i)).toBeInTheDocument();
 
       // Render with active sub, cancel confirmation flow, and various invoice statuses
-      const detailedSummary: BillingSummaryResponse = {
+      const detailedSummary: any = {
         subscription: {
           id: 'sub-1',
           plan: 'enterprise',
-          status: 'paid',
+          status: 'active',
           billingCycle: 'yearly',
           amountCents: 49900,
           currentPeriodEnd: '2026-12-31T00:00:00.000Z',

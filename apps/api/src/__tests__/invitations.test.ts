@@ -227,7 +227,7 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
       expect(listRes.statusCode).toBe(200);
       expect(JSON.parse(listRes.payload).invitations).toHaveLength(1);
 
-      vi.spyOn(InvitationService.prototype, 'revokeInvitation').mockResolvedValueOnce(undefined);
+      vi.spyOn(InvitationService.prototype, 'revokeInvitation').mockResolvedValueOnce({ success: true });
       const delRes = await server.inject({
         method: 'DELETE',
         url: '/api/invitations/inv-1',

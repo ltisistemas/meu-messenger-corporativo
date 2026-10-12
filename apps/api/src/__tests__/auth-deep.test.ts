@@ -302,12 +302,12 @@ describe('Auth HTTP Routes Error & Edge Branches (/api/auth)', () => {
     });
 
     // 404 User not found in DB
-    vi.spyOn(db.query.users, 'findFirst').mockImplementationOnce(async (options: any) => {
+    vi.spyOn(db.query.users, 'findFirst').mockImplementationOnce((async (options: any) => {
       if (typeof options?.where === 'function') {
         options.where({ id: 'u-me-1' }, { eq: (a: any, b: any) => a === b });
       }
       return null;
-    });
+    }) as any);
 
     const notFound = await app.inject({
       method: 'GET',

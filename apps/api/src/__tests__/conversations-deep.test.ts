@@ -1063,7 +1063,7 @@ describe('Additional Route Error Branches', () => {
     };
     const fileServiceMissing = new FileService(mockDbMissing);
     await expect(
-      fileServiceMissing.confirmDownload('acc-1', 'usr-1', 'trans-missing', true)
+      fileServiceMissing.confirmDownload('acc-1', 'usr-1', 'trans-missing', { completed: true })
     ).rejects.toThrow('Transferência de arquivo não encontrada.');
 
     // Already deleted or completed with 0 pending
@@ -1080,7 +1080,7 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const fileServiceDeleted = new FileService(mockDbDeleted);
-    const delRes = await fileServiceDeleted.confirmDownload('acc-1', 'usr-1', 'trans-del', true);
+    const delRes = await fileServiceDeleted.confirmDownload('acc-1', 'usr-1', 'trans-del', { completed: true });
     expect(delRes.deletedFromStorage).toBe(true);
 
     // Existing download deduplication
@@ -1100,7 +1100,7 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const fileServiceDup = new FileService(mockDbExisting);
-    const dupRes = await fileServiceDup.confirmDownload('acc-1', 'usr-1', 'trans-dup', true);
+    const dupRes = await fileServiceDup.confirmDownload('acc-1', 'usr-1', 'trans-dup', { completed: true });
     expect(dupRes.success).toBe(true);
   });
 
@@ -1113,7 +1113,7 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const pollService = new PollService(mockDbNotFound as any);
-    await expect(pollService.getPollDetails('acc-1', 'p-missing')).rejects.toThrow('Enquete não encontrada.');
+    await expect(pollService.getPollDetails('acc-1', 'usr-1', 'p-missing')).rejects.toThrow('Enquete não encontrada.');
 
     // Account mismatch
     const mockDbMismatch: any = {
@@ -1127,7 +1127,7 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const pollMismatch = new PollService(mockDbMismatch as any);
-    await expect(pollMismatch.getPollDetails('acc-1', 'p-1')).rejects.toThrow('Acesso negado a esta enquete.');
+    await expect(pollMismatch.getPollDetails('acc-1', 'usr-1', 'p-1')).rejects.toThrow('Acesso negado a esta enquete.');
 
     // Creator is null
     const mockDbNullCreator: any = {
@@ -1149,7 +1149,7 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const pollNullCreator = new PollService(mockDbNullCreator as any);
-    const details = await pollNullCreator.getPollDetails('acc-1', 'p-1');
+    const details = await pollNullCreator.getPollDetails('acc-1', 'usr-1', 'p-1');
     expect(details.creator).toBeUndefined();
   });
 
@@ -1210,7 +1210,7 @@ describe('Additional Route Error Branches', () => {
     const lgpdWithSockets = new LgpdService(mockDbActive as any, mockIo);
     const delRes = await lgpdWithSockets.deleteAndAnonymizeUser('acc-1', 'u-act', {
       password: 'secret123',
-      confirmationText: 'EXCLUIR MINHA CONTA',
+      confirmationText: 'EXCLUIR',
     });
     expect(delRes.success).toBe(true);
     expect(mockSocket.disconnect).toHaveBeenCalledWith(true);
@@ -1257,7 +1257,7 @@ describe('Additional Route Error Branches', () => {
         fileName: 'doc.pdf',
         fileSize: 1024,
         mimeType: 'application/pdf',
-      })
+      } as any)
     ).rejects.toThrow('A conversa não possui outros participantes.');
 
     // 2. Group on Free with 0 online members
@@ -1283,7 +1283,7 @@ describe('Additional Route Error Branches', () => {
         fileName: 'doc.pdf',
         fileSize: 1024,
         mimeType: 'application/pdf',
-      })
+      } as any)
     ).rejects.toThrow('Nenhum participante da conversa está online');
   });
 

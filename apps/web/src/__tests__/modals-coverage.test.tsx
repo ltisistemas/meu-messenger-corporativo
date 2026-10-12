@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
 import { InviteMemberModal } from '../components/account/InviteMemberModal';
 import { UpgradeCheckoutModal } from '../components/account/UpgradeCheckoutModal';
 import { VerifyHashModal } from '../components/signatures/VerifyHashModal';
 import { SignatureDetailsModal } from '../components/signatures/SignatureDetailsModal';
 import { NewChatModal } from '../components/chat/NewChatModal';
 import { useSignatureStore } from '../stores/signature.store';
-import { SignatureRequestResponse } from '@corpchat/shared';
 
 describe('Account & Signature Modals UI Coverage', () => {
   beforeEach(() => {
@@ -342,10 +340,10 @@ describe('Account & Signature Modals UI Coverage', () => {
 
   describe('SignatureDetailsModal & NewChatModal Direct', () => {
     it('handles onOpenVerifyHash and empty events in SignatureDetailsModal', () => {
-      const mockSignature: SignatureRequestResponse = {
+      const mockSignature: any = {
         id: 'sig-test-1',
         title: 'Contrato de Parceria',
-        status: 'completed',
+        status: 'closed',
         deadlineAt: null,
         totalSigners: 1,
         signedCount: 1,
@@ -375,7 +373,7 @@ describe('Account & Signature Modals UI Coverage', () => {
           signedSha256: 'abc2',
           legalFramework: 'MP 2.200-2/2001',
           events: [], // empty events
-        },
+        } as any,
       });
 
       render(
@@ -409,7 +407,7 @@ describe('Account & Signature Modals UI Coverage', () => {
         clipboard: { writeText: writeTextMock },
       });
 
-      const pendingSignature: SignatureRequestResponse = {
+      const pendingSignature: any = {
         id: 'sig-test-2',
         title: 'Acordo Comercial',
         documentName: 'acordo.pdf',

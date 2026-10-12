@@ -954,10 +954,11 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       await expect(
         signatureService.createSignatureRequest('acc-oq', 'user-1', {
           conversationId: 'conv-1',
+          title: 'Doc',
           documentName: 'doc.pdf',
-          fileBase64: 'base64',
+          contentBase64: 'base64',
           signers: [],
-        })
+        } as any)
       ).rejects.toThrow('limite de membros excedido');
     });
   });

@@ -239,17 +239,17 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
 
     it('updateMemberStatus, updateMemberRole and inviteMember work correctly', async () => {
       useAccountStore.setState({
-        members: [{ id: 'm-1', name: 'Dev', email: 'd@c.com', role: 'member', status: 'active', createdAt: '2026-10-12' }],
+        members: [{ id: 'm-1', accountId: 'acc-1', name: 'Dev', email: 'd@c.com', role: 'member', status: 'active', createdAt: '2026-10-12' }],
       });
 
       vi.mocked(api.patch).mockResolvedValueOnce({
-        member: { id: 'm-1', name: 'Dev', email: 'd@c.com', role: 'member', status: 'inactive', createdAt: '2026-10-12' },
+        member: { id: 'm-1', accountId: 'acc-1', name: 'Dev', email: 'd@c.com', role: 'member', status: 'inactive', createdAt: '2026-10-12' },
       });
       await useAccountStore.getState().updateMemberStatus('m-1', 'inactive');
       expect(api.patch).toHaveBeenCalledWith('/accounts/members/m-1/status', { status: 'inactive' });
 
       vi.mocked(api.patch).mockResolvedValueOnce({
-        member: { id: 'm-1', name: 'Dev', email: 'd@c.com', role: 'admin', status: 'active', createdAt: '2026-10-12' },
+        member: { id: 'm-1', accountId: 'acc-1', name: 'Dev', email: 'd@c.com', role: 'admin', status: 'active', createdAt: '2026-10-12' },
       });
       await useAccountStore.getState().updateMemberRole('m-1', 'admin');
       expect(api.patch).toHaveBeenCalledWith('/accounts/members/m-1/role', { role: 'admin' });
@@ -273,7 +273,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
         plan: 'pro',
         billingCycle: 'monthly',
         paymentMethod: 'pix',
-      });
+      } as any);
       expect(useAccountStore.getState().checkoutResult?.pixQrCode).toBe('pix-code');
 
       useAccountStore.getState().clearCheckoutResult();
@@ -310,10 +310,11 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
 
       const created = await useSignatureStore.getState().createSignatureRequest({
         conversationId: 'conv-1',
+        title: 'Acordo',
         documentName: 'acordo.pdf',
-        fileBase64: 'base64',
+        contentBase64: 'base64',
         signers: [],
-      });
+      } as any);
       expect(created.id).toBe('sig-2');
 
       vi.mocked(api.get).mockResolvedValueOnce({ documentName: 'acordo.pdf', events: [] });
@@ -460,7 +461,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       expect(broad.id).toBe('b-msg-1');
 
       vi.mocked(api.get).mockResolvedValueOnce({ id: 'rep-1', deliveryRate: 100 });
-      const report = await useChatStore.getState().fetchBroadcastReport('b-msg-1');
+      const report: any = await useChatStore.getState().fetchBroadcastReport('b-msg-1');
       expect(report.deliveryRate).toBe(100);
     });
 
@@ -512,7 +513,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       ).rejects.toThrow('Conexão WebSocket indisponível');
 
       // 3. Successful chunk streaming
-      const emitMock = vi.fn((event, payload, cb) => {
+      const emitMock = vi.fn((_event, _payload, cb) => {
         if (cb) cb({ success: true });
       });
       const mockSocket = {
@@ -542,7 +543,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       // Init error with suggestCloudShare
       let mockSocket: any = {
         connected: true,
-        emit: vi.fn((event, payload, cb) => {
+        emit: vi.fn((event, _payload, cb) => {
           if (event === 'file:relay:init' && cb) {
             cb({ error: 'Peer offline', code: 'PEER_OFFLINE', suggestCloudShare: true });
           }
@@ -556,7 +557,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       // Chunk error
       mockSocket = {
         connected: true,
-        emit: vi.fn((event, payload, cb) => {
+        emit: vi.fn((event, _payload, cb) => {
           if (event === 'file:relay:init' && cb) cb({ success: true });
           if (event === 'file:relay:chunk' && cb) cb({ error: 'Chunk timeout' });
         }),
@@ -569,7 +570,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       // Complete error
       mockSocket = {
         connected: true,
-        emit: vi.fn((event, payload, cb) => {
+        emit: vi.fn((event, _payload, cb) => {
           if (event === 'file:relay:init' && cb) cb({ success: true });
           if (event === 'file:relay:chunk' && cb) cb({ success: true });
           if (event === 'file:relay:complete' && cb) cb({ error: 'Relay corrupted' });
@@ -704,7 +705,7 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       expect(useAccountStore.getState().error).toBe('Erro no convite');
 
       vi.mocked(api.post).mockRejectedValueOnce(new Error('Falha no pagamento'));
-      await expect(useAccountStore.getState().subscribePlan({ targetPlan: 'pro', billingCycle: 'monthly', paymentMethod: 'pix' })).rejects.toThrow('Falha no pagamento');
+      await expect(useAccountStore.getState().subscribePlan({ targetPlan: 'pro', billingCycle: 'monthly', paymentMethod: 'pix' } as any)).rejects.toThrow('Falha no pagamento');
       expect(useAccountStore.getState().error).toBe('Falha no pagamento');
 
       useAccountStore.getState().clearCheckoutResult();
