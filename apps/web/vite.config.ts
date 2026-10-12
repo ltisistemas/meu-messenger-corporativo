@@ -7,6 +7,27 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'text-summary', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'dist/**',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/test/**',
+        '**/*.test.*',
+        'src/main.tsx',
+        'postcss.config.js',
+        'tailwind.config.js',
+      ],
+      thresholds: {
+        lines: 95,
+        statements: 95,
+        functions: 95,
+        branches: 90,
+      },
+    },
   },
   server: {
     port: 3000,

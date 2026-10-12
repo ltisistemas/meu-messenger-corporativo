@@ -5,10 +5,10 @@ Instalação e configuração do motor `@vitest/coverage-v8` em todo o monorepo 
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** closed (resolved)
 
-- [ ] Instalação da dependência `@vitest/coverage-v8` compatível com o Vitest 3 do monorepo
-- [ ] Configuração do provider `v8` com relatórios `text`, `text-summary`, `html` e `lcov`
-- [ ] Configuração dos limiares de bloqueio (lines: 95, statements: 95, functions: 95, branches: 90) em cada workspace
-- [ ] Configuração das regras de exclusão técnica (`coverage.exclude`) evitando arquivos estáticos e gerados
-- [ ] Script de execução com cobertura integrado ao fluxo padrão de testes do monorepo
+- [x] Instalação da dependência `@vitest/coverage-v8` compatível com o Vitest 3 do monorepo
+- [x] Configuração do provider `v8` com relatórios `text`, `text-summary`, `html` e `lcov`
+- [x] Configuração dos limiares de bloqueio (lines: 95, statements: 95, functions: 95, branches: 90) em cada workspace
+- [x] Configuração das regras de exclusão técnica (`coverage.exclude`) evitando arquivos estáticos e gerados
+- [x] Script de execução com cobertura integrado ao fluxo padrão de testes do monorepo
