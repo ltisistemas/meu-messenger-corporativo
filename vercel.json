@@ -3,15 +3,7 @@
   "services": {
     "api": {
       "root": "apps/api",
-      "framework": "fastify",
-      "bindings": [
-        {
-          "type": "service",
-          "service": "web",
-          "format": "url",
-          "env": "WEB_URL"
-        }
-      ]
+      "framework": "fastify"
     },
     "web": {
       "root": "apps/web",

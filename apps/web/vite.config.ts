@@ -21,4 +21,16 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'zustand'],
+          icons: ['lucide-react'],
+          socket: ['socket.io-client'],
+        },
+      },
+    },
+  },
 });
