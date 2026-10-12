@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Zap, HardDrive, Clock4, Users, Lock } from 'lucide-react';
+import { ShieldCheck, Zap, HardDrive, Clock4 } from 'lucide-react';
 
 export const LandingMetrics: React.FC = () => {
   const metrics = [

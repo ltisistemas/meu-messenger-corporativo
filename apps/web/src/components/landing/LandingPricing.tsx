@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Sparkles, ArrowRight, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Check, Sparkles, ArrowRight } from 'lucide-react';
 
 export const LandingPricing: React.FC = () => {
   const [isAnnual, setIsAnnual] = useState(false);
