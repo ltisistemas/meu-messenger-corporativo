@@ -132,7 +132,8 @@ export const useSignatureStore = create<SignatureState>((set) => ({
 
   downloadSignedDocument: async (signatureId: string, defaultFilename = 'documento_assinado.pdf') => {
     try {
-      const response = await fetch(`/api/signatures/${signatureId}/download`, {
+      const apiBase = ((import.meta as any).env?.VITE_API_URL || '/api').replace(/\/$/, '');
+      const response = await fetch(`${apiBase}/signatures/${signatureId}/download`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
@@ -160,7 +161,8 @@ export const useSignatureStore = create<SignatureState>((set) => ({
 
   downloadEvidencePdf: async (signatureId: string, defaultFilename = 'certificado_evidencias.pdf') => {
     try {
-      const response = await fetch(`/api/signatures/${signatureId}/evidence/pdf`, {
+      const apiBase = ((import.meta as any).env?.VITE_API_URL || '/api').replace(/\/$/, '');
+      const response = await fetch(`${apiBase}/signatures/${signatureId}/evidence/pdf`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },

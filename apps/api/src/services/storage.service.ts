@@ -109,7 +109,10 @@ export class StorageService {
     }
 
     // Fallback/Mock URL when running in dev/test environment without S3 credentials
-    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const baseUrl =
+      process.env.APP_URL ||
+      process.env.WEB_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
     const mockUploadUrl = `${baseUrl}/api/files/storage-mock/${this.bucket}/${encodeURIComponent(
       storageKey
     )}?expires=${expiresAt.getTime()}&sse=AES256`;
@@ -140,7 +143,10 @@ export class StorageService {
       });
     }
 
-    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const baseUrl =
+      process.env.APP_URL ||
+      process.env.WEB_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
     return `${baseUrl}/api/files/storage-mock/${this.bucket}/${encodeURIComponent(
       storageKey
     )}?download=true`;

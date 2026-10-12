@@ -25,7 +25,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     if (!accessToken) return;
 
-    const socketUrl = window.location.origin;
+    const socketUrl = (import.meta as any).env?.VITE_WS_URL || window.location.origin;
 
     const newSocket = io(socketUrl, {
       auth: { token: accessToken },

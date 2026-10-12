@@ -14,7 +14,7 @@ interface RequestOptions extends RequestInit {
 }
 
 class ApiClient {
-  private baseUrl = '/api';
+  private baseUrl = (import.meta as any).env?.VITE_API_URL || '/api';
 
   private getTokens(): { accessToken: string | null; refreshToken: string | null } {
     try {
