@@ -6,7 +6,8 @@
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test",
+    "test": "pnpm -r run test:coverage",
+    "test:unit": "pnpm -r test",
     "test:coverage": "pnpm -r run test:coverage",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "clean": "rimraf node_modules apps/*/node_modules apps/*/dist packages/*/node_modules packages/*/dist"
