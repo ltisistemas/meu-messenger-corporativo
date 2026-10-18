@@ -5,7 +5,11 @@ node_modules
 # Build outputs
 dist
 build
+.next
 .turbo
+*.tsbuildinfo
+coverage
+*.lcov
 
 # Environment variables
 .env

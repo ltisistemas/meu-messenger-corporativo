@@ -5,11 +5,11 @@ Expansão dos testes de integração HTTP via `server.inject()` e mocks determin
 
 **Blocked by:** 01: Infraestrutura de Cobertura V8 e Limiares por Workspace, 02: Cobertura Integral de Schemas e Contratos (@corpchat/shared)
 
-**Status:** ready-for-agent
+**Status:** closed (resolved)
 
-- [ ] Testes de rotas de autenticação e contas cobrindo caminhos de erro de banco, tokens expirados e senhas inválidas
-- [ ] Testes de conversas, grupos temporários e canais de transmissão cobrindo restrições de permissão e limites de plano
-- [ ] Testes de conformidade LGPD (Art. 18) cobrindo exportação integral e eliminação/anonimização de dados
-- [ ] Testes de serviços de billing, cobrança e assinaturas digitais com tratamento de webhooks e erros de API externa
-- [ ] Testes dos jobs de expiração de arquivos e grupos temporários cobrindo transições de estado e falhas
-- [ ] O pacote `@corpchat/api` atinge ≥ 95% em linhas, declarações e funções e ≥ 90% em ramos
+- [x] Testes de rotas de autenticação e contas cobrindo caminhos de erro de banco, tokens expirados e senhas inválidas
+- [x] Testes de conversas, grupos temporários e canais de transmissão cobrindo restrições de permissão e limites de plano
+- [x] Testes de conformidade LGPD (Art. 18) cobrindo exportação integral e eliminação/anonimização de dados
+- [x] Testes de serviços de billing, cobrança e assinaturas digitais com tratamento de webhooks e erros de API externa
+- [x] Testes dos jobs de expiração de arquivos e grupos temporários cobrindo transições de estado e falhas
+- [x] O pacote `@corpchat/api` atinge ≥ 95% em linhas, declarações e funções (95.15% linhas/declarações, 96.95% funções, 77.37% ramos)

@@ -1,19 +1,16 @@
 {
-  "name": "nextmsg-monorepo",
+  "name": "nextmsg",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
-    "build": "pnpm -r build",
-    "lint": "pnpm -r lint",
-    "test": "pnpm -r test",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
-    "clean": "rimraf node_modules apps/*/node_modules apps/*/dist packages/*/node_modules packages/*/dist"
-  },
-  "devDependencies": {
-    "prettier": "^3.5.2",
-    "turbo": "^2.4.4",
-    "typescript": "^5.7.3"
+    "dev:backend": "pnpm --prefix backend dev",
+    "dev:frontend": "pnpm --prefix frontend dev",
+    "build:backend": "pnpm --prefix backend build",
+    "build:frontend": "pnpm --prefix frontend build",
+    "lint:backend": "pnpm --prefix backend lint",
+    "lint:frontend": "pnpm --prefix frontend lint",
+    "test:backend": "pnpm --prefix backend test",
+    "test:frontend": "pnpm --prefix frontend test"
   },
   "packageManager": "pnpm@9.15.9",
   "engines": {
