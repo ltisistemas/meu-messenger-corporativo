@@ -22,15 +22,15 @@ No Brasil, a validade jurídica de assinaturas eletrônicas é regida pela **Med
 
 ## 2. Comparativo de Provedores Avaliados
 
-| Critério | Clicksign | D4Sign | DocuSign |
-| :--- | :--- | :--- | :--- |
-| **Foco Geográfico / Legal** | Brasil (Lei 14.063 / MP 2.200-2) | Brasil (Lei 14.063 / MP 2.200-2) | Global (eIDAS / ESIGN) |
-| **API REST & DX** | API v1 / v3 madura, documentação clara e SDKs | API REST completa | API extensa e complexa |
-| **Ambiente de Sandbox** | Sandbox ilimitado com simulação de assinatura | Sandbox dedicado | Sandbox developer |
-| **Métodos de Autenticação** | E-mail, SMS, WhatsApp, Pix, Selfie/Doc, ICP-Brasil | E-mail, SMS, WhatsApp, Pix, Selfie | E-mail, SMS, ID Verification |
-| **Certificado de Evidências** | Manifesto de Evidências em PDF/JSON com SHA-256, IPs, User-Agents e carimbo do tempo | Trilha em anexo / Log | Certificate of Completion |
-| **Webhooks & Segurança** | HMAC SHA-256, retentativas e logs detalhados | Webhooks REST | Webhooks Connect |
-| **Preço & Moeda** | R$ por envelope / pacote SaaS | R$ por envelope / documento | Cobrança em USD |
+| Critério                      | Clicksign                                                                            | D4Sign                             | DocuSign                     |
+| :---------------------------- | :----------------------------------------------------------------------------------- | :--------------------------------- | :--------------------------- |
+| **Foco Geográfico / Legal**   | Brasil (Lei 14.063 / MP 2.200-2)                                                     | Brasil (Lei 14.063 / MP 2.200-2)   | Global (eIDAS / ESIGN)       |
+| **API REST & DX**             | API v1 / v3 madura, documentação clara e SDKs                                        | API REST completa                  | API extensa e complexa       |
+| **Ambiente de Sandbox**       | Sandbox ilimitado com simulação de assinatura                                        | Sandbox dedicado                   | Sandbox developer            |
+| **Métodos de Autenticação**   | E-mail, SMS, WhatsApp, Pix, Selfie/Doc, ICP-Brasil                                   | E-mail, SMS, WhatsApp, Pix, Selfie | E-mail, SMS, ID Verification |
+| **Certificado de Evidências** | Manifesto de Evidências em PDF/JSON com SHA-256, IPs, User-Agents e carimbo do tempo | Trilha em anexo / Log              | Certificate of Completion    |
+| **Webhooks & Segurança**      | HMAC SHA-256, retentativas e logs detalhados                                         | Webhooks REST                      | Webhooks Connect             |
+| **Preço & Moeda**             | R$ por envelope / pacote SaaS                                                        | R$ por envelope / documento        | Cobrança em USD              |
 
 ---
 
@@ -39,6 +39,7 @@ No Brasil, a validade jurídica de assinaturas eletrônicas é regida pela **Med
 **Decisão:** **Clicksign** foi selecionada como provedora oficial da funcionalidade de Assinatura Eletrônica do Corporate Messenger.
 
 ### Justificativas:
+
 1. **API REST e Sandbox Realista:** A Clicksign oferece endpoints consistentes para criação de documentos, signatários e listas de assinaturas (`POST /documents`, `POST /signers`, `POST /lists`), permitindo execução e simulação ponta a ponta em sandbox sem custos adicionais.
 2. **Conformidade de Evidências (SHA-256):** Gera o hash SHA-256 do documento original e do documento final assinado, juntamente com registro de IP, data/hora no fuso horário brasileiro (UTC-3), método de autenticação e identificação unívoca.
 3. **Webhooks Confiáveis:** Notificações em tempo real com validação HMAC para atualização instantânea das mensagens no chat.
@@ -64,11 +65,11 @@ sequenceDiagram
     API->>Clicksign: POST /api/v1/signers + POST /api/v1/lists
     Clicksign-->>API: Signatários associados + signing_urls
     API-->>Web: Mensagem tipo "signature" enviada na conversa
-    
+
     Signer->>Clicksign: Acessa signing_url / widget & assina documento
     Clicksign->>API: Webhook (document.signed / document.closed)
     API->>Web: WebSocket: atualiza status da mensagem para "Assinado"
-    
+
     Creator->>API: GET /api/signatures/:id/download (PDF + Evidências)
     API->>Clicksign: Baixa documento assinado + Manifesto SHA-256
     API-->>Creator: Download do PDF final assinado

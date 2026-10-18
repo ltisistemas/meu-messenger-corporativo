@@ -13,6 +13,7 @@ Hoje, quando um potencial tomador de decisão (CEO, COO, Gerente de TI ou RH) ch
 Criar uma Landing Page institucional e comercial de alta conversão, moderna, responsiva e alinhada ao design system premium da aplicação, servida na rota raiz pública (`/`).
 
 A Landing Page apresenta uma narrativa de Product-Led Growth estruturada em 9 blocos estratégicos:
+
 1. **Cabeçalho Fixo (Header):** Identidade visual, links âncora de navegação e botões diretos de "Entrar" e "Começar Grátis".
 2. **Seção Hero:** Headline matadora expondo a Proposta Única de Valor ("Comunicação corporativa focada, sem ruídos e com privacidade radical"), Subheadline persuasiva, duplo Call-to-Action (CTA primário para o Trial de 14 dias e CTA secundário para demonstração interativa), badges de confiança ("Sem cartão de crédito", "100% LGPD") e mockup visual do app em ação.
 3. **Barra de Métricas e Confiança:** Indicadores de impacto (economia de tempo, 0% de retenção indevida de dados no Free, alta disponibilidade).
@@ -30,6 +31,7 @@ Se um usuário com sessão ativa (autenticado com JWT válido) acessar a raiz `/
 ## User Stories
 
 ### Descoberta e Primeira Impressão (Hero & Header)
+
 1. Como um visitante acessando a página pela primeira vez, quero visualizar um cabeçalho fixo com logo e links de navegação, para poder me orientar rapidamente sobre o conteúdo da página.
 2. Como um visitante no smartphone, quero acessar um menu responsivo simplificado no cabeçalho, para navegar confortavelmente sem que elementos visuais quebrem a tela.
 3. Como um gestor de equipe visitando a página, quero ler uma headline clara e impactante no Hero, para entender em menos de 5 segundos o que o produto resolve e por que ele é diferente do WhatsApp.
@@ -39,6 +41,7 @@ Se um usuário com sessão ativa (autenticado com JWT válido) acessar a raiz `/
 7. Como um visitante cauteloso, quero clicar no CTA secundário ("Conhecer Recursos e Planos"), para a página rolar suavemente até a seção demonstrativa ou de preços.
 
 ### Compreensão de Valor e Resolução de Dores
+
 8. Como um empresário incomodado com o uso indiscriminado de áudios no WhatsApp por colaboradores, quero ver uma seção destacando o foco estrito em mensagens de texto e arquivos, para confirmar que o app elimina distrações operacionais.
 9. Como um gestor de operações, quero ver a tabela comparativa "WhatsApp Pessoal vs. NextMsg", para justificar internamente perante a diretoria a adoção de um canal oficial de comunicação.
 10. Como um administrador de TI, quero conhecer o funcionamento do Plano Free com relay em memória sem retenção em disco, para entender o compromisso de privacidade da plataforma.
@@ -48,6 +51,7 @@ Se um usuário com sessão ativa (autenticado com JWT válido) acessar a raiz `/
 14. Como um executivo de empresa de médio/grande porte, quero conhecer a funcionalidade de Assinatura Eletrônica Clicksign, para saber se posso assinar ordens de serviço e documentos diretamente pelo mensageiro corporativo.
 
 ### Avaliação Financeira e Escolha de Planos
+
 15. Como um gestor orçamentário, quero alternar entre os modos de pagamento "Mensal" e "Anual (com desconto)", para calcular a economia de escala para a minha organização.
 16. Como um coordenador de equipe pequena (até 12 pessoas), quero ver os limites claros do Plano Free (até 12 membros, 5 MB por arquivo, envio para destinatário online), para saber se consigo começar com custo zero.
 17. Como um gestor de equipe em crescimento (10 a 80 pessoas), quero examinar os benefícios do Plano Pro (R$ 79,90/mês, até 80 membros, 25 MB por arquivo, store-and-forward de 5 dias, enquetes e comunicados), para identificar o melhor custo-benefício.
@@ -57,12 +61,14 @@ Se um usuário com sessão ativa (autenticado com JWT válido) acessar a raiz `/
 21. Como um usuário clicando no botão "Falar com Especialista / Enterprise", quero ter um canal direto (abertura de conversa comercial via WhatsApp/e-mail) para negociar condições personalizadas.
 
 ### Quebra de Objeções e Conformidade Jurídica (LGPD)
+
 22. Como um encarregado de dados (DPO) ou advogado corporativo, quero ler a seção dedicada à LGPD, para verificar que o sistema cumpre o Artigo 18 (direito de confirmação, acesso, exportação e anonimização/eliminação).
 23. Como um cliente preocupado com segurança, quero consultar no FAQ se os arquivos do Plano Pro ficam armazenados para sempre, para confirmar que há expiração programada em até 5 dias ou deleção pós-download.
 24. Como um administrador de empresa, quero expandir as perguntas frequentes do FAQ em formato accordion, para esclarecer dúvidas sobre convite de membros e compatibilidade móvel (PWA).
 25. Como um visitante no FAQ, quero expandir uma pergunta e poder fechar outra automaticamente ou de forma independente, sem travamentos de layout.
 
 ### Acesso Recorrente e Rodapé
+
 26. Como um usuário que já possui conta ativa e está autenticado, quero que o acesso à URL raiz `/` me redirecione imediatamente para `/chat`, para que eu não precise navegar pela landing page toda vez que abrir o sistema.
 27. Como um usuário com conta criada mas deslogado, quero clicar em "Entrar" no cabeçalho ou rodapé, para ser levado diretamente à página de login.
 28. Como um usuário preocupado com transparência, quero clicar no link de Política de Privacidade no rodapé, para acessar a política completa exigida pela LGPD.
@@ -72,12 +78,15 @@ Se um usuário com sessão ativa (autenticado com JWT válido) acessar a raiz `/
 ## Implementation Decisions
 
 ### 1. Arquitetura da Rota e Componentização
+
 - A Landing Page será implementada como uma página principal dedicada dentro de `apps/web` no caminho de rota `/`.
 - A rota operacional do chat e gerenciamento corporativo residirá na rota `/chat`.
 - O roteador principal da aplicação (`apps/web/src/routes/index.tsx` ou equivalente) verificará o estado de autenticação no `useAuthStore`: se o token JWT for válido, a raiz `/` efetuará um redirecionamento automático (`Navigate to="/chat" replace`). Caso contrário, renderizará a `LandingPage`.
 
 ### 2. Decomposição de Componentes da Landing Page
+
 A página será organizada em componentes isolados e de alta coesão:
+
 - `LandingNavbar`: Barra de navegação com glassmorphism, links suaves com `scrollIntoView`, logo NextMsg e botões de ação.
 - `LandingHero`: Área principal de conversão com badges de benefício, headline persuasiva, CTA duplo, avatar stack de times e preview do app.
 - `LandingMetrics`: Faixa de métricas de impacto (tempo de foco recuperado, 0% retenção no Free, disponibilidade garantida).
@@ -89,12 +98,14 @@ A página será organizada em componentes isolados e de alta coesão:
 - `LandingFooter`: Rodapé com copyright, links para termos, política LGPD e botão de retorno ao topo.
 
 ### 3. Integração de Rotas com os CTAs de Conversão
+
 - O CTA "Testar Pro por 14 dias grátis" navega para `/register?plan=pro&trial=true`.
 - O CTA "Começar Grátis" navega para `/register?plan=free`.
 - O CTA "Entrar" navega para `/login`.
 - A tela existente de registro já aceita parâmetros de plano ou permite ao usuário concluir o cadastro sem fricção inicial de faturamento.
 
 ### 4. Estilos, Acessibilidade e Performance
+
 - Utilização estrita de Tailwind CSS já configurado no projeto, com paleta de cores corporativa escura/clara refinada (tons de Slate/Zinc, destaques em Emerald/Indigo).
 - Contraste WCAG AA para todas as fontes e botões.
 - Efeitos visuais refinados: gradientes sutis, sombras em camadas (`shadow-xl`), bordas finas com transparência (`border-slate-700/50` / `border-slate-200`) e microtransições de hover (`transition-all duration-200`).
@@ -105,10 +116,12 @@ A página será organizada em componentes isolados e de alta coesão:
 ## Testing Decisions
 
 ### Seams de Teste
+
 - **Seam de Teste Primário (Highest Seam):** Testes de integração em nível de página via React Testing Library e Vitest em `apps/web/src/__tests__/landing-page.test.tsx`.
 - Esse seam renderiza a aplicação completa dentro do `MemoryRouter` na rota `/`, simulando a experiência real de navegação do usuário no navegador sem mockar a árvore interna de DOM.
 
 ### Critérios de Aceite para Testes
+
 - **Comportamento Externo:**
   1. Renderização de todos os 9 blocos principais da Landing Page para usuários anônimos (Hero, Dores, Recursos, Preços, LGPD, FAQ, Rodapé).
   2. Clique no CTA primário redireciona o usuário para a página de registro com os parâmetros adequados.
@@ -118,6 +131,7 @@ A página será organizada em componentes isolados e de alta coesão:
   6. Itens do accordion de FAQ alternam os estados de visibilidade da resposta ao serem clicados.
 
 ### Prior Art
+
 - Testes de roteamento e fluxos de tela em `apps/web/src/__tests__/App.test.tsx` e `apps/web/src/__tests__/auth-pages.test.tsx`.
 
 ---
