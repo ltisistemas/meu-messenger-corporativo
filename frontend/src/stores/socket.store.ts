@@ -25,7 +25,21 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     if (!accessToken) return;
 
-    const socketUrl = (import.meta as any).env?.VITE_WS_URL || window.location.origin;
+    const envWsUrl =
+      (typeof process !== 'undefined' ? process.env?.NEXT_PUBLIC_WS_URL : undefined) ||
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_WS_URL);
+
+    const envApiUrl =
+      (typeof process !== 'undefined' ? process.env?.NEXT_PUBLIC_API_URL : undefined) ||
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL);
+
+    const fallbackUrl = envApiUrl
+      ? envApiUrl.replace(/\/api\/?$/, '').replace(/\/+$/, '')
+      : typeof window !== 'undefined'
+      ? window.location.origin
+      : 'http://localhost:3001';
+
+    const socketUrl = envWsUrl || fallbackUrl || 'http://localhost:3001';
 
     const newSocket = io(socketUrl, {
       auth: { token: accessToken },

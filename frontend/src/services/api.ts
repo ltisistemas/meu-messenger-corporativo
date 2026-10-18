@@ -14,10 +14,18 @@ interface RequestOptions extends RequestInit {
 }
 
 class ApiClient {
-  private baseUrl =
-    (typeof process !== 'undefined' ? process.env?.NEXT_PUBLIC_API_URL : undefined) ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) ||
-    '/api';
+  public getBaseUrl(): string {
+    const raw =
+      (typeof process !== 'undefined' ? process.env?.NEXT_PUBLIC_API_URL : undefined) ||
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) ||
+      '/api';
+
+    const trimmed = raw.replace(/\/+$/, '');
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+    }
+    return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  }
 
   private getTokens(): { accessToken: string | null; refreshToken: string | null } {
     try {
@@ -37,7 +45,14 @@ class ApiClient {
   public async request<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const { params, headers, ...customConfig } = options;
 
-    let url = `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    const base = this.getBaseUrl();
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const normalizedEndpoint =
+      base.endsWith('/api') && cleanEndpoint.startsWith('/api/')
+        ? cleanEndpoint.replace(/^\/api/, '')
+        : cleanEndpoint;
+
+    let url = `${base}${normalizedEndpoint}`;
 
     if (params) {
       const searchParams = new URLSearchParams();
@@ -75,7 +90,7 @@ class ApiClient {
       const { refreshToken } = this.getTokens();
       if (refreshToken) {
         try {
-          const refreshRes = await fetch(`${this.baseUrl}/auth/refresh`, {
+          const refreshRes = await fetch(`${this.getBaseUrl()}/auth/refresh`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),

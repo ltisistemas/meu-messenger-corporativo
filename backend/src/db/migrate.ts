@@ -1,10 +1,9 @@
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { db, pool } from './index';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const migrationsFolder = typeof __dirname !== 'undefined' 
+  ? path.resolve(__dirname, './migrations')
+  : path.resolve(process.cwd(), 'src/db/migrations');
 
 export async function runMigrations() {
   console.log('Running database migrations...');

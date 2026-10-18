@@ -14,6 +14,8 @@ import { BroadcastModule } from './modules/broadcasts/broadcast.module';
 import { LgpdModule } from './modules/lgpd/lgpd.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
 import { EventsModule } from './modules/events/events.module';
+import { AppController } from './app.controller';
+import { HealthService } from './services/health.service';
 
 @Module({
   imports: [
@@ -36,5 +38,7 @@ import { EventsModule } from './modules/events/events.module';
     ObservabilityModule,
     EventsModule,
   ],
+  controllers: [AppController],
+  providers: [HealthService],
 })
 export class AppModule {}
