@@ -9,18 +9,14 @@ Plataforma completa de mensageria corporativa multi-tenant em tempo real com arq
 
 ---
 
-## 🏛️ Arquitetura do Monorepo
+## 🏛️ Arquitetura Particionada (Front & Back Autônomos)
 
 ```
 messenger-corporativo/
-├── apps/
-│   ├── api/          # Backend Fastify + Socket.IO + Drizzle ORM + Redis + BullMQ (226 testes)
-│   └── web/          # Frontend React 19 + Vite + Tailwind CSS + Zustand (74 testes)
-├── packages/
-│   ├── shared/       # Schemas Zod, validações de plano e DTOs compartilhados
-│   └── tsconfig/     # Configurações TypeScript base
-├── docs/             # Especificações técnicas, ADRs e relatório de teste de carga (T-38)
-└── docker-compose.yml # PostgreSQL 16 e Redis 7 locais
+├── backend/          # Backend NestJS + Socket.IO + Drizzle ORM + PostgreSQL + Redis + BullMQ (429 testes)
+├── frontend/         # Frontend Next.js 15 (App Router) + React 19 + Tailwind CSS + Zustand (246 testes)
+├── docs/             # Especificações técnicas, ADRs e documentação técnica
+└── docker-compose.yml # PostgreSQL 16 e Redis 7 locais para desenvolvimento
 ```
 
 ---
