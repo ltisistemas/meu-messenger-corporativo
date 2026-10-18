@@ -50,16 +50,39 @@ describe('Temporary Groups & Expiration Job (T-24)', () => {
           findMany: vi.fn().mockImplementation(async ({ where }: any) => {
             const strings = getStringsFrom(where);
             const userList = [
-              { id: mockCreatorId, accountId: mockAccountId, name: 'Admin', email: 'admin@corp.com', status: 'active' },
-              { id: mockMemberId, accountId: mockAccountId, name: 'Member 1', email: 'm1@corp.com', status: 'active' },
-              { id: mockOtherId, accountId: mockAccountId, name: 'Member 2', email: 'm2@corp.com', status: 'active' },
+              {
+                id: mockCreatorId,
+                accountId: mockAccountId,
+                name: 'Admin',
+                email: 'admin@corp.com',
+                status: 'active',
+              },
+              {
+                id: mockMemberId,
+                accountId: mockAccountId,
+                name: 'Member 1',
+                email: 'm1@corp.com',
+                status: 'active',
+              },
+              {
+                id: mockOtherId,
+                accountId: mockAccountId,
+                name: 'Member 2',
+                email: 'm2@corp.com',
+                status: 'active',
+              },
             ];
             return userList.filter((u) => strings.includes(u.id));
           }),
           findFirst: vi.fn().mockImplementation(async ({ where }: any) => {
             const strings = getStringsFrom(where);
             if (strings.includes(mockMemberId)) {
-              return { id: mockMemberId, accountId: mockAccountId, name: 'Member 1', status: 'active' };
+              return {
+                id: mockMemberId,
+                accountId: mockAccountId,
+                name: 'Member 1',
+                status: 'active',
+              };
             }
             return { id: mockCreatorId, accountId: mockAccountId, name: 'Admin', status: 'active' };
           }),
@@ -116,7 +139,11 @@ describe('Temporary Groups & Expiration Job (T-24)', () => {
         values: vi.fn().mockImplementation((val) => {
           if (Array.isArray(val)) {
             val.forEach((item) => {
-              mockMembersData.push({ id: `m-${Date.now()}-${Math.random()}`, ...item, joinedAt: new Date() });
+              mockMembersData.push({
+                id: `m-${Date.now()}-${Math.random()}`,
+                ...item,
+                joinedAt: new Date(),
+              });
             });
             return { returning: () => val };
           }
@@ -157,7 +184,9 @@ describe('Temporary Groups & Expiration Job (T-24)', () => {
     it('creates a temporary group with explicit expiresAt date in future and schedules delayed job', async () => {
       const mockDb = createMockDb() as any;
       const groupExpirationService = new GroupExpirationService(mockDb, mockIo, false);
-      const scheduleSpy = vi.spyOn(groupExpirationService, 'scheduleGroupExpiration').mockResolvedValue(true);
+      const scheduleSpy = vi
+        .spyOn(groupExpirationService, 'scheduleGroupExpiration')
+        .mockResolvedValue(true);
 
       const conversationService = new ConversationService(mockDb, groupExpirationService, mockIo);
 
@@ -179,7 +208,9 @@ describe('Temporary Groups & Expiration Job (T-24)', () => {
     it('creates a temporary group using retentionHours (e.g. 24 hours)', async () => {
       const mockDb = createMockDb() as any;
       const groupExpirationService = new GroupExpirationService(mockDb, mockIo, false);
-      const scheduleSpy = vi.spyOn(groupExpirationService, 'scheduleGroupExpiration').mockResolvedValue(true);
+      const scheduleSpy = vi
+        .spyOn(groupExpirationService, 'scheduleGroupExpiration')
+        .mockResolvedValue(true);
 
       const conversationService = new ConversationService(mockDb, groupExpirationService, mockIo);
 
@@ -302,8 +333,12 @@ describe('Temporary Groups & Expiration Job (T-24)', () => {
       expect(sweepResult.processedCount).toBe(2);
       expect(sweepResult.expiredGroupIds).toEqual(['temp-expired-1', 'temp-expired-2']);
 
-      expect(mockConversationsData.find((c) => c.id === 'temp-expired-1').status).toBe('archived_readonly');
-      expect(mockConversationsData.find((c) => c.id === 'temp-expired-2').status).toBe('archived_readonly');
+      expect(mockConversationsData.find((c) => c.id === 'temp-expired-1').status).toBe(
+        'archived_readonly'
+      );
+      expect(mockConversationsData.find((c) => c.id === 'temp-expired-2').status).toBe(
+        'archived_readonly'
+      );
       expect(mockConversationsData.find((c) => c.id === 'temp-future-3').status).toBe('active');
     });
   });
@@ -394,7 +429,12 @@ describe('Temporary Groups & Expiration Job (T-24)', () => {
       });
 
       const conversationService = new ConversationService(mockDb, undefined, mockIo);
-      const res = await conversationService.deleteGroup(mockAccountId, mockCreatorId, 'admin', convId);
+      const res = await conversationService.deleteGroup(
+        mockAccountId,
+        mockCreatorId,
+        'admin',
+        convId
+      );
 
       expect(res.success).toBe(true);
       expect(mockConversationsData.find((c) => c.id === convId)).toBeUndefined();

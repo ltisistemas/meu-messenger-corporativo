@@ -39,9 +39,10 @@ export const SignatureCard: React.FC<SignatureCardProps> = ({
 }) => {
   const isClosed = signature.status === 'closed';
   const isCanceled = signature.status === 'canceled';
-  const progressPercent = signature.signersCount > 0
-    ? Math.round((signature.signedCount / signature.signersCount) * 100)
-    : 0;
+  const progressPercent =
+    signature.signersCount > 0
+      ? Math.round((signature.signedCount / signature.signersCount) * 100)
+      : 0;
 
   return (
     <div

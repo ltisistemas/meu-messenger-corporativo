@@ -17,7 +17,9 @@ export const subscriptions = pgTable('subscriptions', {
   paymentMethod: varchar('payment_method', { length: 50 }).notNull(), // 'pix' | 'credit_card' | 'boleto'
   status: varchar('status', { length: 50 }).notNull().default('pending'), // 'active' | 'pending' | 'overdue' | 'canceled' | 'trialing'
   amountCents: integer('amount_cents').notNull(),
-  currentPeriodStart: timestamp('current_period_start', { withTimezone: true }).notNull().defaultNow(),
+  currentPeriodStart: timestamp('current_period_start', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }).notNull(),
   cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
   canceledAt: timestamp('canceled_at', { withTimezone: true }),

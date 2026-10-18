@@ -27,9 +27,7 @@ export const users = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [
-    uniqueIndex('users_account_email_idx').on(table.accountId, table.email),
-  ]
+  (table) => [uniqueIndex('users_account_email_idx').on(table.accountId, table.email)]
 );
 
 export const usersRelations = relations(users, ({ one, many }) => ({

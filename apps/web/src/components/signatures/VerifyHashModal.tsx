@@ -1,13 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  ShieldCheck,
-  Upload,
-  AlertCircle,
-  CheckCircle2,
-  XCircle,
-  Copy,
-  Check,
-} from 'lucide-react';
+import { ShieldCheck, Upload, AlertCircle, CheckCircle2, XCircle, Copy, Check } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -25,11 +17,7 @@ export const VerifyHashModal: React.FC<VerifyHashModalProps> = ({
   onClose,
   signatureId,
 }) => {
-  const {
-    verificationResult,
-    verifyDocumentHash,
-    clearVerificationResult,
-  } = useSignatureStore();
+  const { verificationResult, verifyDocumentHash, clearVerificationResult } = useSignatureStore();
 
   const [inputHash, setInputHash] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -131,7 +119,8 @@ export const VerifyHashModal: React.FC<VerifyHashModalProps> = ({
             <span>Conformidade Criptográfica (Lei 14.063/2020)</span>
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
-            Selecione o arquivo PDF baixado ou insira manualmente o hash SHA-256 para comprovar que o documento não sofreu nenhuma adulteração desde a sua assinatura.
+            Selecione o arquivo PDF baixado ou insira manualmente o hash SHA-256 para comprovar que
+            o documento não sofreu nenhuma adulteração desde a sua assinatura.
           </p>
         </div>
 
@@ -140,12 +129,7 @@ export const VerifyHashModal: React.FC<VerifyHashModalProps> = ({
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
             Calcular Hash a partir do Arquivo
           </label>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-          />
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 
           {!selectedFile ? (
             <div
@@ -205,7 +189,11 @@ export const VerifyHashModal: React.FC<VerifyHashModalProps> = ({
                 className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 title="Copiar hash"
               >
-                {copiedHash ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedHash ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
               </button>
             )}
           </div>
@@ -255,10 +243,14 @@ export const VerifyHashModal: React.FC<VerifyHashModalProps> = ({
               <div>Documento: {verificationResult.documentName}</div>
               <div className="truncate">Hash Fornecido: {verificationResult.providedSha256}</div>
               {verificationResult.signedSha256 && (
-                <div className="truncate">Hash Assinado Oficial: {verificationResult.signedSha256}</div>
+                <div className="truncate">
+                  Hash Assinado Oficial: {verificationResult.signedSha256}
+                </div>
               )}
               {verificationResult.originalSha256 && (
-                <div className="truncate">Hash Original Oficial: {verificationResult.originalSha256}</div>
+                <div className="truncate">
+                  Hash Original Oficial: {verificationResult.originalSha256}
+                </div>
               )}
             </div>
           </div>

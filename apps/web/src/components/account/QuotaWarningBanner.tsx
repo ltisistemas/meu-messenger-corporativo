@@ -34,7 +34,8 @@ export const QuotaWarningBanner: React.FC<QuotaWarningBannerProps> = ({
           <div className="flex items-center gap-2.5">
             <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
             <span className="text-sm font-medium">
-              <strong>Conta suspensa por inadimplência:</strong> Regularize a fatura pendente para restaurar o envio de mensagens e arquivos.
+              <strong>Conta suspensa por inadimplência:</strong> Regularize a fatura pendente para
+              restaurar o envio de mensagens e arquivos.
             </span>
           </div>
           {onUpgradeClick && (
@@ -59,9 +60,11 @@ export const QuotaWarningBanner: React.FC<QuotaWarningBannerProps> = ({
           <div className="flex items-center gap-2.5">
             <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 animate-bounce" />
             <div className="text-sm">
-              <strong className="font-semibold">Limite de Usuários Excedido:</strong> Sua organização possui{' '}
-              <span className="underline font-bold">{activeUsersCount} membros ativos</span> (limite do plano {planName}: {maxUsers}).
-              O envio de mensagens e convites está em <em>somente leitura</em> até a regularização.
+              <strong className="font-semibold">Limite de Usuários Excedido:</strong> Sua
+              organização possui{' '}
+              <span className="underline font-bold">{activeUsersCount} membros ativos</span> (limite
+              do plano {planName}: {maxUsers}). O envio de mensagens e convites está em{' '}
+              <em>somente leitura</em> até a regularização.
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -99,7 +102,9 @@ export const QuotaWarningBanner: React.FC<QuotaWarningBannerProps> = ({
           <div className="flex items-center gap-2.5 text-sm">
             <Sparkles className="w-4 h-4 text-brand-500 shrink-0" />
             <span>
-              Você está no <strong>Trial Pro de 14 dias</strong> ({trialDaysRemaining} dia{trialDaysRemaining === 1 ? '' : 's'} restante{trialDaysRemaining === 1 ? '' : 's'}). Aproveite todos os recursos ilimitados!
+              Você está no <strong>Trial Pro de 14 dias</strong> ({trialDaysRemaining} dia
+              {trialDaysRemaining === 1 ? '' : 's'} restante{trialDaysRemaining === 1 ? '' : 's'}).
+              Aproveite todos os recursos ilimitados!
             </span>
           </div>
           {onUpgradeClick && (

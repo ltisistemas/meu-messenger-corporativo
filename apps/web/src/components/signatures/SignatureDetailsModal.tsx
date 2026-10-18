@@ -58,9 +58,10 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
   }
 
   const isClosed = activeSignature.status === 'closed';
-  const progressPercent = activeSignature.signersCount > 0
-    ? Math.round((activeSignature.signedCount / activeSignature.signersCount) * 100)
-    : 0;
+  const progressPercent =
+    activeSignature.signersCount > 0
+      ? Math.round((activeSignature.signedCount / activeSignature.signersCount) * 100)
+      : 0;
 
   const handleCopySignUrl = (url: string, key: string) => {
     navigator.clipboard.writeText(url);
@@ -155,7 +156,8 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-500 dark:text-slate-400">Status das Assinaturas</span>
               <span className="font-bold text-slate-800 dark:text-slate-200">
-                {activeSignature.signedCount} de {activeSignature.signersCount} signatários ({progressPercent}%)
+                {activeSignature.signedCount} de {activeSignature.signersCount} signatários (
+                {progressPercent}%)
               </span>
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -232,7 +234,11 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
                           : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                       }`}
                     >
-                      {isSigned ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+                      {isSigned ? (
+                        <CheckCircle2 className="w-5 h-5" />
+                      ) : (
+                        <Clock className="w-5 h-5" />
+                      )}
                     </div>
 
                     <div>
@@ -249,7 +255,9 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
                       </div>
 
                       <div className="text-[11px] text-slate-400 mt-0.5">
-                        {signer.email} • {signer.authType === 'email' ? 'E-mail' : signer.authType.toUpperCase()} • {signer.signAs === 'sign' ? 'Assinatura' : signer.signAs}
+                        {signer.email} •{' '}
+                        {signer.authType === 'email' ? 'E-mail' : signer.authType.toUpperCase()} •{' '}
+                        {signer.signAs === 'sign' ? 'Assinatura' : signer.signAs}
                       </div>
 
                       {signer.signedAt && (
@@ -308,7 +316,9 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
             <div className="p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-xs text-brand-700 dark:text-brand-300 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 shrink-0 text-brand-500" />
               <span>
-                <strong>Validade Jurídica:</strong> {evidenceReport?.legalFramework || 'Conforme Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020.'}
+                <strong>Validade Jurídica:</strong>{' '}
+                {evidenceReport?.legalFramework ||
+                  'Conforme Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020.'}
               </span>
             </div>
 
@@ -324,7 +334,9 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
                     className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 rounded-xl p-3.5 text-xs space-y-1"
                   >
                     <div className="flex items-center justify-between font-semibold text-slate-800 dark:text-slate-200">
-                      <span>{ev.signerName} ({ev.signerEmail})</span>
+                      <span>
+                        {ev.signerName} ({ev.signerEmail})
+                      </span>
                       <span className="text-[10px] text-slate-400 font-mono">
                         {new Date(ev.signedAt).toLocaleString()}
                       </span>
@@ -332,7 +344,9 @@ export const SignatureDetailsModal: React.FC<SignatureDetailsModalProps> = ({
 
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 font-mono">
                       <div>IP: {ev.ipAddress}</div>
-                      <div>Método: {ev.authType} ({ev.signatureRole})</div>
+                      <div>
+                        Método: {ev.authType} ({ev.signatureRole})
+                      </div>
                       <div className="sm:col-span-2 truncate text-slate-400">
                         Dispositivo: {ev.userAgent}
                       </div>

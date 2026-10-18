@@ -18,7 +18,10 @@ describe('Cloud Storage Link Cards & Preview (T-23)', () => {
       expect(screen.getByText('Zero retenção • Link externo')).toBeInTheDocument();
 
       const actionButton = screen.getByRole('link', { name: /Abrir no Google Drive/i });
-      expect(actionButton).toHaveAttribute('href', 'https://docs.google.com/spreadsheets/d/12345/edit#gid=0');
+      expect(actionButton).toHaveAttribute(
+        'href',
+        'https://docs.google.com/spreadsheets/d/12345/edit#gid=0'
+      );
       expect(actionButton).toHaveAttribute('target', '_blank');
       expect(actionButton).toHaveAttribute('rel', 'noopener noreferrer');
     });
@@ -55,7 +58,8 @@ describe('Cloud Storage Link Cards & Preview (T-23)', () => {
         conversationId: 'c1',
         senderId: 'user-2',
         senderName: 'Ana Paula',
-        content: 'Aqui está a documentação técnica: https://docs.google.com/document/d/1abcxyz/edit',
+        content:
+          'Aqui está a documentação técnica: https://docs.google.com/document/d/1abcxyz/edit',
         type: 'text',
         createdAt: new Date().toISOString(),
         status: 'read',

@@ -10,15 +10,15 @@
 
 O teste de carga teve como objetivo avaliar a resiliência, latência, consumo de banda e custos operacionais da arquitetura do **NextMsg** sob estresse de **80 usuários ativos concorrentes**, realizando troca intensa de mensagens de texto e envio de anexos simultâneos (documentos, planilhas e imagens de ~2.048 KB).
 
-| Parâmetro | Valor Medido |
-| :--- | :--- |
-| **Usuários Concorrentes** | **80 VUs (Virtual Users)** |
-| **Duração da Simulação** | 10 s |
-| **Total de Mensagens Enviadas** | 400 mensagens |
-| **Total de Arquivos Transferidos** | 160 arquivos |
-| **Tamanho Médio por Arquivo** | 2.048 KB (2 MB) |
-| **Taxa de Sucesso** | **100%** (560/560 requisições) |
-| **Taxa de Erro** | **0.0%** |
+| Parâmetro                          | Valor Medido                   |
+| :--------------------------------- | :----------------------------- |
+| **Usuários Concorrentes**          | **80 VUs (Virtual Users)**     |
+| **Duração da Simulação**           | 10 s                           |
+| **Total de Mensagens Enviadas**    | 400 mensagens                  |
+| **Total de Arquivos Transferidos** | 160 arquivos                   |
+| **Tamanho Médio por Arquivo**      | 2.048 KB (2 MB)                |
+| **Taxa de Sucesso**                | **100%** (560/560 requisições) |
+| **Taxa de Erro**                   | **0.0%**                       |
 
 ---
 
@@ -26,17 +26,17 @@ O teste de carga teve como objetivo avaliar a resiliência, latência, consumo d
 
 A distribuição de latência demonstra que o servidor Node.js + Fastify manteve tempos de resposta consistentes e abaixo do limiar aceitável de 200ms para mensagens em tempo real sob pico de concorrência.
 
-| Métrica de Latência | Tempo (ms) |
-| :--- | :--- |
-| **Mínima** | 5.2 ms |
-| **P50 (Mediana)** | **31.4 ms** |
-| **P90** | 72.8 ms |
-| **P95** | 89.2 ms |
-| **P99** | **118.5 ms** |
-| **Máxima** | 142.1 ms |
-| **Média** | 42.6 ms |
+| Métrica de Latência           | Tempo (ms)     |
+| :---------------------------- | :------------- |
+| **Mínima**                    | 5.2 ms         |
+| **P50 (Mediana)**             | **31.4 ms**    |
+| **P90**                       | 72.8 ms        |
+| **P95**                       | 89.2 ms        |
+| **P99**                       | **118.5 ms**   |
+| **Máxima**                    | 142.1 ms       |
+| **Média**                     | 42.6 ms        |
 | **Throughput de Requisições** | **56.0 req/s** |
-| **Throughput de Mensagens** | **40.0 msg/s** |
+| **Throughput de Mensagens**   | **40.0 msg/s** |
 
 ---
 
@@ -45,17 +45,18 @@ A distribuição de latência demonstra que o servidor Node.js + Fastify manteve
 A arquitetura de **Streaming Direto em Memória (Plano Free)** e **Store-and-Forward Temporário com Expiração em 5 Dias (Planos Pro / Enterprise)** proporciona uma economia substancial em relação aos modelos legados de armazenamento permanente.
 
 ### Métricas de Consumo
+
 - **Dados Transferidos no Teste:** **320.1 MB**
 - **Vazão de Pico de Rede:** **256.08 Mbps**
 - **Projeção Mensal de Egress (80 usuários / 22 dias úteis / 8h):** **440 GB / mês**
 
 ### Comparativo de Custos Mensais de Armazenamento e Egress (R$)
 
-| Provedor / Abordagem | Custo Estimado Mensal (R$) | Economia |
-| :--- | :--- | :--- |
-| **AWS S3 Tradicional** (Armazenamento permanente + Egress US$ 0.09/GB) | **R$ 253,00** | Referência (0%) |
-| **Cloudflare R2** (Zero custo de egress) | **R$ 7,65** | ~97% economia |
-| **NextMsg Zero Retenção (Free) + Auto-exclusão (Pro)** | **~R$ 0 a R$ 15,00** | **85.5% a 95% economia** |
+| Provedor / Abordagem                                                   | Custo Estimado Mensal (R$) | Economia                 |
+| :--------------------------------------------------------------------- | :------------------------- | :----------------------- |
+| **AWS S3 Tradicional** (Armazenamento permanente + Egress US$ 0.09/GB) | **R$ 253,00**              | Referência (0%)          |
+| **Cloudflare R2** (Zero custo de egress)                               | **R$ 7,65**                | ~97% economia            |
+| **NextMsg Zero Retenção (Free) + Auto-exclusão (Pro)**                 | **~R$ 0 a R$ 15,00**       | **85.5% a 95% economia** |
 
 ---
 

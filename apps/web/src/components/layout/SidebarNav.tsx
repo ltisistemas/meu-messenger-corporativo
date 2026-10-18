@@ -12,13 +12,7 @@ import {
 import { useThemeStore } from '../../stores/theme.store';
 import { Avatar } from '../ui/Avatar';
 
-export type NavItemKey =
-  | 'chats'
-  | 'contacts'
-  | 'broadcast'
-  | 'polls'
-  | 'signature'
-  | 'settings';
+export type NavItemKey = 'chats' | 'contacts' | 'broadcast' | 'polls' | 'signature' | 'settings';
 
 export interface SidebarNavProps {
   activeTab: NavItemKey;

@@ -188,7 +188,6 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
     });
   });
 
-
   describe('MessageComposer', () => {
     it('submits text and triggers typing events', async () => {
       const handleSend = vi.fn().mockResolvedValue(undefined);
@@ -229,7 +228,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       // Clicking shows the offline notice banner
       fireEvent.click(attachBtn);
       expect(
-        screen.getByText('Carlos Offline está offline. No plano Free, arquivos só são enviados para quem está online.')
+        screen.getByText(
+          'Carlos Offline está offline. No plano Free, arquivos só são enviados para quem está online.'
+        )
       ).toBeInTheDocument();
       expect(screen.getByText(/Faça upgrade para o/i)).toBeInTheDocument();
     });
@@ -251,7 +252,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       fireEvent.change(fileInput, { target: { files: [oversizedFile] } });
 
       expect(
-        screen.getByText('Esse arquivo passa de 25 MB. Compartilhe pelo Google Drive e cole o link aqui.')
+        screen.getByText(
+          'Esse arquivo passa de 25 MB. Compartilhe pelo Google Drive e cole o link aqui.'
+        )
       ).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Google Drive' })).toHaveAttribute(
         'href',
@@ -283,9 +286,7 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
 
       fireEvent.change(fileInput, { target: { files: [file6MB] } });
 
-      expect(
-        screen.getByText(/excede o limite de 5 MB do plano Free/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/excede o limite de 5 MB do plano Free/i)).toBeInTheDocument();
     });
 
     it('renders streaming progress bar during file transfer (T-18 State 3: Streaming Progress)', async () => {
@@ -308,7 +309,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       );
 
       const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-      const validFile = new File(['valid file content'], 'apresentacao.pdf', { type: 'application/pdf' });
+      const validFile = new File(['valid file content'], 'apresentacao.pdf', {
+        type: 'application/pdf',
+      });
       Object.defineProperty(validFile, 'size', { value: 2 * 1024 * 1024 }); // 2 MB
 
       fireEvent.change(fileInput, { target: { files: [validFile] } });
@@ -330,7 +333,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
     });
 
     it('displays failure state with Reenviar retry button upon streaming error (T-18 State 4: Failure & Retry)', async () => {
-      const handleSendFile = vi.fn().mockRejectedValueOnce(new Error('Queda de conexão WebSocket.'));
+      const handleSendFile = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('Queda de conexão WebSocket.'));
 
       const { container } = render(
         <MessageComposer
@@ -366,7 +371,6 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       });
     });
   });
-
 
   describe('NewChatModal', () => {
     it('switches tabs and creates new group', async () => {
@@ -495,9 +499,7 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       );
 
       expect(screen.getByText('NextMsg Enterprise')).toBeInTheDocument();
-      expect(
-        screen.getByText(/Selecione uma conversa ao lado para começar/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Selecione uma conversa ao lado para começar/i)).toBeInTheDocument();
     });
 
     it('renders conversation header, messages list, and active typing bubble', () => {
@@ -544,7 +546,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
         />
       );
 
-      expect(screen.getByText(/Envie uma mensagem abaixo para iniciar a conversa/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Envie uma mensagem abaixo para iniciar a conversa/i)
+      ).toBeInTheDocument();
 
       // Mobile back button
       const backBtn = screen.getByTitle('Voltar');
@@ -588,7 +592,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       );
 
       expect(screen.getByText('Canal Oficial')).toBeInTheDocument();
-      expect(screen.getByText(/Nenhum comunicado oficial publicado até o momento/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Nenhum comunicado oficial publicado até o momento/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -619,7 +625,10 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       expect(screen.getByText('3.0 MB')).toBeInTheDocument();
       expect(screen.getByText('Entregue a 5 de 8')).toBeInTheDocument();
       expect(screen.getByText('(somente online)')).toBeInTheDocument();
-      expect(screen.getByTitle('Baixar arquivo')).toHaveAttribute('href', 'https://storage.empresa.com/doc.pdf');
+      expect(screen.getByTitle('Baixar arquivo')).toHaveAttribute(
+        'href',
+        'https://storage.empresa.com/doc.pdf'
+      );
 
       // Not self with delivery summary
       rerender(
@@ -684,7 +693,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       const { rerender } = render(<MessageBubble message={tempMsg} isGroup={true} />);
       expect(screen.getByText(/\d+h\s+\d+m/i)).toBeInTheDocument();
 
-      rerender(<MessageBubble message={{ ...tempMsg, retentionExpiresAt: expiredPast }} isGroup={true} />);
+      rerender(
+        <MessageBubble message={{ ...tempMsg, retentionExpiresAt: expiredPast }} isGroup={true} />
+      );
       expect(screen.getByText('Expirando...')).toBeInTheDocument();
     });
   });
@@ -696,7 +707,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       });
 
       const onClose = vi.fn();
-      const { container } = render(<CreatePollModal isOpen={true} onClose={onClose} conversationId="c1" />);
+      const { container } = render(
+        <CreatePollModal isOpen={true} onClose={onClose} conversationId="c1" />
+      );
 
       expect(screen.getByText(/Recurso do Plano Pro \/ Enterprise/i)).toBeInTheDocument();
       const form = container.querySelector('form')!;
@@ -717,7 +730,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       useChatStore.setState({ createPoll: createPollMock });
 
       const onClose = vi.fn();
-      const { container, rerender } = render(<CreatePollModal isOpen={true} onClose={onClose} conversationId="c1" />);
+      const { container, rerender } = render(
+        <CreatePollModal isOpen={true} onClose={onClose} conversationId="c1" />
+      );
 
       // Submit without question -> error via form submit
       const form = container.querySelector('form')!;
@@ -725,7 +740,9 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       expect(screen.getByText('Informe a pergunta da enquete.')).toBeInTheDocument();
 
       // Fill question
-      const questionInput = screen.getByPlaceholderText(/Ex: Qual dia é melhor para a retrospectiva da sprint\?/i);
+      const questionInput = screen.getByPlaceholderText(
+        /Ex: Qual dia é melhor para a retrospectiva da sprint\?/i
+      );
       fireEvent.change(questionInput, { target: { value: 'Qual melhor horário para daily?' } });
 
       // Add a third option
@@ -770,9 +787,12 @@ describe('Chat Components & Real-time UI (T-13 / T-14)', () => {
       createPollMock.mockRejectedValueOnce(new Error('Servidor indisponível'));
       rerender(<CreatePollModal isOpen={true} onClose={onClose} conversationId="c1" />);
 
-      fireEvent.change(screen.getByPlaceholderText(/Ex: Qual dia é melhor para a retrospectiva da sprint\?/i), {
-        target: { value: 'Pergunta 2' },
-      });
+      fireEvent.change(
+        screen.getByPlaceholderText(/Ex: Qual dia é melhor para a retrospectiva da sprint\?/i),
+        {
+          target: { value: 'Pergunta 2' },
+        }
+      );
       fireEvent.change(screen.getByPlaceholderText('Opção 1'), { target: { value: 'A' } });
       fireEvent.change(screen.getByPlaceholderText('Opção 2'), { target: { value: 'B' } });
       fireEvent.click(screen.getByRole('button', { name: /Publicar Enquete/i }));

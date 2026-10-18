@@ -1,13 +1,6 @@
 import { eq, and, sql, desc, inArray } from 'drizzle-orm';
 import { db as defaultDb } from '../db/index';
-import {
-  accounts,
-  users,
-  subscriptions,
-  invoices,
-  Account,
-  User,
-} from '../db/schema/index';
+import { accounts, users, subscriptions, invoices, Account, User } from '../db/schema/index';
 import {
   PLAN_CONFIGS,
   PlanType,
@@ -51,14 +44,16 @@ export class AccountService {
     const limits = getPlanLimits(plan);
 
     const isTrialing = Boolean(
-      account.trialUntil &&
-        new Date(account.trialUntil) > new Date() &&
-        account.plan === 'pro'
+      account.trialUntil && new Date(account.trialUntil) > new Date() && account.plan === 'pro'
     );
 
-    const trialDaysRemaining = isTrialing && account.trialUntil
-      ? Math.max(0, Math.ceil((new Date(account.trialUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-      : null;
+    const trialDaysRemaining =
+      isTrialing && account.trialUntil
+        ? Math.max(
+            0,
+            Math.ceil((new Date(account.trialUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          )
+        : null;
 
     const quotaInfo = getQuotaStatus(plan, activeCount);
 
@@ -199,7 +194,9 @@ export class AccountService {
 
     // Non-owner admins cannot demote or promote other admins
     if (callerRole === 'admin' && (targetUser.role === 'admin' || newRole === 'admin')) {
-      throw new Error('Apenas o Proprietário pode alterar ou conceder permissões de Administrador.');
+      throw new Error(
+        'Apenas o Proprietário pode alterar ou conceder permissões de Administrador.'
+      );
     }
 
     const [updatedUser] = await this.db
@@ -232,7 +229,9 @@ export class AccountService {
     newPlan: PlanType
   ): Promise<AccountDetailsResponse> {
     if (callerRole !== 'owner' && callerRole !== 'admin') {
-      throw new Error('Apenas Administradores e o Proprietário podem alterar o plano da organização.');
+      throw new Error(
+        'Apenas Administradores e o Proprietário podem alterar o plano da organização.'
+      );
     }
 
     const account = await this.db.query.accounts.findFirst({
@@ -248,11 +247,8 @@ export class AccountService {
     const isExceeded = activeCount > limits.maxUsers;
 
     // If account was suspended, keep suspended; otherwise if quota exceeded, set over_quota
-    const newStatus = account.status === 'suspended'
-      ? 'suspended'
-      : isExceeded
-      ? 'over_quota'
-      : 'active';
+    const newStatus =
+      account.status === 'suspended' ? 'suspended' : isExceeded ? 'over_quota' : 'active';
 
     await this.db
       .update(accounts)
@@ -339,20 +335,14 @@ export class AccountService {
     for (const acc of expiredAccounts) {
       // Check if there is an active paid subscription
       const activeSub = await this.db.query.subscriptions.findFirst({
-        where: and(
-          eq(subscriptions.accountId, acc.id),
-          eq(subscriptions.status, 'active')
-        ),
+        where: and(eq(subscriptions.accountId, acc.id), eq(subscriptions.status, 'active')),
       });
 
       if (!activeSub) {
         const activeCount = await this.countActiveUsers(acc.id);
         const isExceeded = activeCount > PLAN_CONFIGS.free.maxUsers;
-        const newStatus = acc.status === 'suspended'
-          ? 'suspended'
-          : isExceeded
-          ? 'over_quota'
-          : 'active';
+        const newStatus =
+          acc.status === 'suspended' ? 'suspended' : isExceeded ? 'over_quota' : 'active';
 
         await this.db
           .update(accounts)
@@ -384,10 +374,7 @@ export class AccountService {
 
     // Invoices overdue past grace cutoff
     const overdueInvoices = await this.db.query.invoices.findMany({
-      where: and(
-        eq(invoices.status, 'overdue'),
-        sql`${invoices.dueDate} <= ${graceCutoff}`
-      ),
+      where: and(eq(invoices.status, 'overdue'), sql`${invoices.dueDate} <= ${graceCutoff}`),
     });
 
     const suspendedIds = new Set<string>();
@@ -440,20 +427,14 @@ export class AccountService {
     ) {
       // Check if active subscription exists
       const activeSub = await this.db.query.subscriptions.findFirst({
-        where: and(
-          eq(subscriptions.accountId, account.id),
-          eq(subscriptions.status, 'active')
-        ),
+        where: and(eq(subscriptions.accountId, account.id), eq(subscriptions.status, 'active')),
       });
 
       if (!activeSub) {
         const activeCount = await this.countActiveUsers(account.id);
         const isExceeded = activeCount > PLAN_CONFIGS.free.maxUsers;
-        const newStatus = account.status === 'suspended'
-          ? 'suspended'
-          : isExceeded
-          ? 'over_quota'
-          : 'active';
+        const newStatus =
+          account.status === 'suspended' ? 'suspended' : isExceeded ? 'over_quota' : 'active';
 
         const [updatedAccount] = await this.db
           .update(accounts)

@@ -49,8 +49,22 @@ describe('Payment Gateway & Subscriptions (T-28)', () => {
     };
 
     mockUsersData = [
-      { id: adminUserId, accountId, name: 'Lucas Admin', email: 'lucas@acme.com', role: 'admin', status: 'active' },
-      { id: memberUserId, accountId, name: 'Marcos Dev', email: 'marcos@acme.com', role: 'member', status: 'active' },
+      {
+        id: adminUserId,
+        accountId,
+        name: 'Lucas Admin',
+        email: 'lucas@acme.com',
+        role: 'admin',
+        status: 'active',
+      },
+      {
+        id: memberUserId,
+        accountId,
+        name: 'Marcos Dev',
+        email: 'marcos@acme.com',
+        role: 'member',
+        status: 'active',
+      },
     ];
 
     mockSubscriptionsData = [];
@@ -70,7 +84,9 @@ describe('Payment Gateway & Subscriptions (T-28)', () => {
         users: {
           findMany: vi.fn(async ({ where }: any) => {
             const strings = getStringsFrom(where);
-            return mockUsersData.filter((u) => strings.includes(u.accountId) || strings.includes(u.id));
+            return mockUsersData.filter(
+              (u) => strings.includes(u.accountId) || strings.includes(u.id)
+            );
           }),
         },
         subscriptions: {
@@ -143,13 +159,17 @@ describe('Payment Gateway & Subscriptions (T-28)', () => {
             }
 
             // Update subscription
-            const sub = mockSubscriptionsData.find((s) => strings.includes(s.id) || strings.includes(s.accountId));
+            const sub = mockSubscriptionsData.find(
+              (s) => strings.includes(s.id) || strings.includes(s.accountId)
+            );
             if (sub) {
               Object.assign(sub, setVals);
             }
 
             // Update invoice
-            const inv = mockInvoicesData.find((i) => strings.includes(i.id) || strings.includes(i.gatewayInvoiceId));
+            const inv = mockInvoicesData.find(
+              (i) => strings.includes(i.id) || strings.includes(i.gatewayInvoiceId)
+            );
             if (inv) {
               Object.assign(inv, setVals);
             }

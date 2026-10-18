@@ -289,13 +289,7 @@ describe('Electronic Signatures Frontend (T-34)', () => {
       (api.post as any).mockResolvedValue(updatedAfterSign);
 
       const onClose = vi.fn();
-      render(
-        <SignatureDetailsModal
-          isOpen={true}
-          onClose={onClose}
-          signatureId="sig-test-123"
-        />
-      );
+      render(<SignatureDetailsModal isOpen={true} onClose={onClose} signatureId="sig-test-123" />);
 
       expect(screen.getByText(/Acompanhamento do Documento Eletrônico/i)).toBeInTheDocument();
       expect(screen.getByText('Carlos Mendes')).toBeInTheDocument();
@@ -338,15 +332,11 @@ describe('Electronic Signatures Frontend (T-34)', () => {
       (api.post as any).mockResolvedValue(mockResult);
 
       const onClose = vi.fn();
-      render(
-        <VerifyHashModal
-          isOpen={true}
-          onClose={onClose}
-          signatureId="sig-test-123"
-        />
-      );
+      render(<VerifyHashModal isOpen={true} onClose={onClose} signatureId="sig-test-123" />);
 
-      expect(screen.getByText(/Verificação de Autenticidade e Integridade \(SHA-256\)/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Verificação de Autenticidade e Integridade \(SHA-256\)/i)
+      ).toBeInTheDocument();
 
       // Input 64 char hash
       const hashInput = screen.getByPlaceholderText(/Ex: 8f47b567a9d.../i);

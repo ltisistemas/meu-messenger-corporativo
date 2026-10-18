@@ -126,7 +126,9 @@ describe('ConversationService Deep Branch Coverage', () => {
         ],
       });
     mockDb.query.users.findMany.mockResolvedValueOnce([{ id: otherUserId, accountId }]);
-    const okRes = await service.addMembersToGroup(accountId, userId, 'owner', 'conv-1', [otherUserId]);
+    const okRes = await service.addMembersToGroup(accountId, userId, 'owner', 'conv-1', [
+      otherUserId,
+    ]);
     expect(okRes.members).toHaveLength(2);
   });
 
@@ -175,7 +177,13 @@ describe('ConversationService Deep Branch Coverage', () => {
 
     // 3. removeMember: self leave succeeds
     mockDb.query.conversations.findFirst.mockResolvedValueOnce(mockConvGroup);
-    const selfLeave = await service.removeMemberFromGroup(accountId, otherUserId, 'member', 'conv-1', otherUserId);
+    const selfLeave = await service.removeMemberFromGroup(
+      accountId,
+      otherUserId,
+      'member',
+      'conv-1',
+      otherUserId
+    );
     expect(selfLeave.success).toBe(true);
 
     // 4. deleteGroup: direct conversation throws
@@ -699,9 +707,10 @@ describe('Additional Route Error Branches', () => {
     expect(notFoundSig.statusCode).toBe(404);
 
     // 6. GET /api/signatures/conversation/:conversationId error -> 400
-    vi.spyOn(SignatureService.prototype, 'listSignatureRequestsByConversation').mockRejectedValueOnce(
-      new Error('DB error')
-    );
+    vi.spyOn(
+      SignatureService.prototype,
+      'listSignatureRequestsByConversation'
+    ).mockRejectedValueOnce(new Error('DB error'));
     const errList = await app.inject({
       method: 'GET',
       url: '/api/signatures/conversation/conv-1',
@@ -855,7 +864,9 @@ describe('Additional Route Error Branches', () => {
       update: vi.fn(() => ({
         set: vi.fn(() => ({
           where: vi.fn(() => ({
-            returning: vi.fn().mockResolvedValue([{ id: 'acc-susp', plan: 'free', status: 'suspended' }]),
+            returning: vi
+              .fn()
+              .mockResolvedValue([{ id: 'acc-susp', plan: 'free', status: 'suspended' }]),
           })),
         })),
       })),
@@ -956,7 +967,9 @@ describe('Additional Route Error Branches', () => {
       update: vi.fn(() => ({
         set: vi.fn(() => ({
           where: vi.fn(() => ({
-            returning: vi.fn().mockResolvedValue([{ id: 'acc-susp-1', plan: 'free', status: 'active' }]),
+            returning: vi
+              .fn()
+              .mockResolvedValue([{ id: 'acc-susp-1', plan: 'free', status: 'active' }]),
           })),
         })),
       })),
@@ -970,12 +983,14 @@ describe('Additional Route Error Branches', () => {
     const mockDbTrials: any = {
       query: {
         accounts: {
-          findMany: vi.fn().mockResolvedValue([{
-            id: 'acc-exp-1',
-            status: 'active',
-            plan: 'pro',
-            trialUntil: new Date(Date.now() - 1000),
-          }]),
+          findMany: vi.fn().mockResolvedValue([
+            {
+              id: 'acc-exp-1',
+              status: 'active',
+              plan: 'pro',
+              trialUntil: new Date(Date.now() - 1000),
+            },
+          ]),
         },
         users: {
           findMany: vi.fn().mockResolvedValue([{ id: 'u1' }]), // count 1 <= 12
@@ -987,7 +1002,9 @@ describe('Additional Route Error Branches', () => {
       update: vi.fn(() => ({
         set: vi.fn(() => ({
           where: vi.fn(() => ({
-            returning: vi.fn().mockResolvedValue([{ id: 'acc-exp-1', plan: 'free', status: 'active' }]),
+            returning: vi
+              .fn()
+              .mockResolvedValue([{ id: 'acc-exp-1', plan: 'free', status: 'active' }]),
           })),
         })),
       })),
@@ -1036,9 +1053,9 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const billingNull = new BillingService(mockDbNullAcc);
-    await expect(
-      billingNull.getAccountBillingSummary('missing-acc')
-    ).rejects.toThrow('Organização não encontrada.');
+    await expect(billingNull.getAccountBillingSummary('missing-acc')).rejects.toThrow(
+      'Organização não encontrada.'
+    );
 
     // countActiveUsers fallback when query.users is undefined
     const mockDbSqlFallback: any = {
@@ -1080,7 +1097,9 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const fileServiceDeleted = new FileService(mockDbDeleted);
-    const delRes = await fileServiceDeleted.confirmDownload('acc-1', 'usr-1', 'trans-del', { completed: true });
+    const delRes = await fileServiceDeleted.confirmDownload('acc-1', 'usr-1', 'trans-del', {
+      completed: true,
+    });
     expect(delRes.deletedFromStorage).toBe(true);
 
     // Existing download deduplication
@@ -1100,7 +1119,9 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const fileServiceDup = new FileService(mockDbExisting);
-    const dupRes = await fileServiceDup.confirmDownload('acc-1', 'usr-1', 'trans-dup', { completed: true });
+    const dupRes = await fileServiceDup.confirmDownload('acc-1', 'usr-1', 'trans-dup', {
+      completed: true,
+    });
     expect(dupRes.success).toBe(true);
   });
 
@@ -1113,7 +1134,9 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const pollService = new PollService(mockDbNotFound as any);
-    await expect(pollService.getPollDetails('acc-1', 'usr-1', 'p-missing')).rejects.toThrow('Enquete não encontrada.');
+    await expect(pollService.getPollDetails('acc-1', 'usr-1', 'p-missing')).rejects.toThrow(
+      'Enquete não encontrada.'
+    );
 
     // Account mismatch
     const mockDbMismatch: any = {
@@ -1127,7 +1150,9 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const pollMismatch = new PollService(mockDbMismatch as any);
-    await expect(pollMismatch.getPollDetails('acc-1', 'usr-1', 'p-1')).rejects.toThrow('Acesso negado a esta enquete.');
+    await expect(pollMismatch.getPollDetails('acc-1', 'usr-1', 'p-1')).rejects.toThrow(
+      'Acesso negado a esta enquete.'
+    );
 
     // Creator is null
     const mockDbNullCreator: any = {
@@ -1167,7 +1192,10 @@ describe('Additional Route Error Branches', () => {
     };
     const lgpdService = new LgpdService(mockDbAlreadyDeleted as any);
     await expect(
-      lgpdService.deleteAndAnonymizeUser('acc-1', 'u-del', { password: 'pwd', confirmationText: 'EXCLUIR' })
+      lgpdService.deleteAndAnonymizeUser('acc-1', 'u-del', {
+        password: 'pwd',
+        confirmationText: 'EXCLUIR',
+      })
     ).rejects.toThrow('Este usuário já foi excluído e anonimizado anteriormente.');
 
     // Disconnect active socket
@@ -1229,16 +1257,18 @@ describe('Additional Route Error Branches', () => {
       totalRecipientsCount: 1,
       fileName: 'doc.txt',
     });
-    await expect(
-      relayService.completeRelay('sender-1', { transferId: 'sess-1' })
-    ).rejects.toThrow('Acesso negado à sessão de transferência.');
+    await expect(relayService.completeRelay('sender-1', { transferId: 'sess-1' })).rejects.toThrow(
+      'Acesso negado à sessão de transferência.'
+    );
   });
 
   it('FileRelayService initRelay validates member count and offline group members on Free', async () => {
     // 1. Conversation without other members
     const mockDbNoOthers: any = {
       query: {
-        accounts: { findFirst: vi.fn().mockResolvedValue({ id: 'acc-1', plan: 'free', status: 'active' }) },
+        accounts: {
+          findFirst: vi.fn().mockResolvedValue({ id: 'acc-1', plan: 'free', status: 'active' }),
+        },
         users: { findFirst: vi.fn().mockResolvedValue({ id: 'sender-1', name: 'Sender' }) },
         conversations: {
           findFirst: vi.fn().mockResolvedValue({
@@ -1264,7 +1294,9 @@ describe('Additional Route Error Branches', () => {
     const mockPresence: any = { isUserOnline: vi.fn().mockResolvedValue(false) };
     const mockDbAllOffline: any = {
       query: {
-        accounts: { findFirst: vi.fn().mockResolvedValue({ id: 'acc-1', plan: 'free', status: 'active' }) },
+        accounts: {
+          findFirst: vi.fn().mockResolvedValue({ id: 'acc-1', plan: 'free', status: 'active' }),
+        },
         users: { findFirst: vi.fn().mockResolvedValue({ id: 'sender-1', name: 'Sender' }) },
         conversations: {
           findFirst: vi.fn().mockResolvedValue({
@@ -1293,14 +1325,18 @@ describe('Additional Route Error Branches', () => {
       query: { accounts: { findFirst: vi.fn().mockResolvedValue(null) } },
     };
     const accServiceNoAcc = new AccountService(mockDbNoAcc);
-    await expect(accServiceNoAcc.checkAndEnforceQuota('missing-acc')).rejects.toThrow('Organização não encontrada.');
+    await expect(accServiceNoAcc.checkAndEnforceQuota('missing-acc')).rejects.toThrow(
+      'Organização não encontrada.'
+    );
 
     // 2. LgpdService exportUserData throws when user not found
     const mockDbNoUser: any = {
       query: { users: { findFirst: vi.fn().mockResolvedValue(null) } },
     };
     const lgpdNoUser = new LgpdService(mockDbNoUser);
-    await expect(lgpdNoUser.exportUserData('acc-1', 'missing-u')).rejects.toThrow('Usuário não encontrado.');
+    await expect(lgpdNoUser.exportUserData('acc-1', 'missing-u')).rejects.toThrow(
+      'Usuário não encontrado.'
+    );
 
     // 3. LgpdService exportUserData throws when account not found
     const mockDbUserNoAcc: any = {
@@ -1310,11 +1346,16 @@ describe('Additional Route Error Branches', () => {
       },
     };
     const lgpdUserNoAcc = new LgpdService(mockDbUserNoAcc);
-    await expect(lgpdUserNoAcc.exportUserData('acc-1', 'u-1')).rejects.toThrow('Conta corporativa não encontrada.');
+    await expect(lgpdUserNoAcc.exportUserData('acc-1', 'u-1')).rejects.toThrow(
+      'Conta corporativa não encontrada.'
+    );
 
     // 4. LgpdService deleteAndAnonymizeUser throws when user not found
     await expect(
-      lgpdNoUser.deleteAndAnonymizeUser('acc-1', 'missing-u', { password: 'pwd', confirmationText: 'EXCLUIR' })
+      lgpdNoUser.deleteAndAnonymizeUser('acc-1', 'missing-u', {
+        password: 'pwd',
+        confirmationText: 'EXCLUIR',
+      })
     ).rejects.toThrow('Usuário não encontrado.');
   });
 

@@ -1,11 +1,5 @@
 export type CloudStorageProvider =
-  | 'google-drive'
-  | 'onedrive'
-  | 'dropbox'
-  | 'box'
-  | 'figma'
-  | 'notion'
-  | 'generic';
+  'google-drive' | 'onedrive' | 'dropbox' | 'box' | 'figma' | 'notion' | 'generic';
 
 export type CloudResourceType =
   | 'document'
@@ -232,7 +226,12 @@ export function parseCloudLink(urlString: string): CloudLinkPreview | null {
     let title = 'Arquivo Dropbox';
 
     const extractedName = extractFileNameFromPath(rawPath);
-    if (extractedName && extractedName !== 's' && extractedName !== 'sh' && extractedName !== 'scl') {
+    if (
+      extractedName &&
+      extractedName !== 's' &&
+      extractedName !== 'sh' &&
+      extractedName !== 'scl'
+    ) {
       title = extractedName;
       if (/\.(xlsx?|csv)$/i.test(extractedName)) {
         resourceType = 'spreadsheet';

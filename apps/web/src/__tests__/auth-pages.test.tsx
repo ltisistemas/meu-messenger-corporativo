@@ -220,10 +220,14 @@ describe('Auth Pages & Flows (T-12)', () => {
 
       // 1. Empty fields via form submit
       fireEvent.submit(form);
-      expect(screen.getByText(/Preencha seu nome e defina sua senha de acesso/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Preencha seu nome e defina sua senha de acesso/i)
+      ).toBeInTheDocument();
 
       // 2. Short password
-      fireEvent.change(screen.getByPlaceholderText('Ex: Beatriz Lima'), { target: { value: 'Beatriz' } });
+      fireEvent.change(screen.getByPlaceholderText('Ex: Beatriz Lima'), {
+        target: { value: 'Beatriz' },
+      });
       const passwordInputs = screen.getAllByPlaceholderText('••••••••');
       fireEvent.change(passwordInputs[0], { target: { value: '123' } });
       fireEvent.change(passwordInputs[1], { target: { value: '123' } });
@@ -248,7 +252,9 @@ describe('Auth Pages & Flows (T-12)', () => {
         </MemoryRouter>
       );
 
-      expect(await screen.findByText(/Convite inválido, expirado ou já utilizado/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/Convite inválido, expirado ou já utilizado/i)
+      ).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Ir para o Login/i })).toBeInTheDocument();
     });
   });

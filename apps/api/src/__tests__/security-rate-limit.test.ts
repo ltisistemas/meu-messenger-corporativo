@@ -89,7 +89,8 @@ describe('Security, Rate Limiting & XSS Sanitization (T-35)', () => {
 
   describe('3. XSS Sanitization & Input Security', () => {
     it('strips script tags and malicious inline event handlers from user text', () => {
-      const maliciousPayload = '<script>alert("XSS")</script>Olá <b>equipe</b>! <img src="x" onerror="stealData()">';
+      const maliciousPayload =
+        '<script>alert("XSS")</script>Olá <b>equipe</b>! <img src="x" onerror="stealData()">';
       const clean = sanitizeText(maliciousPayload);
 
       expect(clean).not.toContain('<script>');
@@ -99,7 +100,8 @@ describe('Security, Rate Limiting & XSS Sanitization (T-35)', () => {
     });
 
     it('sanitizes iframes, objects, and embed vectors', () => {
-      const input = '<iframe src="https://phishing.com"></iframe><object data="evil.swf"></object>Mensagem segura';
+      const input =
+        '<iframe src="https://phishing.com"></iframe><object data="evil.swf"></object>Mensagem segura';
       const clean = sanitizeMessageContent(input);
 
       expect(clean).not.toContain('<iframe');
@@ -153,7 +155,8 @@ describe('Security, Rate Limiting & XSS Sanitization (T-35)', () => {
         headers: { authorization: `Bearer ${token}` },
         payload: {
           conversationId: '11111111-1111-1111-1111-111111111111',
-          content: '<script>evil()</script>Mensagem corporativa importante <iframe src="evil.com"></iframe>',
+          content:
+            '<script>evil()</script>Mensagem corporativa importante <iframe src="evil.com"></iframe>',
         },
       });
 

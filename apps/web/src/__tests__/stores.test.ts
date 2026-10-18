@@ -9,7 +9,11 @@ import { api, ApiError } from '../services/api';
 
 vi.mock('../services/api', () => {
   class MockApiError extends Error {
-    constructor(message: string, public status: number, public data?: any) {
+    constructor(
+      message: string,
+      public status: number,
+      public data?: any
+    ) {
       super(message);
       this.name = 'ApiError';
     }
@@ -69,7 +73,14 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       vi.mocked(api.post).mockResolvedValueOnce({
         accessToken: 'access-123',
         refreshToken: 'refresh-456',
-        user: { id: 'u-1', name: 'Alice', email: 'alice@corp.com', role: 'owner', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'alice@corp.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-1',
+        },
         account: { id: 'acc-1', name: 'Acme', plan: 'pro', status: 'active' },
       });
 
@@ -113,7 +124,14 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       vi.mocked(api.post).mockResolvedValueOnce({
         accessToken: 'reg-token',
         refreshToken: 'reg-refresh',
-        user: { id: 'u-2', name: 'Bob', email: 'bob@corp.com', role: 'owner', status: 'active', accountId: 'acc-2' },
+        user: {
+          id: 'u-2',
+          name: 'Bob',
+          email: 'bob@corp.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-2',
+        },
         account: { id: 'acc-2', name: 'Beta Corp', plan: 'free', status: 'active' },
       });
 
@@ -147,11 +165,20 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       vi.mocked(api.post).mockResolvedValueOnce({
         accessToken: 'inv-token',
         refreshToken: 'inv-refresh',
-        user: { id: 'u-3', name: 'Carol', email: 'carol@corp.com', role: 'member', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-3',
+          name: 'Carol',
+          email: 'carol@corp.com',
+          role: 'member',
+          status: 'active',
+          accountId: 'acc-1',
+        },
         account: { id: 'acc-1', name: 'Acme', plan: 'pro', status: 'active' },
       });
 
-      await useAuthStore.getState().acceptInvite({ token: 'inv-tok', name: 'Carol', password: 'pwd' });
+      await useAuthStore
+        .getState()
+        .acceptInvite({ token: 'inv-tok', name: 'Carol', password: 'pwd' });
       expect(useAuthStore.getState().isAuthenticated).toBe(true);
       expect(useAuthStore.getState().user?.name).toBe('Carol');
     });
@@ -162,7 +189,14 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
         accessToken: 'tok',
         refreshToken: 'ref',
         isAuthenticated: true,
-        user: { id: 'u-1', name: 'Alice', email: 'a@c.com', role: 'member', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'a@c.com',
+          role: 'member',
+          status: 'active',
+          accountId: 'acc-1',
+        },
       });
 
       useAuthStore.getState().logout();
@@ -176,7 +210,14 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
     it('checkAuth validates session via /auth/me and handles failure', async () => {
       useAuthStore.setState({ accessToken: 'test-tok', isAuthenticated: true });
       vi.mocked(api.get).mockResolvedValueOnce({
-        user: { id: 'u-1', name: 'Alice', email: 'a@c.com', role: 'owner', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'a@c.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-1',
+        },
         account: { id: 'acc-1', name: 'Acme', plan: 'pro', status: 'active' },
       });
 
@@ -214,7 +255,9 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
 
     it('fetchMembers populates members list', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({
-        members: [{ id: 'm-1', name: 'Dev', email: 'dev@corp.com', role: 'member', status: 'active' }],
+        members: [
+          { id: 'm-1', name: 'Dev', email: 'dev@corp.com', role: 'member', status: 'active' },
+        ],
       });
 
       await useAccountStore.getState().fetchMembers();
@@ -239,17 +282,45 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
 
     it('updateMemberStatus, updateMemberRole and inviteMember work correctly', async () => {
       useAccountStore.setState({
-        members: [{ id: 'm-1', accountId: 'acc-1', name: 'Dev', email: 'd@c.com', role: 'member', status: 'active', createdAt: '2026-10-12' }],
+        members: [
+          {
+            id: 'm-1',
+            accountId: 'acc-1',
+            name: 'Dev',
+            email: 'd@c.com',
+            role: 'member',
+            status: 'active',
+            createdAt: '2026-10-12',
+          },
+        ],
       });
 
       vi.mocked(api.patch).mockResolvedValueOnce({
-        member: { id: 'm-1', accountId: 'acc-1', name: 'Dev', email: 'd@c.com', role: 'member', status: 'inactive', createdAt: '2026-10-12' },
+        member: {
+          id: 'm-1',
+          accountId: 'acc-1',
+          name: 'Dev',
+          email: 'd@c.com',
+          role: 'member',
+          status: 'inactive',
+          createdAt: '2026-10-12',
+        },
       });
       await useAccountStore.getState().updateMemberStatus('m-1', 'inactive');
-      expect(api.patch).toHaveBeenCalledWith('/accounts/members/m-1/status', { status: 'inactive' });
+      expect(api.patch).toHaveBeenCalledWith('/accounts/members/m-1/status', {
+        status: 'inactive',
+      });
 
       vi.mocked(api.patch).mockResolvedValueOnce({
-        member: { id: 'm-1', accountId: 'acc-1', name: 'Dev', email: 'd@c.com', role: 'admin', status: 'active', createdAt: '2026-10-12' },
+        member: {
+          id: 'm-1',
+          accountId: 'acc-1',
+          name: 'Dev',
+          email: 'd@c.com',
+          role: 'admin',
+          status: 'active',
+          createdAt: '2026-10-12',
+        },
       });
       await useAccountStore.getState().updateMemberRole('m-1', 'admin');
       expect(api.patch).toHaveBeenCalledWith('/accounts/members/m-1/role', { role: 'admin' });
@@ -286,6 +357,41 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       vi.mocked(api.post).mockResolvedValueOnce({});
       await useAccountStore.getState().downgradePlan('free');
       expect(api.post).toHaveBeenCalledWith('/accounts/downgrade', { plan: 'free' });
+    });
+
+    it('checkCheckoutStatus and simulatePaymentConfirmation poll and refresh account', async () => {
+      // Mock fetchAccountDetails and fetchBillingSummary calls
+      vi.mocked(api.get).mockResolvedValue({
+        status: 'PAID',
+        paid: true,
+        plan: 'pro',
+      });
+
+      const resPaid = await useAccountStore.getState().checkCheckoutStatus('pay_123');
+      expect(resPaid.status).toBe('PAID');
+      expect(api.get).toHaveBeenCalledWith('/billing/checkout/status?chargeId=pay_123');
+
+      // Status pending should not trigger refresh
+      vi.mocked(api.get).mockResolvedValueOnce({
+        status: 'PENDING',
+        paid: false,
+        plan: 'free',
+      });
+      const resPending = await useAccountStore.getState().checkCheckoutStatus('pay_pending');
+      expect(resPending.status).toBe('PENDING');
+
+      // Simulate payment confirmation
+      vi.mocked(api.post).mockResolvedValueOnce({
+        status: 'PAID',
+        paid: true,
+        plan: 'pro',
+      });
+      const simRes = await useAccountStore.getState().simulatePaymentConfirmation('pay_123');
+      expect(simRes.status).toBe('PAID');
+      expect(api.post).toHaveBeenCalledWith('/billing/checkout/status', {
+        chargeId: 'pay_123',
+        simulatePaid: true,
+      });
     });
   });
 
@@ -326,7 +432,9 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       expect(signed.status).toBe('closed');
 
       vi.mocked(api.post).mockResolvedValueOnce({ isValid: true, matchesOriginal: true });
-      const verified = await useSignatureStore.getState().verifyDocumentHash('sig-2', { sha256: 'abc' });
+      const verified = await useSignatureStore
+        .getState()
+        .verifyDocumentHash('sig-2', { sha256: 'abc' });
       expect(verified.isValid).toBe(true);
 
       useSignatureStore.getState().clearVerificationResult();
@@ -405,9 +513,20 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
 
     it('selectConversation switches active id and loads messages', async () => {
       useChatStore.setState({
-        conversations: [{ id: 'c-2', title: 'Devs', type: 'group', status: 'active', unreadCount: 2 } as any],
+        conversations: [
+          { id: 'c-2', title: 'Devs', type: 'group', status: 'active', unreadCount: 2 } as any,
+        ],
       });
-      vi.mocked(api.get).mockResolvedValueOnce([{ id: 'm-1', content: 'Ola', senderId: 'u-1', conversationId: 'c-2', type: 'text', createdAt: '2026-10-12' }]);
+      vi.mocked(api.get).mockResolvedValueOnce([
+        {
+          id: 'm-1',
+          content: 'Ola',
+          senderId: 'u-1',
+          conversationId: 'c-2',
+          type: 'text',
+          createdAt: '2026-10-12',
+        },
+      ]);
 
       await useChatStore.getState().selectConversation('c-2');
       expect(useChatStore.getState().activeConversationId).toBe('c-2');
@@ -415,7 +534,16 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
     });
 
     it('sendMessage adds optimistic message and commits on api success', async () => {
-      useAuthStore.setState({ user: { id: 'u-1', name: 'Alice', email: 'a@c.com', role: 'member', status: 'active', accountId: 'acc-1' } });
+      useAuthStore.setState({
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'a@c.com',
+          role: 'member',
+          status: 'active',
+          accountId: 'acc-1',
+        },
+      });
       useChatStore.setState({
         conversations: [{ id: 'c-1', title: 'Geral', type: 'group', status: 'active' } as any],
         activeConversationId: 'c-1',
@@ -505,7 +633,14 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       // 2. Error if socket disconnected
       useChatStore.setState({ activeConversationId: 'c-1' });
       useAuthStore.setState({
-        user: { id: 'u-1', name: 'Alice', email: 'alice@corp.com', role: 'owner', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'alice@corp.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-1',
+        },
       });
       useSocketStore.setState({ socket: null });
       await expect(
@@ -528,16 +663,35 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       const testFile = new File(['a'.repeat(70000)], 'large.txt', { type: 'text/plain' });
       await useChatStore.getState().sendFileRelay(testFile, progressSpy);
 
-      expect(emitMock).toHaveBeenCalledWith('file:relay:init', expect.any(Object), expect.any(Function));
-      expect(emitMock).toHaveBeenCalledWith('file:relay:chunk', expect.any(Object), expect.any(Function));
-      expect(emitMock).toHaveBeenCalledWith('file:relay:complete', expect.any(Object), expect.any(Function));
+      expect(emitMock).toHaveBeenCalledWith(
+        'file:relay:init',
+        expect.any(Object),
+        expect.any(Function)
+      );
+      expect(emitMock).toHaveBeenCalledWith(
+        'file:relay:chunk',
+        expect.any(Object),
+        expect.any(Function)
+      );
+      expect(emitMock).toHaveBeenCalledWith(
+        'file:relay:complete',
+        expect.any(Object),
+        expect.any(Function)
+      );
       expect(progressSpy).toHaveBeenCalled();
     });
 
     it('sendFileRelay handles relay errors on init, chunk, and complete', async () => {
       useChatStore.setState({ activeConversationId: 'c-1' });
       useAuthStore.setState({
-        user: { id: 'u-1', name: 'Alice', email: 'alice@corp.com', role: 'owner', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'alice@corp.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-1',
+        },
       });
 
       // Init error with suggestCloudShare
@@ -594,13 +748,25 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       };
       useSocketStore.setState({ socket: mockSocket as any });
       useAuthStore.setState({
-        user: { id: 'u-1', name: 'Alice', email: 'alice@corp.com', role: 'owner', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'alice@corp.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-1',
+        },
       });
       useChatStore.setState({
         activeConversationId: 'c-1',
         conversations: [
           { id: 'c-1', title: 'Geral', unreadCount: 0, updatedAt: new Date().toISOString() } as any,
-          { id: 'c-2', title: 'Devs', unreadCount: 0, updatedAt: new Date(Date.now() - 10000).toISOString() } as any,
+          {
+            id: 'c-2',
+            title: 'Devs',
+            unreadCount: 0,
+            updatedAt: new Date(Date.now() - 10000).toISOString(),
+          } as any,
         ],
         messages: {
           'c-1': [],
@@ -653,10 +819,23 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       // 5. Message receipt update
       useChatStore.setState({
         messages: {
-          'c-1': [{ id: 'm-mine', conversationId: 'c-1', senderId: 'u-1', content: 'Minha msg', isSelf: true, status: 'sent' } as any],
+          'c-1': [
+            {
+              id: 'm-mine',
+              conversationId: 'c-1',
+              senderId: 'u-1',
+              content: 'Minha msg',
+              isSelf: true,
+              status: 'sent',
+            } as any,
+          ],
         },
       });
-      listeners['message:receipt']?.({ conversationId: 'c-1', messageId: 'm-mine', status: 'read' });
+      listeners['message:receipt']?.({
+        conversationId: 'c-1',
+        messageId: 'm-mine',
+        status: 'read',
+      });
       expect(useChatStore.getState().messages['c-1'][0].status).toBe('read');
 
       // 6. Poll updated and closed
@@ -680,11 +859,24 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
           ],
         },
       });
-      const pollData: any = { id: 'p-99', conversationId: 'c-1', question: 'Opção Atualizada?', options: [] };
+      const pollData: any = {
+        id: 'p-99',
+        conversationId: 'c-1',
+        question: 'Opção Atualizada?',
+        options: [],
+      };
       listeners['poll:updated']?.(pollData);
-      expect(useChatStore.getState().messages['c-1'][0].metadata?.poll?.question).toBe('Opção Atualizada?');
+      expect(useChatStore.getState().messages['c-1'][0].metadata?.poll?.question).toBe(
+        'Opção Atualizada?'
+      );
 
-      const pollClosedData: any = { id: 'p-99', conversationId: 'c-1', question: 'Opção Fechada', status: 'closed', options: [] };
+      const pollClosedData: any = {
+        id: 'p-99',
+        conversationId: 'c-1',
+        question: 'Opção Fechada',
+        status: 'closed',
+        options: [],
+      };
       listeners['poll:closed']?.(pollClosedData);
       expect(useChatStore.getState().messages['c-1'][0].metadata?.poll?.status).toBe('closed');
     });
@@ -693,19 +885,33 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
   describe('Store Error Handlers & Edge Cases', () => {
     it('account store handles errors on cancelSubscription and downgradePlan', async () => {
       vi.mocked(api.post).mockRejectedValueOnce(new Error('Falha no cancelamento'));
-      await expect(useAccountStore.getState().cancelSubscription()).rejects.toThrow('Falha no cancelamento');
+      await expect(useAccountStore.getState().cancelSubscription()).rejects.toThrow(
+        'Falha no cancelamento'
+      );
       expect(useAccountStore.getState().error).toBe('Falha no cancelamento');
 
       vi.mocked(api.post).mockRejectedValueOnce(new Error('Downgrade não autorizado'));
-      await expect(useAccountStore.getState().downgradePlan('free')).rejects.toThrow('Downgrade não autorizado');
+      await expect(useAccountStore.getState().downgradePlan('free')).rejects.toThrow(
+        'Downgrade não autorizado'
+      );
       expect(useAccountStore.getState().error).toBe('Downgrade não autorizado');
 
       vi.mocked(api.post).mockRejectedValueOnce(new Error('Erro no convite'));
-      await expect(useAccountStore.getState().inviteMember('err@corp.com', 'member')).rejects.toThrow('Erro no convite');
+      await expect(
+        useAccountStore.getState().inviteMember('err@corp.com', 'member')
+      ).rejects.toThrow('Erro no convite');
       expect(useAccountStore.getState().error).toBe('Erro no convite');
 
       vi.mocked(api.post).mockRejectedValueOnce(new Error('Falha no pagamento'));
-      await expect(useAccountStore.getState().subscribePlan({ targetPlan: 'pro', billingCycle: 'monthly', paymentMethod: 'pix' } as any)).rejects.toThrow('Falha no pagamento');
+      await expect(
+        useAccountStore
+          .getState()
+          .subscribePlan({
+            targetPlan: 'pro',
+            billingCycle: 'monthly',
+            paymentMethod: 'pix',
+          } as any)
+      ).rejects.toThrow('Falha no pagamento');
       expect(useAccountStore.getState().error).toBe('Falha no pagamento');
 
       useAccountStore.getState().clearCheckoutResult();
@@ -802,7 +1008,9 @@ describe('Zustand Stores Comprehensive Test Suite', () => {
       useAuthStore.setState({ accessToken: 'token-new' });
       mockSocketInstance.connected = false;
       const oldDisconnectMock = vi.fn();
-      useSocketStore.setState({ socket: { ...mockSocketInstance, disconnect: oldDisconnectMock } as any });
+      useSocketStore.setState({
+        socket: { ...mockSocketInstance, disconnect: oldDisconnectMock } as any,
+      });
 
       useSocketStore.getState().connect();
       expect(oldDisconnectMock).toHaveBeenCalled();

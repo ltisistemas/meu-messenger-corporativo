@@ -26,11 +26,19 @@ describe('Evidence Certificate, Hash Integrity & Document Download (T-33)', () =
   const conversationId = '33333333-3333-3333-3333-333333333333';
   const signatureRequestId = '44444444-4444-4444-4444-444444444444';
 
-  const originalPdfBuffer = Buffer.from('%PDF-1.4 Mock Legal Agreement for T-33 Evidence Verification');
+  const originalPdfBuffer = Buffer.from(
+    '%PDF-1.4 Mock Legal Agreement for T-33 Evidence Verification'
+  );
   const originalPdfBase64 = originalPdfBuffer.toString('base64');
-  const expectedOriginalSha256 = crypto.createHash('sha256').update(originalPdfBuffer).digest('hex');
+  const expectedOriginalSha256 = crypto
+    .createHash('sha256')
+    .update(originalPdfBuffer)
+    .digest('hex');
 
-  const signedSha256Mock = crypto.createHash('sha256').update(Buffer.from('signed-version-t33')).digest('hex');
+  const signedSha256Mock = crypto
+    .createHash('sha256')
+    .update(Buffer.from('signed-version-t33'))
+    .digest('hex');
 
   // In-memory store
   const accountStore = new Map<string, any>();
@@ -228,7 +236,9 @@ describe('Evidence Certificate, Hash Integrity & Document Download (T-33)', () =
 
       expect(response.statusCode).toBe(200);
       expect(response.headers['content-type']).toBe('application/pdf');
-      expect(response.headers['content-disposition']).toContain('contrato_social_certificado_evidencias.pdf');
+      expect(response.headers['content-disposition']).toContain(
+        'contrato_social_certificado_evidencias.pdf'
+      );
       expect(response.headers['x-certificate-sha256']).toBeDefined();
 
       const pdfBody = response.body;

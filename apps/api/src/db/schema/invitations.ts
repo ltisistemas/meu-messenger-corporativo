@@ -24,9 +24,7 @@ export const invitations = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [
-    uniqueIndex('invitations_token_idx').on(table.token),
-  ]
+  (table) => [uniqueIndex('invitations_token_idx').on(table.token)]
 );
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({

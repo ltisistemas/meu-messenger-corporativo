@@ -1,10 +1,11 @@
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, or } from 'drizzle-orm';
 import { db as defaultDb } from '../db/index';
 import {
   accounts,
   users,
   subscriptions,
   invoices,
+  webhookEvents,
   Subscription,
   Invoice,
 } from '../db/schema/index';
@@ -16,6 +17,8 @@ import {
   SubscriptionResponse,
   InvoiceResponse,
   BillingSummaryResponse,
+  CheckoutStatusResponse,
+  WebhookEventsListResponse,
 } from '@corpchat/shared';
 import { AsaasGatewayService } from './asaas.service';
 
@@ -44,7 +47,9 @@ export class BillingService {
     };
   }> {
     if (userRole !== 'admin' && userRole !== 'owner') {
-      throw new Error('Apenas administradores ou proprietários da organização podem gerenciar assinaturas.');
+      throw new Error(
+        'Apenas administradores ou proprietários da organização podem gerenciar assinaturas.'
+      );
     }
 
     const account = await this.db.query.accounts.findFirst({
@@ -67,7 +72,13 @@ export class BillingService {
       : planConfig.priceMonthlyCents;
     const amountFloat = amountCents / 100;
 
-    // 1. Create or get customer in Asaas
+    // Check if account already has an active subscription with customer ID
+    const existingSub = await this.db.query.subscriptions.findFirst({
+      where: eq(subscriptions.accountId, accountId),
+      orderBy: [desc(subscriptions.createdAt)],
+    });
+
+    // 1. Create or get customer in Asaas using cascade resolution
     const customer = await this.asaasService.createOrGetCustomer({
       name: dto.customer.name,
       email: dto.customer.email,
@@ -75,6 +86,8 @@ export class BillingService {
       phone: dto.customer.phone,
       postalCode: dto.customer.postalCode,
       addressNumber: dto.customer.addressNumber,
+      existingCustomerId: existingSub?.gatewayCustomerId || undefined,
+      externalReference: accountId,
     });
 
     // 2. Create subscription in Asaas
@@ -83,8 +96,8 @@ export class BillingService {
       dto.paymentMethod === 'pix'
         ? 'PIX'
         : dto.paymentMethod === 'credit_card'
-        ? 'CREDIT_CARD'
-        : 'BOLETO';
+          ? 'CREDIT_CARD'
+          : 'BOLETO';
 
     const asaasResult = await this.asaasService.createSubscription({
       customerId: customer.id,
@@ -93,6 +106,8 @@ export class BillingService {
       nextDueDate,
       cycle: isYearly ? 'YEARLY' : 'MONTHLY',
       description: `Assinatura NextMsg - Plano ${planConfig.name} (${dto.billingCycle})`,
+      externalReference: accountId,
+      maxPayments: isYearly ? 5 : 24,
       creditCard: dto.creditCard,
       creditCardHolderInfo: dto.customer,
     });
@@ -174,13 +189,16 @@ export class BillingService {
   }
 
   /**
-   * Handles webhook notifications from Asaas Gateway (T-28 / T-29)
+   * Handles webhook notifications from Asaas Gateway with idempotency, multi-key resolution,
+   * audit logging and protection against unwanted downgrades.
    */
   async handleWebhook(
     event: string,
     paymentData: any,
-    webhookToken?: string
-  ): Promise<{ handled: boolean; action?: string }> {
+    webhookToken?: string,
+    incomingEventId?: string
+  ): Promise<{ handled: boolean; action?: string; duplicate?: boolean }> {
+    const startTime = Date.now();
     const expectedSecret = process.env.ASAAS_WEBHOOK_SECRET;
     if (expectedSecret && webhookToken && webhookToken !== expectedSecret) {
       throw new Error('Token de webhook Asaas inválido.');
@@ -190,122 +208,218 @@ export class BillingService {
       return { handled: false, action: 'ignored_no_payload' };
     }
 
+    // Determine unique event ID for idempotency (Asaas provides event ID e.g. evt_...)
+    const eventId =
+      incomingEventId ||
+      paymentData.eventId ||
+      (incomingEventId ? incomingEventId : `evt_${paymentData.id}_${event}`);
+
+    // Check idempotency against webhook_eventos table
+    const alreadyProcessed = await this.findWebhookEvent(eventId);
+    if (alreadyProcessed) {
+      await this.logWebhookEvent({
+        id: `dup_${Date.now()}_${eventId}`,
+        evento: event,
+        status: 'duplicado',
+        acao: 'DUPLICATE_SKIPPED',
+        accountId: alreadyProcessed.accountId || undefined,
+        duracaoMs: Date.now() - startTime,
+        payload: paymentData,
+      });
+      return { handled: true, duplicate: true, action: 'DUPLICATE_SKIPPED' };
+    }
+
     const gatewayPaymentId = paymentData.id;
     const gatewaySubId = paymentData.subscription;
+    const externalRef = paymentData.externalReference;
+    const customerId = paymentData.customer;
 
-    // 1. Find invoice or subscription
-    let targetInvoice: Invoice | undefined;
+    // 1. Multi-key Resolution:
+    // Step A: externalReference (which maps to accountId)
+    // Step B: subscriptionId (gateway_subscription_id)
+    // Step C: paymentId (gateway_invoice_id)
+    // Step D: customerId (gateway_customer_id)
+    let targetAccount: any;
     let targetSub: Subscription | undefined;
+    let targetInvoice: Invoice | undefined;
+
+    if (externalRef) {
+      targetAccount = await this.db.query.accounts.findFirst({
+        where: eq(accounts.id, externalRef),
+      });
+      if (targetAccount) {
+        targetSub = await this.db.query.subscriptions.findFirst({
+          where: eq(subscriptions.accountId, targetAccount.id),
+          orderBy: [desc(subscriptions.createdAt)],
+        });
+      }
+    }
+
+    if (!targetSub && gatewaySubId) {
+      targetSub = await this.db.query.subscriptions.findFirst({
+        where: eq(subscriptions.gatewaySubscriptionId, gatewaySubId),
+      });
+    }
 
     if (gatewayPaymentId) {
       targetInvoice = await this.db.query.invoices.findFirst({
         where: eq(invoices.gatewayInvoiceId, gatewayPaymentId),
       });
+      if (targetInvoice?.subscriptionId && !targetSub) {
+        targetSub = await this.db.query.subscriptions.findFirst({
+          where: eq(subscriptions.id, targetInvoice.subscriptionId),
+        });
+      }
     }
 
-    if (gatewaySubId) {
+    if (!targetSub && customerId) {
       targetSub = await this.db.query.subscriptions.findFirst({
-        where: eq(subscriptions.gatewaySubscriptionId, gatewaySubId),
-      });
-    } else if (targetInvoice?.subscriptionId) {
-      targetSub = await this.db.query.subscriptions.findFirst({
-        where: eq(subscriptions.id, targetInvoice.subscriptionId),
+        where: eq(subscriptions.gatewayCustomerId, customerId),
+        orderBy: [desc(subscriptions.createdAt)],
       });
     }
 
-    // 2. Process specific Asaas webhook events
-    switch (event) {
-      case 'PAYMENT_CONFIRMED':
-      case 'PAYMENT_RECEIVED': {
-        const paidDate = paymentData.paymentDate ? new Date(paymentData.paymentDate) : new Date();
+    if (!targetAccount && targetSub?.accountId) {
+      targetAccount = await this.db.query.accounts.findFirst({
+        where: eq(accounts.id, targetSub.accountId),
+      });
+    }
 
-        // Update invoice to paid
-        if (targetInvoice) {
-          await this.db
-            .update(invoices)
-            .set({
-              status: 'paid',
-              paidAt: paidDate,
-            })
-            .where(eq(invoices.id, targetInvoice.id));
+    // If completely unmatched, record audit with status 'aviso' and return 200 OK
+    // so Asaas does not retry indefinitely
+    if (!targetSub && !targetAccount && !targetInvoice) {
+      const duracaoMs = Date.now() - startTime;
+      await this.logWebhookEvent({
+        id: eventId,
+        evento: event,
+        status: 'aviso',
+        acao: 'UNMATCHED_ACCOUNT',
+        duracaoMs,
+        payload: paymentData,
+      });
+      return { handled: true, action: 'UNMATCHED_ACCOUNT' };
+    }
+
+    // Determine if account is protected from downgrade (e.g. admin or manual exemption)
+    const isAccountProtected = Boolean(
+      (targetAccount as any)?.isProtected || (targetSub?.metadata as any)?.manualExemption
+    );
+
+    let resultAction = `unhandled_event_${event}`;
+
+    try {
+      // 2. Process specific Asaas webhook events
+      switch (event) {
+        case 'PAYMENT_CONFIRMED':
+        case 'PAYMENT_RECEIVED':
+        case 'PAYMENT_RECEIVED_IN_CASH': {
+          const paidDate = paymentData.paymentDate ? new Date(paymentData.paymentDate) : new Date();
+
+          // Update invoice to paid
+          if (targetInvoice) {
+            await this.db
+              .update(invoices)
+              .set({
+                status: 'paid',
+                paidAt: paidDate,
+              })
+              .where(eq(invoices.id, targetInvoice.id));
+          }
+
+          // Update subscription and account plan
+          if (targetSub) {
+            const isYearly = targetSub.billingCycle === 'yearly';
+            const periodDays = isYearly ? 365 : 30;
+            const currentPeriodStart = paidDate;
+            const currentPeriodEnd = new Date(paidDate.getTime() + periodDays * 86400 * 1000);
+
+            await this.db
+              .update(subscriptions)
+              .set({
+                status: 'active',
+                currentPeriodStart,
+                currentPeriodEnd,
+                cancelAtPeriodEnd: false,
+              })
+              .where(eq(subscriptions.id, targetSub.id));
+
+            // Upgrade account to plan and reconcile quota
+            const activeCount = await this.countActiveUsers(targetSub.accountId);
+            const targetPlanLimits = PLAN_CONFIGS[targetSub.plan as PlanType] || PLAN_CONFIGS.free;
+            const isExceeded = activeCount > targetPlanLimits.maxUsers;
+
+            await this.db
+              .update(accounts)
+              .set({
+                plan: targetSub.plan,
+                status: isExceeded ? 'over_quota' : 'active',
+                updatedAt: new Date(),
+              })
+              .where(eq(accounts.id, targetSub.accountId));
+          }
+
+          resultAction = 'payment_confirmed_and_plan_activated';
+          break;
         }
 
-        // Update subscription and account plan
-        if (targetSub) {
-          const isYearly = targetSub.billingCycle === 'yearly';
-          const periodDays = isYearly ? 365 : 30;
-          const currentPeriodStart = paidDate;
-          const currentPeriodEnd = new Date(paidDate.getTime() + periodDays * 86400 * 1000);
+        case 'PAYMENT_OVERDUE': {
+          if (targetInvoice) {
+            await this.db
+              .update(invoices)
+              .set({ status: 'overdue' })
+              .where(eq(invoices.id, targetInvoice.id));
+          }
+          if (targetSub) {
+            await this.db
+              .update(subscriptions)
+              .set({ status: 'overdue' })
+              .where(eq(subscriptions.id, targetSub.id));
+          }
 
-          await this.db
-            .update(subscriptions)
-            .set({
-              status: 'active',
-              currentPeriodStart,
-              currentPeriodEnd,
-            })
-            .where(eq(subscriptions.id, targetSub.id));
+          // Grace period tolerance of 3 calendar days
+          const dueDate = targetInvoice?.dueDate ? new Date(targetInvoice.dueDate) : new Date();
+          const daysPastDue = Math.floor((Date.now() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
 
-          // Upgrade account to plan and reconcile quota
-          const activeCount = await this.countActiveUsers(targetSub.accountId);
-          const targetPlanLimits = PLAN_CONFIGS[targetSub.plan as PlanType] || PLAN_CONFIGS.free;
-          const isExceeded = activeCount > targetPlanLimits.maxUsers;
+          if (daysPastDue > 3 && targetSub) {
+            if (isAccountProtected) {
+              resultAction = 'ADMIN_DOWNGRADE_SKIPPED';
+              break;
+            }
 
-          await this.db
-            .update(accounts)
-            .set({
-              plan: targetSub.plan,
-              status: isExceeded ? 'over_quota' : 'active',
-              updatedAt: new Date(),
-            })
-            .where(eq(accounts.id, targetSub.accountId));
-        }
-
-        return { handled: true, action: 'payment_confirmed_and_plan_activated' };
-      }
-
-      case 'PAYMENT_OVERDUE': {
-        if (targetInvoice) {
-          await this.db
-            .update(invoices)
-            .set({ status: 'overdue' })
-            .where(eq(invoices.id, targetInvoice.id));
-        }
-        if (targetSub) {
-          await this.db
-            .update(subscriptions)
-            .set({ status: 'overdue' })
-            .where(eq(subscriptions.id, targetSub.id));
-        }
-        return { handled: true, action: 'payment_marked_overdue' };
-      }
-
-      case 'PAYMENT_REFUNDED': {
-        if (targetInvoice) {
-          await this.db
-            .update(invoices)
-            .set({ status: 'refunded' })
-            .where(eq(invoices.id, targetInvoice.id));
-        }
-        return { handled: true, action: 'payment_refunded' };
-      }
-
-      case 'SUBSCRIPTION_CANCELED':
-      case 'PAYMENT_DELETED': {
-        if (targetSub) {
-          await this.db
-            .update(subscriptions)
-            .set({
-              status: 'canceled',
-              canceledAt: new Date(),
-            })
-            .where(eq(subscriptions.id, targetSub.id));
-
-          // If current period has expired, downgrade to Free plan and enforce quota
-          if (new Date(targetSub.currentPeriodEnd) <= new Date()) {
             const activeCount = await this.countActiveUsers(targetSub.accountId);
             const isExceeded = activeCount > PLAN_CONFIGS.free.maxUsers;
+            await this.db
+              .update(accounts)
+              .set({
+                plan: 'free',
+                status: isExceeded ? 'over_quota' : 'active',
+                updatedAt: new Date(),
+              })
+              .where(eq(accounts.id, targetSub.accountId));
 
+            resultAction = 'DOWNGRADE_TO_FREE';
+          } else {
+            resultAction = 'payment_marked_overdue';
+          }
+          break;
+        }
+
+        case 'PAYMENT_REFUNDED': {
+          if (targetInvoice) {
+            await this.db
+              .update(invoices)
+              .set({ status: 'refunded' })
+              .where(eq(invoices.id, targetInvoice.id));
+          }
+
+          if (isAccountProtected) {
+            resultAction = 'ADMIN_DOWNGRADE_SKIPPED';
+            break;
+          }
+
+          if (targetSub) {
+            const activeCount = await this.countActiveUsers(targetSub.accountId);
+            const isExceeded = activeCount > PLAN_CONFIGS.free.maxUsers;
             await this.db
               .update(accounts)
               .set({
@@ -315,17 +429,196 @@ export class BillingService {
               })
               .where(eq(accounts.id, targetSub.accountId));
           }
+
+          resultAction = 'payment_refunded';
+          break;
         }
-        return { handled: true, action: 'subscription_canceled' };
+
+        case 'SUBSCRIPTION_CANCELED':
+        case 'SUBSCRIPTION_DELETED':
+        case 'PAYMENT_DELETED':
+        case 'PAYMENT_CHARGEBACK_REQUESTED': {
+          if (targetSub) {
+            await this.db
+              .update(subscriptions)
+              .set({
+                status: 'canceled',
+                canceledAt: new Date(),
+              })
+              .where(eq(subscriptions.id, targetSub.id));
+
+            // If current period has expired or chargeback, downgrade to Free plan
+            const isExpired = new Date(targetSub.currentPeriodEnd) <= new Date();
+            const isImmediateRevoke = event === 'PAYMENT_CHARGEBACK_REQUESTED' || isExpired;
+
+            if (isImmediateRevoke) {
+              if (isAccountProtected) {
+                resultAction = 'ADMIN_DOWNGRADE_SKIPPED';
+                break;
+              }
+
+              const activeCount = await this.countActiveUsers(targetSub.accountId);
+              const isExceeded = activeCount > PLAN_CONFIGS.free.maxUsers;
+
+              await this.db
+                .update(accounts)
+                .set({
+                  plan: 'free',
+                  status: isExceeded ? 'over_quota' : 'active',
+                  updatedAt: new Date(),
+                })
+                .where(eq(accounts.id, targetSub.accountId));
+            }
+          }
+          resultAction = 'subscription_canceled';
+          break;
+        }
+
+        default:
+          resultAction = `unhandled_event_${event}`;
+          break;
       }
 
-      default:
-        return { handled: true, action: `unhandled_event_${event}` };
+      // Log successful audit
+      const duracaoMs = Date.now() - startTime;
+      await this.logWebhookEvent({
+        id: eventId,
+        evento: event,
+        status: 'sucesso',
+        acao: resultAction,
+        accountId: targetAccount?.id || targetSub?.accountId,
+        duracaoMs,
+        payload: paymentData,
+      });
+
+      return { handled: true, action: resultAction };
+    } catch (err: any) {
+      const duracaoMs = Date.now() - startTime;
+      await this.logWebhookEvent({
+        id: eventId,
+        evento: event,
+        status: 'erro',
+        acao: 'ERROR',
+        erroMensagem: err.message,
+        accountId: targetAccount?.id || targetSub?.accountId,
+        duracaoMs,
+        payload: paymentData,
+      });
+      throw err;
     }
   }
 
   /**
-   * Cancels a subscription at end of current billing cycle (T-28)
+   * Queries checkout status for polling and auto-confirms if paid on gateway
+   */
+  async getCheckoutStatus(accountId: string, chargeId: string): Promise<CheckoutStatusResponse> {
+    const account = await this.db.query.accounts.findFirst({
+      where: eq(accounts.id, accountId),
+    });
+
+    if (!account) {
+      throw new Error('Organização não encontrada.');
+    }
+
+    // 1. Look up invoice in local DB
+    const allInvoices = await this.db.query.invoices.findMany({
+      where: eq(invoices.accountId, accountId),
+      orderBy: [desc(invoices.createdAt)],
+    });
+
+    const invoice = allInvoices.find(
+      (inv) => inv.gatewayInvoiceId === chargeId || inv.id === chargeId
+    );
+
+    // If marked paid in local DB (via webhook)
+    if (invoice?.status === 'paid') {
+      return {
+        status: 'PAID',
+        isPro: account.plan === 'pro' || account.plan === 'enterprise',
+        plan: account.plan,
+        invoiceUrl: invoice.pdfUrl,
+        sucesso: true,
+      };
+    }
+
+    // 2. Query gateway directly
+    try {
+      const gatewayPayment = await this.asaasService.getPaymentStatus(chargeId);
+      if (
+        gatewayPayment.status === 'CONFIRMED' ||
+        gatewayPayment.status === 'RECEIVED' ||
+        gatewayPayment.status === 'RECEIVED_IN_CASH'
+      ) {
+        // Confirm locally
+        if (invoice) {
+          await this.db
+            .update(invoices)
+            .set({ status: 'paid', paidAt: new Date() })
+            .where(eq(invoices.id, invoice.id));
+        }
+
+        const activeSub = await this.db.query.subscriptions.findFirst({
+          where: eq(subscriptions.accountId, accountId),
+          orderBy: [desc(subscriptions.createdAt)],
+        });
+
+        if (activeSub) {
+          const isYearly = activeSub.billingCycle === 'yearly';
+          const periodEnd = new Date(Date.now() + (isYearly ? 365 : 30) * 86400 * 1000);
+          await this.db
+            .update(subscriptions)
+            .set({ status: 'active', currentPeriodEnd: periodEnd })
+            .where(eq(subscriptions.id, activeSub.id));
+
+          const activeCount = await this.countActiveUsers(accountId);
+          const limits = PLAN_CONFIGS[activeSub.plan as PlanType] || PLAN_CONFIGS.free;
+          const isExceeded = activeCount > limits.maxUsers;
+
+          await this.db
+            .update(accounts)
+            .set({
+              plan: activeSub.plan,
+              status: isExceeded ? 'over_quota' : 'active',
+              updatedAt: new Date(),
+            })
+            .where(eq(accounts.id, accountId));
+
+          return {
+            status: 'PAID',
+            isPro: true,
+            plan: activeSub.plan,
+            invoiceUrl: invoice?.pdfUrl || gatewayPayment.invoiceUrl,
+            message: 'Pagamento confirmado e plano ativado com sucesso!',
+            sucesso: true,
+          };
+        }
+      }
+    } catch (_) {
+      // If gateway query throws or payment is pending, continue
+    }
+
+    return {
+      status: invoice?.status === 'overdue' ? 'OVERDUE' : 'PENDING',
+      isPro: account.plan === 'pro' || account.plan === 'enterprise',
+      plan: account.plan,
+      invoiceUrl: invoice?.pdfUrl,
+      sucesso: false,
+    };
+  }
+
+  /**
+   * Simulates immediate confirmation of a checkout charge for sandbox/dev testing
+   */
+  async simulateCheckoutStatus(
+    accountId: string,
+    chargeId: string
+  ): Promise<CheckoutStatusResponse> {
+    this.asaasService.simulateDevPayment(chargeId);
+    return this.getCheckoutStatus(accountId, chargeId);
+  }
+
+  /**
+   * Cancels a subscription or schedules cancellation at period end (T-28)
    */
   async cancelSubscription(
     accountId: string,
@@ -340,13 +633,27 @@ export class BillingService {
     const sub = await this.db.query.subscriptions.findFirst({
       where: and(
         eq(subscriptions.accountId, accountId),
-        eq(subscriptions.status, 'active')
+        or(eq(subscriptions.status, 'active'), eq(subscriptions.status, 'pending'))
       ),
       orderBy: [desc(subscriptions.createdAt)],
     });
 
     if (!sub) {
       throw new Error('Nenhuma assinatura ativa encontrada para esta organização.');
+    }
+
+    // Check if user requested reactivation of a previously scheduled cancellation
+    if (dto?.acao === 'reativar') {
+      const [reactivatedSub] = await this.db
+        .update(subscriptions)
+        .set({
+          cancelAtPeriodEnd: false,
+          canceledAt: null,
+        })
+        .where(eq(subscriptions.id, sub.id))
+        .returning();
+
+      return this.formatSubscription(reactivatedSub);
     }
 
     // Cancel in Asaas gateway
@@ -418,6 +725,90 @@ export class BillingService {
       latestInvoice: allInvoices[0] ? this.formatInvoice(allInvoices[0]) : null,
       invoices: allInvoices.map((inv) => this.formatInvoice(inv)),
     };
+  }
+
+  /**
+   * Lists audited webhook events for administrative observability
+   */
+  async listWebhookEvents(options: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    gateway?: string;
+  }): Promise<WebhookEventsListResponse> {
+    const page = Math.max(1, options.page || 1);
+    const limit = Math.min(100, Math.max(1, options.limit || 20));
+    const offset = (page - 1) * limit;
+
+    try {
+      if ((this.db as any).query?.webhookEvents?.findMany) {
+        const events = await (this.db as any).query.webhookEvents.findMany({
+          orderBy: [desc(webhookEvents.processadoEm)],
+          limit,
+          offset,
+        });
+
+        return {
+          events: events.map((e: any) => ({
+            id: e.id,
+            evento: e.evento,
+            gateway: e.gateway,
+            status: e.status,
+            acao: e.acao,
+            accountId: e.accountId,
+            duracaoMs: e.duracaoMs,
+            erroMensagem: e.erroMensagem,
+            payload: e.payload,
+            processadoEm: new Date(e.processadoEm).toISOString(),
+          })),
+          total: events.length,
+          page,
+          limit,
+        };
+      }
+    } catch (_) {}
+
+    return { events: [], total: 0, page, limit };
+  }
+
+  private async findWebhookEvent(id: string): Promise<any | null> {
+    try {
+      if ((this.db as any).query?.webhookEvents?.findFirst) {
+        return await (this.db as any).query.webhookEvents.findFirst({
+          where: eq(webhookEvents.id, id),
+        });
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  private async logWebhookEvent(params: {
+    id: string;
+    evento: string;
+    status: string;
+    acao?: string;
+    accountId?: string;
+    duracaoMs?: number;
+    erroMensagem?: string;
+    payload?: any;
+  }): Promise<void> {
+    try {
+      if (this.db.insert) {
+        await this.db.insert(webhookEvents).values({
+          id: params.id,
+          evento: params.evento,
+          gateway: 'asaas',
+          status: params.status,
+          acao: params.acao,
+          accountId: params.accountId,
+          duracaoMs: params.duracaoMs,
+          erroMensagem: params.erroMensagem,
+          payload: params.payload,
+        });
+      }
+    } catch (_) {
+      // Do not block webhook processing if audit logging insert fails
+    }
   }
 
   private formatSubscription(sub: Subscription): SubscriptionResponse {

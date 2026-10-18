@@ -39,7 +39,9 @@ describe('Load Testing Simulation & Bandwidth Cost Analysis (T-38)', () => {
     expect(report.bandwidth.peakThroughputMbps).toBeGreaterThan(0);
     expect(report.bandwidth.costAnalysis.awsS3EgressMonthlyBrl).toBeGreaterThan(0);
     expect(report.bandwidth.costAnalysis.cloudflareR2MonthlyBrl).toBeGreaterThan(0);
-    expect(report.bandwidth.costAnalysis.nextMsgZeroRetentionSavingsPercent).toBeGreaterThanOrEqual(80);
+    expect(report.bandwidth.costAnalysis.nextMsgZeroRetentionSavingsPercent).toBeGreaterThanOrEqual(
+      80
+    );
 
     // 5. Bottlenecks and recommendations assertions
     expect(report.bottlenecksAndRecommendations.length).toBeGreaterThanOrEqual(5);

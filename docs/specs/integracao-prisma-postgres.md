@@ -10,6 +10,7 @@
 ## Problem Statement
 
 O desenvolvedor provisionou uma instância remota gerenciada no **Prisma Postgres** (`db.prisma.io:5432`) e configurou as credenciais de acesso no ambiente local e no painel do Vercel. No entanto:
+
 1. **Banco Remoto Não Inicializado:** A instância de banco em nuvem está vazia (0 tabelas públicas), impossibilitando a persistência de organizações, colaboradores, conversas, mensagens e registros de auditoria.
 2. **Desalinhamento de Ambiente Monorepo:** As variáveis de conexão (`DATABASE_URL`, `POSTGRES_URL`) foram adicionadas na raiz do monorepo, mas a camada de execução da API e as ferramentas CLI de migração de banco rodam a partir do pacote do backend, exigindo sincronização consistente dos arquivos de ambiente.
 3. **Resiliência Serverless no Vercel:** Quando o backend executa em ambiente serverless no Vercel, o ciclo de vida efêmero das funções e a terminação SSL obrigatória (`sslmode=require`) exigem pooling controlado e detecção de conectividade para evitar estouro de conexões ativas na instância do banco.
@@ -19,6 +20,7 @@ O desenvolvedor provisionou uma instância remota gerenciada no **Prisma Postgre
 ## Solution
 
 Conectar o backend NextMsg e a infraestrutura do Vercel à instância remota do **Prisma Postgres**, mantendo o **Drizzle ORM** como motor de mapeamento relacional e persistência:
+
 1. Sincronizar as variáveis de ambiente com o pacote do backend e garantir que o carregador de configuração localize credenciais tanto da raiz do monorepo quanto do pacote da API.
 2. Provisionar todas as tabelas, tipos enumerados e índices do esquema relacional diretamente no banco Prisma Postgres utilizando a ferramenta de push/migração do ORM.
 3. Assegurar parâmetros de pooling seguros para ambiente serverless com limite reduzido de conexões por função lambda e tratamento resiliente de erros transitórios de conexão.
@@ -29,12 +31,14 @@ Conectar o backend NextMsg e a infraestrutura do Vercel à instância remota do 
 ## User Stories
 
 ### Configuração e Resolução de Ambiente
+
 1. As a developer running local commands, I want the backend service to locate connection strings from the environment file, so that CLI tools execute against the intended database without manual exports.
 2. As a DevOps engineer deploying to Vercel, I want the API to read connection parameters seamlessly from Vercel environment variables, so that production builds connect directly to the cloud database.
 3. As a developer, I want documentation and template environment files updated with Prisma Postgres connection patterns, so that team members can onboard with consistent configuration.
 4. As a systems operator, I want SSL mode requirements automatically detected and negotiated with the database driver, so that secure connections succeed without certificate rejection errors.
 
 ### Provisionamento e Integridade de Esquema
+
 5. As an organization administrator, I want organization and collaborator tables created on the remote database, so that newly registered corporate tenants are persisted with full data isolation.
 6. As a collaborator, I want conversation, message, reaction and attachment tables created, so that real-time messages are stored reliably.
 7. As an administrator, I want broadcast communication channels and polls tables created, so that official announcements and team votes are persisted correctly.
@@ -42,11 +46,13 @@ Conectar o backend NextMsg e a infraestrutura do Vercel à instância remota do 
 9. As a developer, I want schema synchronization to be idempotent, so that running schema push operations multiple times does not destroy existing data or duplicate constraints.
 
 ### Resiliência e Concorrência Serverless
+
 10. As a cloud architect, I want the database connection pool in serverless mode to limit simultaneous sockets per lambda instance, so that sudden spikes in serverless invocations do not exhaust database connection capacity.
 11. As a systems administrator, I want database pool connection timeouts strictly configured, so that hanging network calls to the cloud database fail fast rather than stalling HTTP responses.
 12. As an observability engineer, I want database connection errors logged with non-fatal warnings rather than unhandled process crashes, so that transient network interruptions do not crash active workers.
 
 ### Verificação Operacional e Monitoramento
+
 13. As an automated monitoring agent, I want the readiness endpoint (`/ready`) to run a lightweight connectivity query against the database, so that traffic is only routed when the database is reachable.
 14. As an automated monitoring agent, I want the health endpoint (`/health`) to return HTTP 200 and healthy status when the database responds normally, so that Vercel health checks pass consistently.
 15. As a QA engineer, I want automated test suites to continue passing with 100% mocked pool isolation in unit tests while verifying live connection capabilities in integration benchmarks, so that regression thresholds (95% coverage) remain fulfilled.

@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Users,
-  User,
-  Clock,
-  ShieldCheck,
-  Radio,
-  Hourglass,
-  AlertTriangle,
-} from 'lucide-react';
+import { Users, User, Clock, ShieldCheck, Radio, Hourglass, AlertTriangle } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -17,7 +9,11 @@ import { useChatStore, CreateGroupOptions } from '../../stores/chat.store';
 export interface NewChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateGroup: (options: CreateGroupOptions | string, memberIds?: string[], retentionHours?: number) => Promise<void>;
+  onCreateGroup: (
+    options: CreateGroupOptions | string,
+    memberIds?: string[],
+    retentionHours?: number
+  ) => Promise<void>;
   onCreateDirect: (userIdOrEmail: string) => Promise<void>;
 }
 
@@ -66,11 +62,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
             expiresInHours: expHours,
           });
         } else {
-          await onCreateGroup(
-            groupTitle.trim(),
-            [],
-            parseInt(retentionHours, 10) || 0
-          );
+          await onCreateGroup(groupTitle.trim(), [], parseInt(retentionHours, 10) || 0);
         }
       } else if (tab === 'broadcast') {
         if (isFreePlan) {
@@ -110,8 +102,8 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
         tab === 'group'
           ? 'Criar Novo Grupo Corporativo'
           : tab === 'broadcast'
-          ? 'Nova Transmissão Corporativa'
-          : 'Iniciar Conversa Direta 1:1'
+            ? 'Nova Transmissão Corporativa'
+            : 'Iniciar Conversa Direta 1:1'
       }
     >
       <div className="space-y-4">
@@ -204,7 +196,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
 
                 {isTemporary && (
                   <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                    <label htmlFor="group-exp-select" className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    <label
+                      htmlFor="group-exp-select"
+                      className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1"
+                    >
                       Prazo de Expiração do Grupo
                     </label>
                     <select
@@ -224,7 +219,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
               </div>
 
               <div>
-                <label htmlFor="group-retention-select" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1">
+                <label
+                  htmlFor="group-retention-select"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1"
+                >
                   <Clock className="w-3.5 h-3.5 text-slate-500" />
                   Política de Retenção de Mensagens
                 </label>
@@ -234,7 +232,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
                   onChange={(e) => setRetentionHours(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 >
-                  <option value="0">Permanente (Sem auto-destruição individual de mensagens)</option>
+                  <option value="0">
+                    Permanente (Sem auto-destruição individual de mensagens)
+                  </option>
                   <option value="24">24 horas</option>
                   <option value="72">72 horas (3 dias)</option>
                   <option value="168">7 dias (1 semana)</option>
@@ -249,13 +249,16 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
                   <div>
                     <p className="font-semibold mb-0.5">Recurso dos Planos Pro e Enterprise</p>
                     <p>
-                      Listas de transmissão corporativa e relatórios analíticos de entrega são exclusivos para assinantes Pro e Enterprise.
+                      Listas de transmissão corporativa e relatórios analíticos de entrega são
+                      exclusivos para assinantes Pro e Enterprise.
                     </p>
                   </div>
                 </div>
               ) : (
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Transmissões enviam uma mensagem oficial a todos os membros da sua organização no canal <strong>Comunicados</strong> e geram relatório detalhado de entrega e leitura.
+                  Transmissões enviam uma mensagem oficial a todos os membros da sua organização no
+                  canal <strong>Comunicados</strong> e geram relatório detalhado de entrega e
+                  leitura.
                 </p>
               )}
 
@@ -306,8 +309,8 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
                     ? 'Criar Grupo Temporário'
                     : 'Criar Grupo'
                   : tab === 'broadcast'
-                  ? 'Disparar Transmissão'
-                  : 'Iniciar Conversa'}
+                    ? 'Disparar Transmissão'
+                    : 'Iniciar Conversa'}
               </Button>
             </div>
           </div>
@@ -316,4 +319,3 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
     </Modal>
   );
 };
-

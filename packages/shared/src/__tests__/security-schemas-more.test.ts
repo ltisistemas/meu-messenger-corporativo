@@ -1,16 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {
-  sanitizeText,
-  sanitizeMessageContent,
-  isSafeUrl,
-  maskSensitiveData,
-} from '../security';
-import {
-  parseCloudLink,
-  isCloudStorageUrl,
-  detectUrls,
-  extractCloudLinks,
-} from '../cloud-links';
+import { sanitizeText, sanitizeMessageContent, isSafeUrl, maskSensitiveData } from '../security';
+import { parseCloudLink, isCloudStorageUrl, detectUrls, extractCloudLinks } from '../cloud-links';
 import {
   validateFileAttachment,
   getQuotaStatus,
@@ -262,66 +252,86 @@ describe('Domain Schemas & DTO Validation', () => {
     expect(SendTextMessageDtoSchema.parse({ conversationId: uuid, content: 'Olá' })).toBeDefined();
     expect(() => SendTextMessageDtoSchema.parse({ conversationId: 'bad', content: '' })).toThrow();
 
-    expect(MarkMessagesReadDtoSchema.parse({ conversationId: uuid, messageIds: [uuid] })).toBeDefined();
+    expect(
+      MarkMessagesReadDtoSchema.parse({ conversationId: uuid, messageIds: [uuid] })
+    ).toBeDefined();
     expect(TypingEventDtoSchema.parse({ conversationId: uuid, isTyping: true })).toBeDefined();
 
     expect(CreateDirectConversationDtoSchema.parse({ targetUserId: uuid })).toBeDefined();
-    expect(CreateGroupConversationDtoSchema.parse({ title: 'Squad Frontend', memberUserIds: [uuid] })).toBeDefined();
+    expect(
+      CreateGroupConversationDtoSchema.parse({ title: 'Squad Frontend', memberUserIds: [uuid] })
+    ).toBeDefined();
     expect(AddMembersDtoSchema.parse({ userIds: [uuid] })).toBeDefined();
   });
 
   it('validates Broadcast, Poll, Billing, Signature, LGPD and Relay DTOs', () => {
     const uuid = 'a0000000-0000-0000-0000-000000000001';
-    expect(SendBroadcastDtoSchema.parse({
-      title: 'Aviso Geral',
-      content: 'Todos devem comparecer',
-    })).toBeDefined();
+    expect(
+      SendBroadcastDtoSchema.parse({
+        title: 'Aviso Geral',
+        content: 'Todos devem comparecer',
+      })
+    ).toBeDefined();
 
-    expect(CreatePollDtoSchema.parse({
-      conversationId: uuid,
-      question: 'Aprovado?',
-      options: ['Sim', 'Não'],
-    })).toBeDefined();
+    expect(
+      CreatePollDtoSchema.parse({
+        conversationId: uuid,
+        question: 'Aprovado?',
+        options: ['Sim', 'Não'],
+      })
+    ).toBeDefined();
     expect(VotePollDtoSchema.parse({ optionIds: [uuid] })).toBeDefined();
 
     expect(ChangePlanDtoSchema.parse({ plan: 'pro' })).toBeDefined();
-    expect(CreateSignatureRequestDtoSchema.parse({
-      conversationId: uuid,
-      title: 'Contrato de Trabalho',
-      documentName: 'contrato.pdf',
-      contentBase64: 'JVBERi0xLjQK...',
-      signers: [{ name: 'Ana Silva', email: 'ana@empresa.com', signAs: 'sign' }],
-    })).toBeDefined();
+    expect(
+      CreateSignatureRequestDtoSchema.parse({
+        conversationId: uuid,
+        title: 'Contrato de Trabalho',
+        documentName: 'contrato.pdf',
+        contentBase64: 'JVBERi0xLjQK...',
+        signers: [{ name: 'Ana Silva', email: 'ana@empresa.com', signAs: 'sign' }],
+      })
+    ).toBeDefined();
 
-    expect(LgpdDeleteAccountDtoSchema.parse({
-      password: 'senhaSegura123',
-      confirmationText: 'EXCLUIR',
-    })).toBeDefined();
+    expect(
+      LgpdDeleteAccountDtoSchema.parse({
+        password: 'senhaSegura123',
+        confirmationText: 'EXCLUIR',
+      })
+    ).toBeDefined();
     expect(CreateInvitationDtoSchema.parse({ email: 'novo@empresa.com' })).toBeDefined();
-    expect(AcceptInvitationDtoSchema.parse({
-      token: 'tok-123',
-      name: 'Novo Membro',
-      password: 'senhaSegura123',
-    })).toBeDefined();
+    expect(
+      AcceptInvitationDtoSchema.parse({
+        token: 'tok-123',
+        name: 'Novo Membro',
+        password: 'senhaSegura123',
+      })
+    ).toBeDefined();
 
-    expect(FileRelayInitDtoSchema.parse({
-      transferId: uuid,
-      conversationId: uuid,
-      fileName: 'relatorio.pdf',
-      fileSize: 1024,
-      mimeType: 'application/pdf',
-      totalChunks: 2,
-    })).toBeDefined();
+    expect(
+      FileRelayInitDtoSchema.parse({
+        transferId: uuid,
+        conversationId: uuid,
+        fileName: 'relatorio.pdf',
+        fileSize: 1024,
+        mimeType: 'application/pdf',
+        totalChunks: 2,
+      })
+    ).toBeDefined();
 
-    expect(FileRelayChunkDtoSchema.parse({
-      transferId: uuid,
-      chunkIndex: 0,
-      data: 'base64data',
-    })).toBeDefined();
+    expect(
+      FileRelayChunkDtoSchema.parse({
+        transferId: uuid,
+        chunkIndex: 0,
+        data: 'base64data',
+      })
+    ).toBeDefined();
 
-    expect(FileRelayCompleteDtoSchema.parse({
-      transferId: uuid,
-    })).toBeDefined();
+    expect(
+      FileRelayCompleteDtoSchema.parse({
+        transferId: uuid,
+      })
+    ).toBeDefined();
   });
 
   it('validates Subscription, Member and Signature Verification errorMaps and refinements', () => {
@@ -364,10 +374,12 @@ describe('Domain Schemas & DTO Validation', () => {
     const emptyVerify = VerifySignatureHashDtoSchema.safeParse({});
     expect(emptyVerify.success).toBe(false);
 
-    expect(LgpdDeleteAccountDtoSchema.parse({
-      password: 'senha',
-      confirmationText: 'DELETAR',
-    })).toBeDefined();
+    expect(
+      LgpdDeleteAccountDtoSchema.parse({
+        password: 'senha',
+        confirmationText: 'DELETAR',
+      })
+    ).toBeDefined();
     const badDelete = LgpdDeleteAccountDtoSchema.safeParse({
       password: 'senha',
       confirmationText: 'CANCELAR',

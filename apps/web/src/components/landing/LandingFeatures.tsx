@@ -69,7 +69,10 @@ export const LandingFeatures: React.FC = () => {
   ];
 
   return (
-    <section id="features" className="py-20 md:py-32 relative bg-slate-950/70 border-t border-slate-900">
+    <section
+      id="features"
+      className="py-20 md:py-32 relative bg-slate-950/70 border-t border-slate-900"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-400">
@@ -80,7 +83,8 @@ export const LandingFeatures: React.FC = () => {
             Ferramentas pensadas para o dia a dia da sua equipe
           </h2>
           <p className="text-base sm:text-lg text-slate-400 leading-relaxed">
-            Cada funcionalidade do NextMsg foi desenhada para aumentar a velocidade de tomada de decisões sem abrir mão da governança e da segurança de dados.
+            Cada funcionalidade do NextMsg foi desenhada para aumentar a velocidade de tomada de
+            decisões sem abrir mão da governança e da segurança de dados.
           </p>
         </div>
 
@@ -110,9 +114,7 @@ export const LandingFeatures: React.FC = () => {
                   <h3 className="text-xl font-bold text-white mb-3 group-hover:text-emerald-300 transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-slate-400 leading-relaxed mb-6">
-                    {item.description}
-                  </p>
+                  <p className="text-sm text-slate-400 leading-relaxed mb-6">{item.description}</p>
                 </div>
 
                 <div className="pt-4 border-t border-slate-800/80 flex items-center text-xs font-semibold text-emerald-400 gap-1.5">

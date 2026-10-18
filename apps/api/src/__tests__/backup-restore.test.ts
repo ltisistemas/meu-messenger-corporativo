@@ -10,13 +10,24 @@ describe('PostgreSQL Backup & Disaster Recovery Service (T-37)', () => {
     { id: 'acc-uuid-1', name: 'Acme Corp', plan: 'enterprise', status: 'active' },
   ];
   const mockUsers = [
-    { id: 'usr-uuid-1', accountId: 'acc-uuid-1', name: 'John Doe', email: 'john@acme.com', role: 'owner' },
+    {
+      id: 'usr-uuid-1',
+      accountId: 'acc-uuid-1',
+      name: 'John Doe',
+      email: 'john@acme.com',
+      role: 'owner',
+    },
   ];
   const mockConversations = [
     { id: 'conv-uuid-1', accountId: 'acc-uuid-1', type: 'direct', isTemporary: false },
   ];
   const mockMessages = [
-    { id: 'msg-uuid-1', conversationId: 'conv-uuid-1', type: 'text', content: 'Mensagem confidencial' },
+    {
+      id: 'msg-uuid-1',
+      conversationId: 'conv-uuid-1',
+      type: 'text',
+      content: 'Mensagem confidencial',
+    },
   ];
 
   beforeEach(() => {

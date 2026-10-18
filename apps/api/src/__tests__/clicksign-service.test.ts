@@ -7,8 +7,14 @@ describe('ClicksignProviderService Sandbox & Live Adapter Tests', () => {
   let liveService: ClicksignProviderService;
 
   beforeEach(() => {
-    sandboxService = new ClicksignProviderService('mock-api-key', 'https://sandbox.clicksign.com/api/v1');
-    liveService = new ClicksignProviderService('live-token-secret-123', 'https://app.clicksign.com/api/v1');
+    sandboxService = new ClicksignProviderService(
+      'mock-api-key',
+      'https://sandbox.clicksign.com/api/v1'
+    );
+    liveService = new ClicksignProviderService(
+      'live-token-secret-123',
+      'https://app.clicksign.com/api/v1'
+    );
   });
 
   afterEach(() => {
@@ -257,7 +263,9 @@ describe('ClicksignProviderService Sandbox & Live Adapter Tests', () => {
           documentKey: 'doc-live-1',
           signerKey: 'sig-live-1',
         })
-      ).rejects.toThrow('Falha no Clicksign (addSignerToDocument): Signatário inválido para o documento');
+      ).rejects.toThrow(
+        'Falha no Clicksign (addSignerToDocument): Signatário inválido para o documento'
+      );
 
       // 3. Network error
       vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('EPIPE'));
@@ -340,7 +348,8 @@ describe('ClicksignProviderService Sandbox & Live Adapter Tests', () => {
       const pdfBytes = Buffer.from('%PDF-1.4 Mock Real Live File');
       vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
         ok: true,
-        arrayBuffer: async () => pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength),
+        arrayBuffer: async () =>
+          pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength),
       } as any);
 
       const downloaded = await liveService.downloadSignedDocument('doc-live-1');

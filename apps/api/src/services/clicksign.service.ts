@@ -386,7 +386,9 @@ export class ClicksignProviderService {
       documentation: params.signerInfo.documentation,
       authType: params.signerInfo.authType || 'email',
       ipAddress: params.ipAddress || '189.120.45.12',
-      userAgent: params.userAgent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
+      userAgent:
+        params.userAgent ||
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
       signedAt,
       token: params.token || crypto.randomBytes(16).toString('hex'),
       signatureRole: listItem.signAs,
@@ -432,7 +434,9 @@ export class ClicksignProviderService {
     }
 
     try {
-      const res = await fetch(`${this.baseUrl}/documents/${documentKey}?access_token=${this.apiKey}`);
+      const res = await fetch(
+        `${this.baseUrl}/documents/${documentKey}?access_token=${this.apiKey}`
+      );
       if (!res.ok) {
         throw new Error('Documento não encontrado na API Clicksign.');
       }
@@ -491,7 +495,8 @@ export class ClicksignProviderService {
         status: store.document.status,
         createdAt: store.document.createdAt,
         closedAt: store.document.closedAt,
-        legalFramework: 'Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020 (Assinatura Eletrônica Simples/Avançada)',
+        legalFramework:
+          'Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020 (Assinatura Eletrônica Simples/Avançada)',
         events: store.evidenceEvents,
       };
     }
@@ -506,7 +511,8 @@ export class ClicksignProviderService {
         status: document.status,
         createdAt: document.createdAt,
         closedAt: document.closedAt,
-        legalFramework: 'Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020 (Assinatura Eletrônica Simples/Avançada)',
+        legalFramework:
+          'Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020 (Assinatura Eletrônica Simples/Avançada)',
         events: [],
       };
     } catch (err: any) {
@@ -546,7 +552,9 @@ export class ClicksignProviderService {
     }
 
     try {
-      const res = await fetch(`${this.baseUrl}/documents/${documentKey}/download?access_token=${this.apiKey}`);
+      const res = await fetch(
+        `${this.baseUrl}/documents/${documentKey}/download?access_token=${this.apiKey}`
+      );
       if (!res.ok) {
         throw new Error('Falha ao baixar documento assinado.');
       }
@@ -569,13 +577,14 @@ export class ClicksignProviderService {
   /**
    * 8. Verify Clicksign HMAC-SHA256 Webhook Signature
    */
-  verifyWebhookSignature(rawPayload: string | Buffer, signatureHeader: string, secret: string): boolean {
+  verifyWebhookSignature(
+    rawPayload: string | Buffer,
+    signatureHeader: string,
+    secret: string
+  ): boolean {
     if (!signatureHeader || !secret) return false;
     try {
-      const computedHmac = crypto
-        .createHmac('sha256', secret)
-        .update(rawPayload)
-        .digest('hex');
+      const computedHmac = crypto.createHmac('sha256', secret).update(rawPayload).digest('hex');
 
       if (computedHmac.length !== signatureHeader.length) {
         return false;

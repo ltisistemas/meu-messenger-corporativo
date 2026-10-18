@@ -95,7 +95,8 @@ export const LandingPricing: React.FC = () => {
             Escolha o plano ideal para a sua equipe
           </h2>
           <p className="text-base sm:text-lg text-slate-400 leading-relaxed">
-            Comece gratuitamente no Plano Free ou ative o Trial de 14 dias do Plano Pro com todas as funcionalidades liberadas e sem necessidade de cartão de crédito.
+            Comece gratuitamente no Plano Free ou ative o Trial de 14 dias do Plano Pro com todas as
+            funcionalidades liberadas e sem necessidade de cartão de crédito.
           </p>
 
           {/* Billing Switcher */}

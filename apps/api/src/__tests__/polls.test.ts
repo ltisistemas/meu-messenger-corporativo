@@ -83,9 +83,30 @@ describe('Polls System & Real-time Voting (T-26)', () => {
     };
 
     const mockUsersList = [
-      { id: user1Id, accountId: proAccountId, name: 'Lucas Admin', email: 'lucas@corp.com', role: 'admin', status: 'active' },
-      { id: user2Id, accountId: proAccountId, name: 'Beatriz Dev', email: 'beatriz@corp.com', role: 'member', status: 'active' },
-      { id: user3Id, accountId: proAccountId, name: 'Marcos QA', email: 'marcos@corp.com', role: 'member', status: 'active' },
+      {
+        id: user1Id,
+        accountId: proAccountId,
+        name: 'Lucas Admin',
+        email: 'lucas@corp.com',
+        role: 'admin',
+        status: 'active',
+      },
+      {
+        id: user2Id,
+        accountId: proAccountId,
+        name: 'Beatriz Dev',
+        email: 'beatriz@corp.com',
+        role: 'member',
+        status: 'active',
+      },
+      {
+        id: user3Id,
+        accountId: proAccountId,
+        name: 'Marcos QA',
+        email: 'marcos@corp.com',
+        role: 'member',
+        status: 'active',
+      },
     ];
 
     return {
@@ -102,7 +123,9 @@ describe('Polls System & Real-time Voting (T-26)', () => {
         users: {
           findMany: vi.fn(async ({ where }: any) => {
             const strings = getStringsFrom(where);
-            return mockUsersList.filter((u) => strings.includes(u.accountId) || strings.includes(u.id));
+            return mockUsersList.filter(
+              (u) => strings.includes(u.accountId) || strings.includes(u.id)
+            );
           }),
           findFirst: vi.fn(async ({ where }: any) => {
             const strings = getStringsFrom(where);
@@ -162,7 +185,12 @@ describe('Polls System & Real-time Voting (T-26)', () => {
             });
             returnedVal = val;
           } else if (val.question !== undefined && val.allowMultiple !== undefined) {
-            const pollRecord = { id: crypto.randomUUID(), ...val, createdAt: new Date(), updatedAt: new Date() };
+            const pollRecord = {
+              id: crypto.randomUUID(),
+              ...val,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
             mockPollsData.push(pollRecord);
             returnedVal = [pollRecord];
           } else if (val.content !== undefined) {
@@ -194,7 +222,9 @@ describe('Polls System & Real-time Voting (T-26)', () => {
       delete: vi.fn(() => ({
         where: vi.fn((whereClause: any) => {
           const strings = getStringsFrom(whereClause);
-          mockVotesData = mockVotesData.filter((v) => !(strings.includes(v.pollId) && strings.includes(v.userId)));
+          mockVotesData = mockVotesData.filter(
+            (v) => !(strings.includes(v.pollId) && strings.includes(v.userId))
+          );
           return {
             then: (resolve: any) => Promise.resolve({ rowCount: 1 }).then(resolve),
           };
@@ -468,9 +498,9 @@ describe('Polls System & Real-time Voting (T-26)', () => {
       ).rejects.toThrow('Enquete não pertence a esta organização.');
 
       // 3. User is neither creator nor admin
-      await expect(
-        pollService.closePoll(proAccountId, user2Id, 'member', poll.id)
-      ).rejects.toThrow('Apenas o criador da enquete ou administradores podem encerrá-la.');
+      await expect(pollService.closePoll(proAccountId, user2Id, 'member', poll.id)).rejects.toThrow(
+        'Apenas o criador da enquete ou administradores podem encerrá-la.'
+      );
 
       // 4. Creator or admin can close successfully
       const closed = await pollService.closePoll(proAccountId, user1Id, 'member', poll.id);

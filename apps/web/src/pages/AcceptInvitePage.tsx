@@ -64,9 +64,7 @@ export const AcceptInvitePage: React.FC = () => {
       .catch((err) => {
         if (isMounted) {
           const msg =
-            err instanceof ApiError
-              ? err.message
-              : 'Convite inválido, expirado ou já utilizado.';
+            err instanceof ApiError ? err.message : 'Convite inválido, expirado ou já utilizado.';
           setInviteFetchError(msg);
           setIsLoadingInvite(false);
         }
@@ -157,9 +155,7 @@ export const AcceptInvitePage: React.FC = () => {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 shadow-glow mb-2">
             <MessageSquare className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Você foi convidado!
-          </h1>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Você foi convidado!</h1>
           <p className="text-slate-400 text-sm">
             Junte-se à equipe no NextMsg para trocar mensagens com segurança.
           </p>
@@ -171,9 +167,7 @@ export const AcceptInvitePage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Building className="w-4 h-4 text-brand-400 shrink-0" />
-                <span className="text-sm font-bold text-white">
-                  {invitation.account.name}
-                </span>
+                <span className="text-sm font-bold text-white">{invitation.account.name}</span>
               </div>
               <Badge variant="brand" size="sm">
                 {invitation.role === 'admin' ? 'Administrador' : 'Membro'}
@@ -181,8 +175,7 @@ export const AcceptInvitePage: React.FC = () => {
             </div>
 
             <p className="text-xs text-slate-400">
-              Convite para o e-mail:{' '}
-              <strong className="text-slate-200">{invitation.email}</strong>
+              Convite para o e-mail: <strong className="text-slate-200">{invitation.email}</strong>
             </p>
 
             <div className="flex items-center gap-1 text-[11px] text-slate-500 pt-1 border-t border-slate-700/40">

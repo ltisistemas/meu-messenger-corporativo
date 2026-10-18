@@ -9,12 +9,7 @@ import {
   users,
   accounts,
 } from '../db/schema/index';
-import {
-  can,
-  PlanType,
-  SendBroadcastDto,
-  BroadcastReportResponse,
-} from '@corpchat/shared';
+import { can, PlanType, SendBroadcastDto, BroadcastReportResponse } from '@corpchat/shared';
 import { PresenceService } from './presence.service';
 import { WS_EVENTS } from '../ws/events';
 
@@ -52,10 +47,7 @@ export class BroadcastService {
 
     // 2. Find existing broadcast channel for this account
     let broadcastConv = await this.db.query.conversations.findFirst({
-      where: and(
-        eq(conversations.accountId, accountId),
-        eq(conversations.type, 'broadcast')
-      ),
+      where: and(eq(conversations.accountId, accountId), eq(conversations.type, 'broadcast')),
       with: {
         members: {
           with: {
@@ -106,9 +98,7 @@ export class BroadcastService {
       });
     } else {
       // Sync any new active users who joined after channel creation
-      const existingUserIds = new Set(
-        (broadcastConv.members as any[]).map((m: any) => m.userId)
-      );
+      const existingUserIds = new Set((broadcastConv.members as any[]).map((m: any) => m.userId));
       const missingUsers = allActiveUsers.filter((u) => !existingUserIds.has(u.id));
 
       if (missingUsers.length > 0) {
@@ -254,7 +244,9 @@ export class BroadcastService {
       try {
         // Room for the "Comunicados" channel
         this.io.to(`conv:${broadcastConv.id}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
-        this.io.to(`conversation:${broadcastConv.id}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
+        this.io
+          .to(`conversation:${broadcastConv.id}`)
+          .emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
 
         // Room for the entire organization
         this.io.to(`account:${accountId}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
@@ -303,10 +295,7 @@ export class BroadcastService {
       throw new Error('Mensagem de transmissão não encontrada.');
     }
 
-    if (
-      message.conversation.accountId !== accountId ||
-      message.conversation.type !== 'broadcast'
-    ) {
+    if (message.conversation.accountId !== accountId || message.conversation.type !== 'broadcast') {
       throw new Error('Esta mensagem não é um comunicado de transmissão desta organização.');
     }
 

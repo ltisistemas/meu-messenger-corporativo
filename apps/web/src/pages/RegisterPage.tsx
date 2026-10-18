@@ -24,9 +24,8 @@ export const RegisterPage: React.FC = () => {
   const { register, isLoading, error, clearError } = useAuthStore();
 
   const queryPlan = searchParams.get('plan') as PlanType | null;
-  const initialPlan: PlanType = queryPlan && ['free', 'pro', 'enterprise'].includes(queryPlan)
-    ? queryPlan
-    : 'pro';
+  const initialPlan: PlanType =
+    queryPlan && ['free', 'pro', 'enterprise'].includes(queryPlan) ? queryPlan : 'pro';
   const [selectedPlan, setSelectedPlan] = useState<PlanType>(initialPlan);
   const [accountName, setAccountName] = useState('');
   const [name, setName] = useState('');
@@ -81,7 +80,8 @@ export const RegisterPage: React.FC = () => {
             Criar Organização no Next<span className="text-brand-400">Msg</span>
           </h1>
           <p className="text-slate-400 text-sm max-w-md mx-auto">
-            Configure seu workspace corporativo com isolamento multi-tenant e política de privacidade.
+            Configure seu workspace corporativo com isolamento multi-tenant e política de
+            privacidade.
           </p>
         </div>
 
@@ -230,7 +230,10 @@ export const RegisterPage: React.FC = () => {
 
           <div className="pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
             Já possui uma conta ou foi convidado?{' '}
-            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-semibold transition">
+            <Link
+              to="/login"
+              className="text-brand-400 hover:text-brand-300 font-semibold transition"
+            >
               Fazer login
             </Link>
           </div>

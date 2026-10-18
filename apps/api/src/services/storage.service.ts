@@ -48,7 +48,8 @@ export class StorageService {
     const bucket = config?.bucket || process.env.S3_BUCKET || 'corpchat-attachments';
     const accessKeyId = config?.accessKeyId || process.env.S3_ACCESS_KEY_ID;
     const secretAccessKey = config?.secretAccessKey || process.env.S3_SECRET_ACCESS_KEY;
-    const forcePathStyle = config?.forcePathStyle ?? (process.env.S3_FORCE_PATH_STYLE === 'true' || Boolean(endpoint));
+    const forcePathStyle =
+      config?.forcePathStyle ?? (process.env.S3_FORCE_PATH_STYLE === 'true' || Boolean(endpoint));
 
     this.bucket = bucket;
 
@@ -127,10 +128,7 @@ export class StorageService {
   /**
    * Generates a pre-signed GET URL for temporary secure download
    */
-  async generatePresignedDownloadUrl(
-    storageKey: string,
-    expiresInSeconds = 900
-  ): Promise<string> {
+  async generatePresignedDownloadUrl(storageKey: string, expiresInSeconds = 900): Promise<string> {
     if (this.client && this.isConfigured) {
       const command = new GetObjectCommand({
         Bucket: this.bucket,

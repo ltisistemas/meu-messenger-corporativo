@@ -89,10 +89,7 @@ export class LoadTestService {
 
     const getPercentile = (p: number) => {
       if (latencies.length === 0) return 0;
-      const index = Math.min(
-        latencies.length - 1,
-        Math.floor((p / 100) * latencies.length)
-      );
+      const index = Math.min(latencies.length - 1, Math.floor((p / 100) * latencies.length));
       return latencies[index];
     };
 
@@ -105,8 +102,7 @@ export class LoadTestService {
     const throughputMessagesSec =
       Math.round((totalMessagesSent / actualDurationSeconds) * 100) / 100;
 
-    const totalDataTransferredMb =
-      Math.round((totalBytesTransferred / (1024 * 1024)) * 100) / 100;
+    const totalDataTransferredMb = Math.round((totalBytesTransferred / (1024 * 1024)) * 100) / 100;
     const peakThroughputMbps =
       Math.round(((totalDataTransferredMb * 8) / actualDurationSeconds) * 100) / 100;
 
@@ -114,16 +110,15 @@ export class LoadTestService {
     // AWS S3 standard storage: $0.023/GB/mo + Egress $0.09/GB (USD -> BRL @ 5.80)
     // Cloudflare R2: $0.015/GB/mo storage + $0 egress
     // Monthly estimated extrapolation: 80 active users x 22 business days x 8h
-    const estimatedMonthlyBandwidthGb =
-      Math.round(((totalDataTransferredMb / actualDurationSeconds) * 8 * 3600 * 22) / 1024);
+    const estimatedMonthlyBandwidthGb = Math.round(
+      ((totalDataTransferredMb / actualDurationSeconds) * 8 * 3600 * 22) / 1024
+    );
 
     const usdToBrl = 5.8;
     const awsS3EgressMonthlyBrl = Math.round(
-      (estimatedMonthlyBandwidthGb * 0.09 + (estimatedMonthlyBandwidthGb * 0.2) * 0.023) * usdToBrl
+      (estimatedMonthlyBandwidthGb * 0.09 + estimatedMonthlyBandwidthGb * 0.2 * 0.023) * usdToBrl
     );
-    const cloudflareR2MonthlyBrl = Math.round(
-      ((estimatedMonthlyBandwidthGb * 0.2) * 0.015) * usdToBrl
-    );
+    const cloudflareR2MonthlyBrl = Math.round(estimatedMonthlyBandwidthGb * 0.2 * 0.015 * usdToBrl);
     const nextMsgZeroRetentionSavingsPercent = 85.5; // Free plan direct stream eliminates 100% cloud bucket egress/storage
 
     const bottlenecksAndRecommendations = [

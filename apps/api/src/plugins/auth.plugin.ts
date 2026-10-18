@@ -32,20 +32,17 @@ const authPluginCallback: FastifyPluginAsync = async (fastify: FastifyInstance) 
     },
   });
 
-  fastify.decorate(
-    'authenticate',
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      try {
-        await request.jwtVerify();
-      } catch (err) {
-        reply.status(401).send({
-          statusCode: 401,
-          error: 'Unauthorized',
-          message: 'Token de acesso inválido ou expirado.',
-        });
-      }
+  fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      reply.status(401).send({
+        statusCode: 401,
+        error: 'Unauthorized',
+        message: 'Token de acesso inválido ou expirado.',
+      });
     }
-  );
+  });
 };
 
 export const authPlugin = fp(authPluginCallback, {

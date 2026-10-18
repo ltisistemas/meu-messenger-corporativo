@@ -22,8 +22,15 @@ export interface SignatureState {
   fetchSignatureDetails: (id: string) => Promise<SignatureRequestResponse>;
   createSignatureRequest: (dto: CreateSignatureRequestDto) => Promise<SignatureRequestResponse>;
   fetchEvidenceReport: (id: string) => Promise<SignatureEvidenceReport>;
-  simulateSign: (signatureId: string, signerId: string, dto?: SimulateSignerDto) => Promise<SignatureRequestResponse>;
-  verifyDocumentHash: (signatureId: string, dto: VerifySignatureHashDto) => Promise<VerifySignatureHashResponse>;
+  simulateSign: (
+    signatureId: string,
+    signerId: string,
+    dto?: SimulateSignerDto
+  ) => Promise<SignatureRequestResponse>;
+  verifyDocumentHash: (
+    signatureId: string,
+    dto: VerifySignatureHashDto
+  ) => Promise<VerifySignatureHashResponse>;
   downloadSignedDocument: (signatureId: string, defaultFilename?: string) => Promise<void>;
   downloadEvidencePdf: (signatureId: string, defaultFilename?: string) => Promise<void>;
   setActiveSignature: (sig: SignatureRequestResponse | null) => void;
@@ -130,7 +137,10 @@ export const useSignatureStore = create<SignatureState>((set) => ({
     }
   },
 
-  downloadSignedDocument: async (signatureId: string, defaultFilename = 'documento_assinado.pdf') => {
+  downloadSignedDocument: async (
+    signatureId: string,
+    defaultFilename = 'documento_assinado.pdf'
+  ) => {
     try {
       const apiBase = ((import.meta as any).env?.VITE_API_URL || '/api').replace(/\/$/, '');
       const response = await fetch(`${apiBase}/signatures/${signatureId}/download`, {
@@ -159,7 +169,10 @@ export const useSignatureStore = create<SignatureState>((set) => ({
     }
   },
 
-  downloadEvidencePdf: async (signatureId: string, defaultFilename = 'certificado_evidencias.pdf') => {
+  downloadEvidencePdf: async (
+    signatureId: string,
+    defaultFilename = 'certificado_evidencias.pdf'
+  ) => {
     try {
       const apiBase = ((import.meta as any).env?.VITE_API_URL || '/api').replace(/\/$/, '');
       const response = await fetch(`${apiBase}/signatures/${signatureId}/evidence/pdf`, {

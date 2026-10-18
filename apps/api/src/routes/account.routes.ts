@@ -10,10 +10,7 @@ export interface AccountRoutesOptions {
   accountService?: AccountService;
 }
 
-export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
-  fastify,
-  opts
-) => {
+export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (fastify, opts) => {
   const accountService = opts.accountService || new AccountService();
 
   /**
@@ -24,7 +21,9 @@ export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
     try {
       await request.jwtVerify();
     } catch {
-      return reply.status(401).send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
+      return reply
+        .status(401)
+        .send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
     }
 
     const { accountId } = request.user as { accountId: string; userId: string; role: string };
@@ -49,7 +48,9 @@ export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
     try {
       await request.jwtVerify();
     } catch {
-      return reply.status(401).send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
+      return reply
+        .status(401)
+        .send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
     }
 
     const { accountId } = request.user as { accountId: string };
@@ -74,7 +75,9 @@ export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
     try {
       await request.jwtVerify();
     } catch {
-      return reply.status(401).send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
+      return reply
+        .status(401)
+        .send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
     }
 
     const { accountId, userId, role } = request.user as {
@@ -122,7 +125,9 @@ export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
     try {
       await request.jwtVerify();
     } catch {
-      return reply.status(401).send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
+      return reply
+        .status(401)
+        .send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
     }
 
     const { accountId, userId, role } = request.user as {
@@ -170,7 +175,9 @@ export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
     try {
       await request.jwtVerify();
     } catch {
-      return reply.status(401).send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
+      return reply
+        .status(401)
+        .send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
     }
 
     const { accountId, role } = request.user as { accountId: string; role: string };
@@ -211,7 +218,9 @@ export const accountRoutes: FastifyPluginAsync<AccountRoutesOptions> = async (
     try {
       await request.jwtVerify();
     } catch {
-      return reply.status(401).send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
+      return reply
+        .status(401)
+        .send({ statusCode: 401, error: 'Unauthorized', message: 'Token inválido ou ausente' });
     }
 
     const { accountId } = request.user as { accountId: string };

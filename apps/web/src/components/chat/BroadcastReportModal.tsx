@@ -236,10 +236,10 @@ export const BroadcastReportModal: React.FC<BroadcastReportModalProps> = ({
                       {filter === 'all'
                         ? 'Todos'
                         : filter === 'read'
-                        ? 'Lidos'
-                        : filter === 'delivered'
-                        ? 'Entregues'
-                        : 'Pendentes'}
+                          ? 'Lidos'
+                          : filter === 'delivered'
+                            ? 'Entregues'
+                            : 'Pendentes'}
                     </button>
                   ))}
                 </div>

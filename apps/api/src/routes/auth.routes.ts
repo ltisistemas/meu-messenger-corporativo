@@ -96,57 +96,58 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (
       },
     },
     async (request, reply) => {
-    const parseResult = LoginDtoSchema.safeParse(request.body);
-    if (!parseResult.success) {
-      return reply.status(400).send({
-        statusCode: 400,
-        error: 'Bad Request',
-        message: parseResult.error.errors[0]?.message || 'Dados de login inválidos.',
-      });
-    }
-
-    try {
-      const result = await authService.login(parseResult.data);
-
-      const accessToken = fastify.jwt.sign({
-        userId: result.rawUser.id,
-        accountId: result.account.id,
-        role: result.rawUser.role,
-        email: result.rawUser.email,
-      });
-
-      const refreshToken = await authService.createRefreshToken(result.rawUser.id);
-
-      return reply.status(200).send({
-        user: result.user,
-        account: result.account,
-        accessToken,
-        refreshToken,
-      });
-    } catch (err: any) {
-      const isDbError =
-        err.message?.includes('ECONNREFUSED') ||
-        err.message?.includes('connect') ||
-        err.message?.includes('timeout') ||
-        err.code === 'ECONNREFUSED';
-
-      if (isDbError) {
-        fastify.log.error(err);
-        return reply.status(503).send({
-          statusCode: 503,
-          error: 'Service Unavailable',
-          message:
-            'Banco de dados indisponível ou não configurado. Verifique a variável DATABASE_URL na Vercel.',
+      const parseResult = LoginDtoSchema.safeParse(request.body);
+      if (!parseResult.success) {
+        return reply.status(400).send({
+          statusCode: 400,
+          error: 'Bad Request',
+          message: parseResult.error.errors[0]?.message || 'Dados de login inválidos.',
         });
       }
 
-      return reply.status(401).send({
-        statusCode: 401,
-        error: 'Unauthorized',
-        message: err.message || 'Falha na autenticação.',
-      });
+      try {
+        const result = await authService.login(parseResult.data);
+
+        const accessToken = fastify.jwt.sign({
+          userId: result.rawUser.id,
+          accountId: result.account.id,
+          role: result.rawUser.role,
+          email: result.rawUser.email,
+        });
+
+        const refreshToken = await authService.createRefreshToken(result.rawUser.id);
+
+        return reply.status(200).send({
+          user: result.user,
+          account: result.account,
+          accessToken,
+          refreshToken,
+        });
+      } catch (err: any) {
+        const isDbError =
+          err.message?.includes('ECONNREFUSED') ||
+          err.message?.includes('connect') ||
+          err.message?.includes('timeout') ||
+          err.code === 'ECONNREFUSED';
+
+        if (isDbError) {
+          fastify.log.error(err);
+          return reply.status(503).send({
+            statusCode: 503,
+            error: 'Service Unavailable',
+            message:
+              'Banco de dados indisponível ou não configurado. Verifique a variável DATABASE_URL na Vercel.',
+          });
+        }
+
+        return reply.status(401).send({
+          statusCode: 401,
+          error: 'Unauthorized',
+          message: err.message || 'Falha na autenticação.',
+        });
+      }
     }
-  });
+  );
 
   // 3. POST /api/auth/refresh
   fastify.post('/refresh', async (request, reply) => {
@@ -194,30 +195,26 @@ export const authRoutes: FastifyPluginAsync<AuthRoutesOptions> = async (
   });
 
   // 5. GET /api/auth/me
-  fastify.get(
-    '/me',
-    { preHandler: [fastify.authenticate] },
-    async (request, reply) => {
-      const { userId } = request.user;
-      const user = await authService['db'].query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, userId),
-        with: {
-          account: true,
-        },
-      });
+  fastify.get('/me', { preHandler: [fastify.authenticate] }, async (request, reply) => {
+    const { userId } = request.user;
+    const user = await authService['db'].query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, userId),
+      with: {
+        account: true,
+      },
+    });
 
-      if (!user) {
-        return reply.status(404).send({
-          statusCode: 404,
-          error: 'Not Found',
-          message: 'Usuário não encontrado.',
-        });
-      }
-
-      return reply.status(200).send({
-        user: authService.sanitizeUser(user),
-        account: user.account,
+    if (!user) {
+      return reply.status(404).send({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Usuário não encontrado.',
       });
     }
-  );
+
+    return reply.status(200).send({
+      user: authService.sanitizeUser(user),
+      account: user.account,
+    });
+  });
 };

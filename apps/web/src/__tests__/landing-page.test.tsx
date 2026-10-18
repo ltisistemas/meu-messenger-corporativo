@@ -159,7 +159,9 @@ describe('Landing Page de Alta Conversão (PLG & Conversão B2B)', () => {
 
     // Question 1 answer is open by default
     expect(
-      screen.getByText(/Você cadastra sua organização em menos de 1 minuto sem precisar informar cartão/i)
+      screen.getByText(
+        /Você cadastra sua organização em menos de 1 minuto sem precisar informar cartão/i
+      )
     ).toBeInTheDocument();
 
     // Question 2: Why no audio messages?
@@ -256,4 +258,3 @@ describe('Landing Page de Alta Conversão (PLG & Conversão B2B)', () => {
     fireEvent.click(q3Button);
   });
 });
-

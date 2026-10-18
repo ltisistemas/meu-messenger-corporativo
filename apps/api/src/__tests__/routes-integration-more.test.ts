@@ -424,7 +424,9 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
       expect(noTokenQuota.statusCode).toBe(401);
 
       // Quota 400 error
-      mockAccountService.checkAndEnforceQuota.mockRejectedValueOnce(new Error('Quota check failed'));
+      mockAccountService.checkAndEnforceQuota.mockRejectedValueOnce(
+        new Error('Quota check failed')
+      );
       const errQuota = await app.inject({
         method: 'POST',
         url: '/api/accounts/check-quota',
@@ -445,14 +447,18 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
       expect(overdue.statusCode).toBe(200);
 
       // Error paths -> 500
-      mockAccountService.processTrialExpirations.mockRejectedValueOnce(new Error('Crash in trials'));
+      mockAccountService.processTrialExpirations.mockRejectedValueOnce(
+        new Error('Crash in trials')
+      );
       const trialsErr = await app.inject({
         method: 'POST',
         url: '/api/accounts/cron/process-trials',
       });
       expect(trialsErr.statusCode).toBe(500);
 
-      mockAccountService.processOverdueInvoices.mockRejectedValueOnce(new Error('Crash in overdue'));
+      mockAccountService.processOverdueInvoices.mockRejectedValueOnce(
+        new Error('Crash in overdue')
+      );
       const overdueErr = await app.inject({
         method: 'POST',
         url: '/api/accounts/cron/process-overdue',
@@ -483,7 +489,9 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
       });
       expect(ok.statusCode).toBe(201);
 
-      mockPollService.createPoll.mockRejectedValueOnce(new Error('plano Free não suporta enquetes'));
+      mockPollService.createPoll.mockRejectedValueOnce(
+        new Error('plano Free não suporta enquetes')
+      );
       const err = await app.inject({
         method: 'POST',
         url: '/api/polls',
@@ -549,7 +557,9 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
       });
       expect(ok.statusCode).toBe(200);
 
-      mockPollService.closePoll.mockRejectedValueOnce(new Error('Apenas criador ou admin pode encerrar'));
+      mockPollService.closePoll.mockRejectedValueOnce(
+        new Error('Apenas criador ou admin pode encerrar')
+      );
       const forbidden = await app.inject({
         method: 'POST',
         url: `/api/polls/${uuid}/close`,
@@ -624,7 +634,9 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
     });
 
     it('GET /api/files/:transferId/status handles service error', async () => {
-      mockFileService.getTransferStatus.mockRejectedValueOnce(new Error('Transferência indisponível'));
+      mockFileService.getTransferStatus.mockRejectedValueOnce(
+        new Error('Transferência indisponível')
+      );
       const errRes = await app.inject({
         method: 'GET',
         url: `/api/files/${uuid}/status`,
@@ -653,7 +665,9 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
       expect(okExpire.statusCode).toBe(200);
 
       // POST /api/conversations/:id/expire error
-      mockGroupExpirationService.expireSingleGroup.mockRejectedValueOnce(new Error('Falha ao expirar'));
+      mockGroupExpirationService.expireSingleGroup.mockRejectedValueOnce(
+        new Error('Falha ao expirar')
+      );
       const errExpire = await app.inject({
         method: 'POST',
         url: `/api/conversations/${uuid}/expire`,
@@ -662,7 +676,9 @@ describe('HTTP Routes Deep Coverage (T-04, T-08, T-26, T-29)', () => {
       expect(errExpire.statusCode).toBe(400);
 
       // POST /api/conversations/sweep-expired error
-      mockGroupExpirationService.sweepExpiredGroups.mockRejectedValueOnce(new Error('Erro na varredura'));
+      mockGroupExpirationService.sweepExpiredGroups.mockRejectedValueOnce(
+        new Error('Erro na varredura')
+      );
       const errSweep = await app.inject({
         method: 'POST',
         url: '/api/conversations/sweep-expired',

@@ -35,7 +35,9 @@ export const AccountPage: React.FC = () => {
     clearCheckoutResult,
   } = useAccountStore();
 
-  const [activeTab, setActiveTab] = useState<'members' | 'plans' | 'invoices' | 'privacy'>('members');
+  const [activeTab, setActiveTab] = useState<'members' | 'plans' | 'invoices' | 'privacy'>(
+    'members'
+  );
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [selectedUpgradePlan, setSelectedUpgradePlan] = useState<'pro' | 'enterprise'>('pro');
@@ -55,7 +57,11 @@ export const AccountPage: React.FC = () => {
   };
 
   const handleDowngradeToFree = async () => {
-    if (window.confirm('Tem certeza que deseja mudar para o plano Free? Recursos como armazenamento store-and-forward, transmissão e enquetes serão desabilitados.')) {
+    if (
+      window.confirm(
+        'Tem certeza que deseja mudar para o plano Free? Recursos como armazenamento store-and-forward, transmissão e enquetes serão desabilitados.'
+      )
+    ) {
       await downgradePlan('free');
     }
   };
@@ -204,10 +210,7 @@ export const AccountPage: React.FC = () => {
         )}
 
         {activeTab === 'privacy' && (
-          <LgpdPrivacySection
-            userRole={user?.role}
-            userEmail={user?.email}
-          />
+          <LgpdPrivacySection userRole={user?.role} userEmail={user?.email} />
         )}
       </main>
 

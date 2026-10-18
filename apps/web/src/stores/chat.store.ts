@@ -184,11 +184,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         status: msg.receipts?.some((r: any) => r.status === 'read')
           ? 'read'
           : msg.receipts?.some((r: any) => r.status === 'delivered')
-          ? 'delivered'
-          : 'sent',
+            ? 'delivered'
+            : 'sent',
         isSelf: msg.senderId === currentUser?.id,
       }));
-
 
       set((state) => ({
         messages: {
@@ -224,10 +223,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set((state) => ({
       messages: {
         ...state.messages,
-        [activeConversationId]: [
-          ...(state.messages[activeConversationId] || []),
-          optimisticMsg,
-        ],
+        [activeConversationId]: [...(state.messages[activeConversationId] || []), optimisticMsg],
       },
       conversations: state.conversations.map((c) =>
         c.id === activeConversationId
@@ -282,10 +278,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendFileRelay: async (
-    file: File,
-    onProgress?: (percent: number) => void
-  ): Promise<void> => {
+  sendFileRelay: async (file: File, onProgress?: (percent: number) => void): Promise<void> => {
     const { activeConversationId } = get();
     const socket = useSocketStore.getState().socket;
     const currentUser = useAuthStore.getState().user;
@@ -359,21 +352,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     // 3. Complete relay
     await new Promise<void>((resolve, reject) => {
-      socket.emit(
-        'file:relay:complete',
-        { transferId },
-        (res: any) => {
-          if (res?.error) {
-            return reject(new Error(res.error));
-          }
-          resolve();
+      socket.emit('file:relay:complete', { transferId }, (res: any) => {
+        if (res?.error) {
+          return reject(new Error(res.error));
         }
-      );
+        resolve();
+      });
     });
   },
 
   createDirectConversation: async (targetUserId: string) => {
-
     const conv = await api.post('/conversations/direct', { targetUserId });
     await get().fetchConversations();
     await get().selectConversation(conv.id);
@@ -533,26 +521,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
     });
 
     // 2. Typing start
-    socket.on('typing:start', (data: { conversationId: string; userId: string; userName?: string }) => {
-      const currentUser = useAuthStore.getState().user;
-      if (data.userId === currentUser?.id) return;
+    socket.on(
+      'typing:start',
+      (data: { conversationId: string; userId: string; userName?: string }) => {
+        const currentUser = useAuthStore.getState().user;
+        if (data.userId === currentUser?.id) return;
 
-      set((state) => {
-        const convTyping = state.typingUsers[data.conversationId] || {};
-        return {
-          typingUsers: {
-            ...state.typingUsers,
-            [data.conversationId]: {
-              ...convTyping,
-              [data.userId]: {
-                name: data.userName || 'Alguém',
-                timestamp: Date.now(),
+        set((state) => {
+          const convTyping = state.typingUsers[data.conversationId] || {};
+          return {
+            typingUsers: {
+              ...state.typingUsers,
+              [data.conversationId]: {
+                ...convTyping,
+                [data.userId]: {
+                  name: data.userName || 'Alguém',
+                  timestamp: Date.now(),
+                },
               },
             },
-          },
-        };
-      });
-    });
+          };
+        });
+      }
+    );
 
     // 3. Typing stop
     socket.on('typing:stop', (data: { conversationId: string; userId: string }) => {
@@ -639,17 +630,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
     });
 
     // 5. Message Receipt update
-    socket.on('message:receipt', (data: { messageId?: string; conversationId?: string; status: 'delivered' | 'read' }) => {
-      set((state) => {
-        const updated = { ...state.messages };
-        if (data.conversationId && updated[data.conversationId]) {
-          updated[data.conversationId] = updated[data.conversationId].map((m) =>
-            m.isSelf ? { ...m, status: data.status } : m
-          );
-        }
-        return { messages: updated };
-      });
-    });
+    socket.on(
+      'message:receipt',
+      (data: { messageId?: string; conversationId?: string; status: 'delivered' | 'read' }) => {
+        set((state) => {
+          const updated = { ...state.messages };
+          if (data.conversationId && updated[data.conversationId]) {
+            updated[data.conversationId] = updated[data.conversationId].map((m) =>
+              m.isSelf ? { ...m, status: data.status } : m
+            );
+          }
+          return { messages: updated };
+        });
+      }
+    );
 
     // 6. Poll updates & closure (T-26 / T-27)
     socket.on('poll:updated', (updatedPoll: PollDetailsResponse) => {
@@ -657,7 +651,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         const convId = updatedPoll.conversationId;
         const convMessages = state.messages[convId] || [];
         const updatedMessages = convMessages.map((m) => {
-          if (m.metadata?.poll?.id === updatedPoll.id || (m.type === 'poll' && m.metadata?.poll?.id === updatedPoll.id)) {
+          if (
+            m.metadata?.poll?.id === updatedPoll.id ||
+            (m.type === 'poll' && m.metadata?.poll?.id === updatedPoll.id)
+          ) {
             return {
               ...m,
               metadata: {
@@ -683,7 +680,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         const convId = closedPoll.conversationId;
         const convMessages = state.messages[convId] || [];
         const updatedMessages = convMessages.map((m) => {
-          if (m.metadata?.poll?.id === closedPoll.id || (m.type === 'poll' && m.metadata?.poll?.id === closedPoll.id)) {
+          if (
+            m.metadata?.poll?.id === closedPoll.id ||
+            (m.type === 'poll' && m.metadata?.poll?.id === closedPoll.id)
+          ) {
             return {
               ...m,
               metadata: {

@@ -5,11 +5,16 @@ import { SignatureEvidenceReportSchema } from '@corpchat/shared';
 
 describe('Clicksign Signature Provider Spike & Sandbox Test (T-31)', () => {
   let clicksignService: ClicksignProviderService;
-  const samplePdfContent = Buffer.from('%PDF-1.4 Mock Contract Content for Corporate Messenger Sandbox Testing').toString('base64');
+  const samplePdfContent = Buffer.from(
+    '%PDF-1.4 Mock Contract Content for Corporate Messenger Sandbox Testing'
+  ).toString('base64');
 
   beforeEach(() => {
     vi.clearAllMocks();
-    clicksignService = new ClicksignProviderService('mock-clicksign-key', 'https://sandbox.clicksign.com/api/v1');
+    clicksignService = new ClicksignProviderService(
+      'mock-clicksign-key',
+      'https://sandbox.clicksign.com/api/v1'
+    );
   });
 
   describe('1. Document Creation & SHA-256 Hashing', () => {
@@ -321,8 +326,15 @@ describe('Clicksign Signature Provider Spike & Sandbox Test (T-31)', () => {
         },
       });
 
-      const validSignature = clicksignService.generateTestWebhookSignature(rawPayload, webhookSecret);
-      const isValid = clicksignService.verifyWebhookSignature(rawPayload, validSignature, webhookSecret);
+      const validSignature = clicksignService.generateTestWebhookSignature(
+        rawPayload,
+        webhookSecret
+      );
+      const isValid = clicksignService.verifyWebhookSignature(
+        rawPayload,
+        validSignature,
+        webhookSecret
+      );
 
       expect(isValid).toBe(true);
     });
@@ -331,9 +343,20 @@ describe('Clicksign Signature Provider Spike & Sandbox Test (T-31)', () => {
       const rawPayload = JSON.stringify({ event: { name: 'document.closed' } });
       const tamperedPayload = JSON.stringify({ event: { name: 'document.canceled' } });
 
-      const validSignature = clicksignService.generateTestWebhookSignature(rawPayload, webhookSecret);
-      const isTamperedValid = clicksignService.verifyWebhookSignature(tamperedPayload, validSignature, webhookSecret);
-      const isWrongSignatureValid = clicksignService.verifyWebhookSignature(rawPayload, 'invalid_signature_hex', webhookSecret);
+      const validSignature = clicksignService.generateTestWebhookSignature(
+        rawPayload,
+        webhookSecret
+      );
+      const isTamperedValid = clicksignService.verifyWebhookSignature(
+        tamperedPayload,
+        validSignature,
+        webhookSecret
+      );
+      const isWrongSignatureValid = clicksignService.verifyWebhookSignature(
+        rawPayload,
+        'invalid_signature_hex',
+        webhookSecret
+      );
 
       expect(isTamperedValid).toBe(false);
       expect(isWrongSignatureValid).toBe(false);
@@ -342,12 +365,16 @@ describe('Clicksign Signature Provider Spike & Sandbox Test (T-31)', () => {
 
   describe('8. Live API Mocking & Error Handling', () => {
     it('throws descriptive error on API failure in live mode', async () => {
-      const liveService = new ClicksignProviderService('live-token-abc', 'https://api.clicksign.com/api/v1');
+      const liveService = new ClicksignProviderService(
+        'live-token-abc',
+        'https://api.clicksign.com/api/v1'
+      );
 
       // Mock fetch failure
       const mockFetch = vi.fn().mockResolvedValue({
         ok: false,
-        json: () => Promise.resolve({ errors: ['Limite de envelopes excedido na conta Clicksign.'] }),
+        json: () =>
+          Promise.resolve({ errors: ['Limite de envelopes excedido na conta Clicksign.'] }),
       });
       global.fetch = mockFetch;
 
@@ -356,7 +383,9 @@ describe('Clicksign Signature Provider Spike & Sandbox Test (T-31)', () => {
           documentName: 'fail.pdf',
           contentBase64: samplePdfContent,
         })
-      ).rejects.toThrow('Falha no Clicksign (createDocument): Limite de envelopes excedido na conta Clicksign.');
+      ).rejects.toThrow(
+        'Falha no Clicksign (createDocument): Limite de envelopes excedido na conta Clicksign.'
+      );
     });
   });
 });

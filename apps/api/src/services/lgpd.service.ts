@@ -49,7 +49,8 @@ export class LgpdService {
       retentionPolicies: {
         free: 'Zero retenção de arquivos em disco (streaming em memória somente para destinatários online). Mensagens de texto com isolamento por tenant.',
         pro: 'Arquivos com retenção temporária máxima de 5 dias em bucket seguro criptografado com exclusão automática após download por todos os participantes.',
-        enterprise: 'Retenção corporativa configurável, evidências auditáveis SHA-256 e conformidade integral com Lei nº 14.063/2020 e LGPD.',
+        enterprise:
+          'Retenção corporativa configurável, evidências auditáveis SHA-256 e conformidade integral com Lei nº 14.063/2020 e LGPD.',
       },
       legalBases: [
         'Execução de contrato de prestação de serviços de mensageria corporativa (Art. 7º, V da LGPD)',
@@ -157,7 +158,10 @@ export class LgpdService {
       throw new Error('Usuário não encontrado.');
     }
 
-    if (user.status === 'deleted' || user.status === 'inactive' && user.email.includes('@deleted.local')) {
+    if (
+      user.status === 'deleted' ||
+      (user.status === 'inactive' && user.email.includes('@deleted.local'))
+    ) {
       throw new Error('Este usuário já foi excluído e anonimizado anteriormente.');
     }
 

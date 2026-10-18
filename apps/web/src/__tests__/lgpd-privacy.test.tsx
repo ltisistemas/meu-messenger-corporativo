@@ -9,7 +9,10 @@ vi.mock('../services/api', () => ({
     post: vi.fn(),
   },
   ApiError: class ApiError extends Error {
-    constructor(msg: string, public status: number) {
+    constructor(
+      msg: string,
+      public status: number
+    ) {
       super(msg);
     }
   },
@@ -49,9 +52,7 @@ describe('LGPD Privacy & Data Management Frontend (T-36)', () => {
             pro: 'Arquivos com retenção temporária máxima de 5 dias em bucket seguro.',
             enterprise: 'Retenção corporativa configurável com trilha de auditoria.',
           },
-          legalBases: [
-            'Execução de contrato de prestação de serviços (Art. 7º, V)',
-          ],
+          legalBases: ['Execução de contrato de prestação de serviços (Art. 7º, V)'],
         });
       }
       if (url === '/lgpd/export') {

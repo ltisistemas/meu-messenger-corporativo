@@ -89,10 +89,7 @@ export class AuthService {
     }
 
     // Update lastSeenAt
-    await this.db
-      .update(users)
-      .set({ lastSeenAt: new Date() })
-      .where(eq(users.id, user.id));
+    await this.db.update(users).set({ lastSeenAt: new Date() }).where(eq(users.id, user.id));
 
     return {
       account: user.account,
@@ -116,10 +113,7 @@ export class AuthService {
 
   async rotateRefreshToken(oldToken: string) {
     const storedToken = await this.db.query.refreshTokens.findFirst({
-      where: and(
-        eq(refreshTokens.token, oldToken),
-        gt(refreshTokens.expiresAt, new Date())
-      ),
+      where: and(eq(refreshTokens.token, oldToken), gt(refreshTokens.expiresAt, new Date())),
       with: {
         user: {
           with: {
@@ -134,9 +128,7 @@ export class AuthService {
     }
 
     // Delete old token
-    await this.db
-      .delete(refreshTokens)
-      .where(eq(refreshTokens.id, storedToken.id));
+    await this.db.delete(refreshTokens).where(eq(refreshTokens.id, storedToken.id));
 
     // Generate new token
     const newRefreshToken = await this.createRefreshToken(storedToken.user.id);

@@ -22,11 +22,7 @@ describe('Real-time Messaging & Offline Delivery (T-09)', () => {
     accountId,
     type: 'group',
     status: 'active',
-    members: [
-      { userId: senderId },
-      { userId: onlineRecipientId },
-      { userId: offlineRecipientId },
-    ],
+    members: [{ userId: senderId }, { userId: onlineRecipientId }, { userId: offlineRecipientId }],
   };
 
   let mockDb: any;
@@ -55,7 +51,9 @@ describe('Real-time Messaging & Offline Delivery (T-09)', () => {
           findFirst: vi.fn().mockResolvedValue(mockConversation),
         },
         users: {
-          findFirst: vi.fn().mockResolvedValue({ id: senderId, name: 'Sender Name', avatarUrl: null }),
+          findFirst: vi
+            .fn()
+            .mockResolvedValue({ id: senderId, name: 'Sender Name', avatarUrl: null }),
         },
         messageReceipts: {
           findMany: vi.fn().mockResolvedValue([]),

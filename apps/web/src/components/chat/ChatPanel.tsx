@@ -74,7 +74,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
           NextMsg Enterprise
         </h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-          Selecione uma conversa ao lado para começar a enviar mensagens protegidas por criptografia.
+          Selecione uma conversa ao lado para começar a enviar mensagens protegidas por
+          criptografia.
         </p>
       </div>
     );
@@ -85,8 +86,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   const name = isBroadcast
     ? conversation.title || 'Comunicados Oficiais'
     : isGroup
-    ? conversation.title || 'Grupo sem título'
-    : conversation.otherUser?.name || 'Colaborador';
+      ? conversation.title || 'Grupo sem título'
+      : conversation.otherUser?.name || 'Colaborador';
   const avatarUrl = isGroup || isBroadcast ? undefined : conversation.otherUser?.avatarUrl;
 
   const isExpired =
@@ -237,21 +238,26 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         <div className="px-4 py-2.5 bg-amber-500/10 dark:bg-amber-950/30 border-b border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 flex items-center justify-center gap-2 font-medium">
           <Lock className="w-4 h-4 text-amber-500 shrink-0" />
           <span>
-            Este grupo temporário expirou e foi arquivado como <strong>somente leitura</strong>. O envio de novas mensagens está desativado.
+            Este grupo temporário expirou e foi arquivado como <strong>somente leitura</strong>. O
+            envio de novas mensagens está desativado.
           </span>
         </div>
       ) : isBroadcast ? (
         <div className="px-4 py-2 bg-blue-500/10 dark:bg-blue-950/30 border-b border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 flex items-center justify-center gap-2">
           <Radio className="w-3.5 h-3.5 text-blue-500" />
           <span>
-            Canal de transmissão: {isAdminOrOwner ? 'mensagens enviadas aqui notificam toda a conta com relatório analítico de entrega.' : 'apenas administradores podem publicar comunicados.'}
+            Canal de transmissão:{' '}
+            {isAdminOrOwner
+              ? 'mensagens enviadas aqui notificam toda a conta com relatório analítico de entrega.'
+              : 'apenas administradores podem publicar comunicados.'}
           </span>
         </div>
       ) : (
         <div className="px-4 py-2 bg-brand-500/10 dark:bg-brand-500/15 border-b border-brand-500/20 text-xs text-brand-700 dark:text-brand-300 flex items-center justify-center gap-2">
           <Shield className="w-3.5 h-3.5 text-brand-500" />
           <span>
-            Mensagens protegidas por isolamento multi-tenant e política corporativa de zero retenção.
+            Mensagens protegidas por isolamento multi-tenant e política corporativa de zero
+            retenção.
           </span>
         </div>
       )}
@@ -364,4 +370,3 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     </div>
   );
 };
-

@@ -11,13 +11,7 @@ export type AccountStatus = z.infer<typeof AccountStatusSchema>;
 export const ConversationTypeSchema = z.enum(['direct', 'group', 'broadcast']);
 export type ConversationType = z.infer<typeof ConversationTypeSchema>;
 
-export const MessageTypeSchema = z.enum([
-  'text',
-  'file',
-  'poll',
-  'link',
-  'signature',
-]);
+export const MessageTypeSchema = z.enum(['text', 'file', 'poll', 'link', 'signature']);
 export type MessageType = z.infer<typeof MessageTypeSchema>;
 
 // Auth DTOs
@@ -115,7 +109,12 @@ export const FileRelayInitDtoSchema = z.object({
     .max(5 * 1024 * 1024, 'O plano Free permite arquivos de no máximo 5 MB'),
   mimeType: z.string().min(1).max(100).default('application/octet-stream'),
   totalChunks: z.number().int().positive('Total de chunks deve ser positivo'),
-  chunkSize: z.number().int().positive().max(512 * 1024).default(64 * 1024),
+  chunkSize: z
+    .number()
+    .int()
+    .positive()
+    .max(512 * 1024)
+    .default(64 * 1024),
 });
 export type FileRelayInitDto = z.infer<typeof FileRelayInitDtoSchema>;
 
@@ -349,8 +348,47 @@ export type CreateSubscriptionDto = z.infer<typeof CreateSubscriptionDtoSchema>;
 
 export const CancelSubscriptionDtoSchema = z.object({
   reason: z.string().max(500).optional(),
+  acao: z.enum(['agendar', 'reativar']).optional(),
 });
 export type CancelSubscriptionDto = z.infer<typeof CancelSubscriptionDtoSchema>;
+
+export const CheckoutStatusResponseSchema = z.object({
+  status: z.enum(['PAID', 'PENDING', 'OVERDUE', 'REFUNDED', 'CANCELED']),
+  isPro: z.boolean(),
+  plan: z.string(),
+  invoiceUrl: z.string().nullable().optional(),
+  message: z.string().optional(),
+  sucesso: z.boolean().optional(),
+});
+export type CheckoutStatusResponse = z.infer<typeof CheckoutStatusResponseSchema>;
+
+export const SimulateCheckoutStatusDtoSchema = z.object({
+  chargeId: z.string().min(1, 'ID da cobrança obrigatório'),
+  simulatePaid: z.boolean().default(true),
+});
+export type SimulateCheckoutStatusDto = z.infer<typeof SimulateCheckoutStatusDtoSchema>;
+
+export const WebhookEventItemSchema = z.object({
+  id: z.string(),
+  evento: z.string(),
+  gateway: z.string(),
+  status: z.string(),
+  acao: z.string().nullable().optional(),
+  accountId: z.string().nullable().optional(),
+  duracaoMs: z.number().nullable().optional(),
+  erroMensagem: z.string().nullable().optional(),
+  payload: z.any().optional(),
+  processadoEm: z.string(),
+});
+export type WebhookEventItem = z.infer<typeof WebhookEventItemSchema>;
+
+export const WebhookEventsListResponseSchema = z.object({
+  events: z.array(WebhookEventItemSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+});
+export type WebhookEventsListResponse = z.infer<typeof WebhookEventsListResponseSchema>;
 
 export const SubscriptionResponseSchema = z.object({
   id: z.string().uuid(),
@@ -502,19 +540,21 @@ export const CreateSignatureRequestDtoSchema = z.object({
   contentBase64: z.string().min(1),
   deadlineAt: z.string().optional(),
   autoClose: z.boolean().optional().default(true),
-  signers: z.array(
-    z.object({
-      name: z.string().min(2).max(100),
-      email: z.string().email(),
-      userId: z.string().uuid().optional(),
-      documentation: z.string().optional(),
-      phoneNumber: z.string().optional(),
-      authType: SignatureAuthTypeSchema.optional().default('email'),
-      signAs: SignatureSignAsRoleSchema.optional().default('sign'),
-      groupOrder: z.number().int().min(1).optional().default(1),
-      message: z.string().optional(),
-    })
-  ).min(1),
+  signers: z
+    .array(
+      z.object({
+        name: z.string().min(2).max(100),
+        email: z.string().email(),
+        userId: z.string().uuid().optional(),
+        documentation: z.string().optional(),
+        phoneNumber: z.string().optional(),
+        authType: SignatureAuthTypeSchema.optional().default('email'),
+        signAs: SignatureSignAsRoleSchema.optional().default('sign'),
+        groupOrder: z.number().int().min(1).optional().default(1),
+        message: z.string().optional(),
+      })
+    )
+    .min(1),
 });
 export type CreateSignatureRequestDto = z.input<typeof CreateSignatureRequestDtoSchema>;
 
@@ -542,11 +582,14 @@ export const SignatureRequestResponseSchema = z.object({
   conversationId: z.string().uuid(),
   messageId: z.string().uuid().nullable().optional(),
   creatorId: z.string().uuid().nullable().optional(),
-  creator: z.object({
-    id: z.string().uuid(),
-    name: z.string(),
-    email: z.string().email(),
-  }).nullable().optional(),
+  creator: z
+    .object({
+      id: z.string().uuid(),
+      name: z.string(),
+      email: z.string().email(),
+    })
+    .nullable()
+    .optional(),
   title: z.string(),
   documentName: z.string(),
   provider: SignatureProviderSchema,
@@ -572,12 +615,14 @@ export const SimulateSignerDtoSchema = z.object({
 });
 export type SimulateSignerDto = z.infer<typeof SimulateSignerDtoSchema>;
 
-export const VerifySignatureHashDtoSchema = z.object({
-  sha256: z.string().optional(),
-  contentBase64: z.string().optional(),
-}).refine((data) => Boolean(data.sha256 || data.contentBase64), {
-  message: 'Informe o hash SHA-256 ou o conteúdo base64 do documento para verificação.',
-});
+export const VerifySignatureHashDtoSchema = z
+  .object({
+    sha256: z.string().optional(),
+    contentBase64: z.string().optional(),
+  })
+  .refine((data) => Boolean(data.sha256 || data.contentBase64), {
+    message: 'Informe o hash SHA-256 ou o conteúdo base64 do documento para verificação.',
+  });
 export type VerifySignatureHashDto = z.infer<typeof VerifySignatureHashDtoSchema>;
 
 export const VerifySignatureHashResponseSchema = z.object({
@@ -782,8 +827,3 @@ export const LoadTestReportSchema = z.object({
   bottlenecksAndRecommendations: z.array(z.string()),
 });
 export type LoadTestReport = z.infer<typeof LoadTestReportSchema>;
-
-
-
-
-

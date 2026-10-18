@@ -61,7 +61,9 @@ describe('File Limits Validation Module (T-15)', () => {
       const result = validateOfflineRecipient('free', false, 'João Silva');
       expect(result.allowed).toBe(false);
       expect(result.code).toBe('OFFLINE_RECIPIENT_NOT_ALLOWED');
-      expect(result.error).toContain('João Silva está offline. No plano Free, arquivos só são enviados para quem está online.');
+      expect(result.error).toContain(
+        'João Silva está offline. No plano Free, arquivos só são enviados para quem está online.'
+      );
     });
 
     it('allows online recipient on Free plan', () => {
@@ -258,9 +260,7 @@ describe('File Limits Validation Module (T-15)', () => {
 
     it('validates ValidateFilesDtoSchema correctly', () => {
       const validDto = {
-        files: [
-          { name: 'foto.png', size: 500000, mimeType: 'image/png' },
-        ],
+        files: [{ name: 'foto.png', size: 500000, mimeType: 'image/png' }],
         isRecipientOnline: true,
         recipientName: 'Carlos',
       };

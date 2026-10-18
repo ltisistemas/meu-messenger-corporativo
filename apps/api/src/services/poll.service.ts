@@ -71,10 +71,7 @@ export class PollService {
 
     // 2. Verify conversation membership and status
     const conversation = await this.db.query.conversations.findFirst({
-      where: and(
-        eq(conversations.id, dto.conversationId),
-        eq(conversations.accountId, accountId)
-      ),
+      where: and(eq(conversations.id, dto.conversationId), eq(conversations.accountId, accountId)),
       with: {
         members: true,
       },
@@ -212,7 +209,9 @@ export class PollService {
         };
 
         this.io.to(`conv:${dto.conversationId}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
-        this.io.to(`conversation:${dto.conversationId}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
+        this.io
+          .to(`conversation:${dto.conversationId}`)
+          .emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
         this.io.to(`conversation:${dto.conversationId}`).emit(WS_EVENTS.POLL_NEW, pollDetails);
 
         for (const uid of onlineRecipientIds) {
@@ -308,9 +307,7 @@ export class PollService {
         this.io
           .to(`conversation:${poll.conversationId}`)
           .emit(WS_EVENTS.POLL_UPDATED, updatedDetails);
-        this.io
-          .to(`conv:${poll.conversationId}`)
-          .emit(WS_EVENTS.POLL_UPDATED, updatedDetails);
+        this.io.to(`conv:${poll.conversationId}`).emit(WS_EVENTS.POLL_UPDATED, updatedDetails);
       } catch (_) {}
     }
 

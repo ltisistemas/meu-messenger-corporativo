@@ -102,20 +102,15 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
 
   describe('Relay Initialization (file:relay:init)', () => {
     it('initializes streaming relay session for online recipient in Free plan', async () => {
-      const result = await fileRelayService.initRelay(
-        accountId,
-        senderId,
-        'socket-sender-1',
-        {
-          transferId,
-          conversationId: directConvId,
-          fileName: 'planilha.xlsx',
-          fileSize: 3.5 * MB,
-          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          totalChunks: 56,
-          chunkSize: 64 * 1024,
-        }
-      );
+      const result = await fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+        transferId,
+        conversationId: directConvId,
+        fileName: 'planilha.xlsx',
+        fileSize: 3.5 * MB,
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        totalChunks: 56,
+        chunkSize: 64 * 1024,
+      });
 
       expect(result.success).toBe(true);
       expect(result.transferId).toBe(transferId);
@@ -131,20 +126,15 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
       mockDb.query.conversations.findFirst.mockResolvedValueOnce(mockDirectConvWithOffline);
 
       await expect(
-        fileRelayService.initRelay(
-          accountId,
-          senderId,
-          'socket-sender-1',
-          {
-            transferId,
-            conversationId: directConvId,
-            fileName: 'documento.pdf',
-            fileSize: 2 * MB,
-            mimeType: 'application/pdf',
-            totalChunks: 32,
-            chunkSize: 64 * 1024,
-          }
-        )
+        fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+          transferId,
+          conversationId: directConvId,
+          fileName: 'documento.pdf',
+          fileSize: 2 * MB,
+          mimeType: 'application/pdf',
+          totalChunks: 32,
+          chunkSize: 64 * 1024,
+        })
       ).rejects.toThrow(
         'Recipient Offline está offline. No plano Free, arquivos só são enviados para quem está online.'
       );
@@ -154,20 +144,15 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
 
     it('rejects relay initialization if file exceeds 5 MB on Free plan', async () => {
       await expect(
-        fileRelayService.initRelay(
-          accountId,
-          senderId,
-          'socket-sender-1',
-          {
-            transferId,
-            conversationId: directConvId,
-            fileName: 'video_grande.mp4',
-            fileSize: 6 * MB,
-            mimeType: 'video/mp4',
-            totalChunks: 96,
-            chunkSize: 64 * 1024,
-          }
-        )
+        fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+          transferId,
+          conversationId: directConvId,
+          fileName: 'video_grande.mp4',
+          fileSize: 6 * MB,
+          mimeType: 'video/mp4',
+          totalChunks: 96,
+          chunkSize: 64 * 1024,
+        })
       ).rejects.toThrow('excede o limite de 5 MB do plano Free');
 
       expect(fileRelayService.getActiveSessionsCount()).toBe(0);
@@ -180,40 +165,30 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
       });
 
       await expect(
-        fileRelayService.initRelay(
-          accountId,
-          senderId,
-          'socket-sender-1',
-          {
-            transferId,
-            conversationId: directConvId,
-            fileName: 'doc.pdf',
-            fileSize: 1 * MB,
-            mimeType: 'application/pdf',
-            totalChunks: 16,
-            chunkSize: 64 * 1024,
-          }
-        )
+        fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+          transferId,
+          conversationId: directConvId,
+          fileName: 'doc.pdf',
+          fileSize: 1 * MB,
+          mimeType: 'application/pdf',
+          totalChunks: 16,
+          chunkSize: 64 * 1024,
+        })
       ).rejects.toThrow('Você não é membro desta conversa.');
     });
   });
 
   describe('Relay Chunk Piping (file:relay:chunk)', () => {
     beforeEach(async () => {
-      await fileRelayService.initRelay(
-        accountId,
-        senderId,
-        'socket-sender-1',
-        {
-          transferId,
-          conversationId: directConvId,
-          fileName: 'dados.bin',
-          fileSize: 128 * 1024,
-          mimeType: 'application/octet-stream',
-          totalChunks: 2,
-          chunkSize: 64 * 1024,
-        }
-      );
+      await fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+        transferId,
+        conversationId: directConvId,
+        fileName: 'dados.bin',
+        fileSize: 128 * 1024,
+        mimeType: 'application/octet-stream',
+        totalChunks: 2,
+        chunkSize: 64 * 1024,
+      });
     });
 
     it('forwards binary chunk directly to online recipient socket with zero heap persistence', async () => {
@@ -253,20 +228,15 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
 
   describe('Relay Completion (file:relay:complete)', () => {
     beforeEach(async () => {
-      await fileRelayService.initRelay(
-        accountId,
-        senderId,
-        'socket-sender-1',
-        {
-          transferId,
-          conversationId: directConvId,
-          fileName: 'relatorio.pdf',
-          fileSize: 3 * MB,
-          mimeType: 'application/pdf',
-          totalChunks: 48,
-          chunkSize: 64 * 1024,
-        }
-      );
+      await fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+        transferId,
+        conversationId: directConvId,
+        fileName: 'relatorio.pdf',
+        fileSize: 3 * MB,
+        mimeType: 'application/pdf',
+        totalChunks: 48,
+        chunkSize: 64 * 1024,
+      });
     });
 
     it('completes transfer, persists message in database, emits message:new, and frees session', async () => {
@@ -313,20 +283,15 @@ describe('In-Memory WebSocket File Streaming Relay (T-16)', () => {
       mockPresence.isUserOnline.mockImplementation(async (uid: string) => onlineSet.has(uid));
 
       // 1. Initialize relay
-      const initRes = await fileRelayService.initRelay(
-        accountId,
-        senderId,
-        'socket-sender-1',
-        {
-          transferId: 'group-transfer-777',
-          conversationId: groupConvId,
-          fileName: 'pauta_reuniao.pdf',
-          fileSize: 2 * MB,
-          mimeType: 'application/pdf',
-          totalChunks: 32,
-          chunkSize: 64 * 1024,
-        }
-      );
+      const initRes = await fileRelayService.initRelay(accountId, senderId, 'socket-sender-1', {
+        transferId: 'group-transfer-777',
+        conversationId: groupConvId,
+        fileName: 'pauta_reuniao.pdf',
+        fileSize: 2 * MB,
+        mimeType: 'application/pdf',
+        totalChunks: 32,
+        chunkSize: 64 * 1024,
+      });
 
       expect(initRes.success).toBe(true);
       expect(initRes.recipientCount).toBe(4);

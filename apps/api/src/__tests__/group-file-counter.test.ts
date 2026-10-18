@@ -212,25 +212,33 @@ describe('Group File Transfer Pending Counter & Last Recipient Deletion (T-21)',
 
     it('Full Group Lifecycle: File disappears ONLY after the 4th (last) recipient downloads', async () => {
       // 1. Recipient 1 downloads -> 3 pending
-      const res1 = await fileService.confirmDownload(accountId, member1Id, transferId, { completed: true });
+      const res1 = await fileService.confirmDownload(accountId, member1Id, transferId, {
+        completed: true,
+      });
       expect(res1.pendingDownloadsCount).toBe(3);
       expect(res1.deletedFromStorage).toBe(false);
       expect(mockStorageService.deleteObject).not.toHaveBeenCalled();
 
       // 2. Recipient 2 downloads -> 2 pending
-      const res2 = await fileService.confirmDownload(accountId, member2Id, transferId, { completed: true });
+      const res2 = await fileService.confirmDownload(accountId, member2Id, transferId, {
+        completed: true,
+      });
       expect(res2.pendingDownloadsCount).toBe(2);
       expect(res2.deletedFromStorage).toBe(false);
       expect(mockStorageService.deleteObject).not.toHaveBeenCalled();
 
       // 3. Recipient 3 downloads -> 1 pending
-      const res3 = await fileService.confirmDownload(accountId, member3Id, transferId, { completed: true });
+      const res3 = await fileService.confirmDownload(accountId, member3Id, transferId, {
+        completed: true,
+      });
       expect(res3.pendingDownloadsCount).toBe(1);
       expect(res3.deletedFromStorage).toBe(false);
       expect(mockStorageService.deleteObject).not.toHaveBeenCalled();
 
       // 4. Recipient 4 (LAST RECIPIENT) downloads -> 0 pending & DELETED
-      const res4 = await fileService.confirmDownload(accountId, member4Id, transferId, { completed: true });
+      const res4 = await fileService.confirmDownload(accountId, member4Id, transferId, {
+        completed: true,
+      });
       expect(res4.pendingDownloadsCount).toBe(0);
       expect(res4.deletedFromStorage).toBe(true);
       expect(res4.status).toBe('completed');

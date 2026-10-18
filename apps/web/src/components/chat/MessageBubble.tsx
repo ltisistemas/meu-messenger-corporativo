@@ -88,7 +88,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   }
 
   // If this message is a signature envelope, render SignatureCard
-  if ((message.type === 'signature' || message.metadata?.signature) && message.metadata?.signature) {
+  if (
+    (message.type === 'signature' || message.metadata?.signature) &&
+    message.metadata?.signature
+  ) {
     return (
       <div className={`flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-1 w-full`}>
         {!isSelf && isGroup && message.senderName && (
@@ -276,4 +279,3 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     </div>
   );
 };
-

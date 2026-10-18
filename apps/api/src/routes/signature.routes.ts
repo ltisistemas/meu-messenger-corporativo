@@ -42,7 +42,9 @@ export const signatureRoutes: FastifyPluginAsync<SignatureRoutesOptions> = async
         return reply.status(400).send({
           statusCode: 400,
           error: 'Bad Request',
-          message: parseResult.error.errors[0]?.message || 'Dados inválidos para solicitação de assinatura.',
+          message:
+            parseResult.error.errors[0]?.message ||
+            'Dados inválidos para solicitação de assinatura.',
         });
       }
 
@@ -224,7 +226,8 @@ export const signatureRoutes: FastifyPluginAsync<SignatureRoutesOptions> = async
         return reply.status(400).send({
           statusCode: 400,
           error: 'Bad Request',
-          message: parseResult.error.errors[0]?.message || 'Dados inválidos para verificação de hash.',
+          message:
+            parseResult.error.errors[0]?.message || 'Dados inválidos para verificação de hash.',
         });
       }
 
@@ -242,28 +245,26 @@ export const signatureRoutes: FastifyPluginAsync<SignatureRoutesOptions> = async
   );
 
   // 9. POST /api/signatures/webhooks/clicksign - Clicksign Webhook receiver
-  fastify.post(
-    '/webhooks/clicksign',
-    async (request, reply) => {
-      const rawPayload = typeof request.body === 'string' ? request.body : JSON.stringify(request.body);
-      const signatureHeader =
-        (request.headers['x-clicksign-signature'] as string) ||
-        (request.headers['content-hmac-sha256'] as string) ||
-        '';
+  fastify.post('/webhooks/clicksign', async (request, reply) => {
+    const rawPayload =
+      typeof request.body === 'string' ? request.body : JSON.stringify(request.body);
+    const signatureHeader =
+      (request.headers['x-clicksign-signature'] as string) ||
+      (request.headers['content-hmac-sha256'] as string) ||
+      '';
 
-      try {
-        const result = await signatureService.handleClicksignWebhook(rawPayload, signatureHeader);
-        return reply.status(200).send({
-          status: 'ok',
-          received: true,
-          ...result,
-        });
-      } catch (err: any) {
-        return reply.status(400).send({
-          status: 'error',
-          message: err.message || 'Erro ao processar webhook da Clicksign.',
-        });
-      }
+    try {
+      const result = await signatureService.handleClicksignWebhook(rawPayload, signatureHeader);
+      return reply.status(200).send({
+        status: 'ok',
+        received: true,
+        ...result,
+      });
+    } catch (err: any) {
+      return reply.status(400).send({
+        status: 'error',
+        message: err.message || 'Erro ao processar webhook da Clicksign.',
+      });
     }
-  );
+  });
 };

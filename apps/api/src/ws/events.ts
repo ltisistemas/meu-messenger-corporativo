@@ -27,7 +27,6 @@ export const WS_EVENTS = {
   FILE_RELAY_ERROR: 'file:relay:error',
   FILE_RELAY_CANCEL: 'file:relay:cancel',
 
-
   // Group / System
   CONVERSATION_JOIN: 'conversation:join',
   CONVERSATION_LEAVE: 'conversation:leave',

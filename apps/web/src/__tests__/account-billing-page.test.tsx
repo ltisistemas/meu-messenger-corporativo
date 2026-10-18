@@ -213,12 +213,7 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
     });
 
     it('renders suspended warning banner when account is suspended', () => {
-      render(
-        <QuotaWarningBanner
-          status="suspended"
-          onUpgradeClick={vi.fn()}
-        />
-      );
+      render(<QuotaWarningBanner status="suspended" onUpgradeClick={vi.fn()} />);
 
       expect(screen.getByText(/Conta suspensa por inadimplência/i)).toBeInTheDocument();
     });
@@ -266,7 +261,10 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
       const deactivateButtons = screen.getAllByText('Desativar');
       fireEvent.click(deactivateButtons[0]);
 
-      expect(onUpdateStatus).toHaveBeenCalledWith('33333333-3333-3333-3333-333333333333', 'inactive');
+      expect(onUpdateStatus).toHaveBeenCalledWith(
+        '33333333-3333-3333-3333-333333333333',
+        'inactive'
+      );
     });
 
     it('calls onUpdateStatus to activate an inactive member and renders error when update fails', async () => {
@@ -403,15 +401,61 @@ describe('Plans, Invoices & Account Dashboard Frontend (T-30)', () => {
           billingCycle="monthly"
           onSubmitCheckout={vi.fn()}
           checkoutResult={{
-            pixQrCode: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+            pixQrCode:
+              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
             pixCopyPaste: '00020126580014br.gov.bcb.pix0136asaas_pix_mock',
           }}
         />
       );
 
       expect(screen.getByText(/Pague via Pix para Ativação Instantânea/i)).toBeInTheDocument();
-      expect(screen.getByText(/00020126580014br.gov.bcb.pix0136asaas_pix_mock/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/00020126580014br.gov.bcb.pix0136asaas_pix_mock/i)
+      ).toBeInTheDocument();
       expect(screen.getByText('Copiar')).toBeInTheDocument();
+    });
+
+    it('renders simulation button, confirms payment and renders success screen', async () => {
+      const onClose = vi.fn();
+      // Setup mock on useAccountStore
+      useAccountStore.setState({
+        simulatePaymentConfirmation: vi.fn().mockResolvedValue({
+          chargeId: 'pay_123',
+          status: 'PAID',
+          paid: true,
+          plan: 'pro',
+        }),
+      });
+
+      render(
+        <UpgradeCheckoutModal
+          isOpen={true}
+          onClose={onClose}
+          targetPlan="pro"
+          billingCycle="monthly"
+          onSubmitCheckout={vi.fn()}
+          checkoutResult={{
+            pixQrCode: 'raw_base64_pix',
+            pixCopyPaste: '00020126580014br.gov.bcb.pix0136asaas_pix_mock',
+            chargeId: 'pay_123',
+          }}
+        />
+      );
+
+      expect(screen.getByText(/Aguardando confirmação do pagamento/i)).toBeInTheDocument();
+      const simButton = screen.getByText(/Simular Confirmação Instantânea/i);
+      expect(simButton).toBeInTheDocument();
+
+      fireEvent.click(simButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/Assinatura Confirmada!/i)).toBeInTheDocument();
+        expect(screen.getByText(/Parabéns! Sua Assinatura está Ativa/i)).toBeInTheDocument();
+      });
+
+      const finishBtn = screen.getByText('Ir para o Painel da Organização');
+      fireEvent.click(finishBtn);
+      expect(onClose).toHaveBeenCalled();
     });
   });
 

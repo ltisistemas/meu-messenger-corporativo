@@ -47,9 +47,7 @@ describe('Authentication & Account Creation (T-04)', () => {
         },
         insert: vi.fn((table) => ({
           values: vi.fn((val) => ({
-            returning: vi.fn().mockResolvedValue([
-              table === mockUser ? mockUser : mockAccount,
-            ]),
+            returning: vi.fn().mockResolvedValue([table === mockUser ? mockUser : mockAccount]),
           })),
         })),
       };
@@ -85,7 +83,9 @@ describe('Authentication & Account Creation (T-04)', () => {
       const mockDb: any = {
         query: {
           users: {
-            findFirst: vi.fn().mockResolvedValue({ id: 'existing-usr', email: 'taken@example.com' }),
+            findFirst: vi
+              .fn()
+              .mockResolvedValue({ id: 'existing-usr', email: 'taken@example.com' }),
           },
         },
       };

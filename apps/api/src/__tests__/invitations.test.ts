@@ -227,7 +227,9 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
       expect(listRes.statusCode).toBe(200);
       expect(JSON.parse(listRes.payload).invitations).toHaveLength(1);
 
-      vi.spyOn(InvitationService.prototype, 'revokeInvitation').mockResolvedValueOnce({ success: true });
+      vi.spyOn(InvitationService.prototype, 'revokeInvitation').mockResolvedValueOnce({
+        success: true,
+      });
       const delRes = await server.inject({
         method: 'DELETE',
         url: '/api/invitations/inv-1',
@@ -280,7 +282,9 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
         rawUser: { id: 'usr-new', email: 'novo@corp.com', role: 'member' } as any,
         account: { id: 'acc-1', name: 'Acme' } as any,
       });
-      vi.spyOn(AuthService.prototype, 'createRefreshToken').mockResolvedValueOnce('mock-refresh-tok');
+      vi.spyOn(AuthService.prototype, 'createRefreshToken').mockResolvedValueOnce(
+        'mock-refresh-tok'
+      );
 
       const goodAccept = await server.inject({
         method: 'POST',
@@ -308,9 +312,9 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
       const mockDb: any = {
         query: {
           invitations: {
-            findMany: vi.fn().mockResolvedValue([
-              { id: 'inv-1', email: 'inv1@corp.com', status: 'pending' },
-            ]),
+            findMany: vi
+              .fn()
+              .mockResolvedValue([{ id: 'inv-1', email: 'inv1@corp.com', status: 'pending' }]),
           },
         },
         update: vi.fn(() => ({
@@ -327,9 +331,9 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
       expect(list).toHaveLength(1);
 
       // revokeInvitation rejects member role
-      await expect(
-        service.revokeInvitation('acc-1', 'inv-1', 'member')
-      ).rejects.toThrow('Apenas Administradores e o Proprietário podem revogar convites.');
+      await expect(service.revokeInvitation('acc-1', 'inv-1', 'member')).rejects.toThrow(
+        'Apenas Administradores e o Proprietário podem revogar convites.'
+      );
 
       // revokeInvitation allows admin role
       const resAdmin = await service.revokeInvitation('acc-1', 'inv-1', 'admin');
@@ -354,9 +358,11 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
         })),
         insert: vi.fn(() => ({
           values: vi.fn(() => ({
-            returning: vi.fn().mockResolvedValue([
-              { id: 'usr-accepted', email: 'acc@corp.com', role: 'member', passwordHash: 'hash' },
-            ]),
+            returning: vi
+              .fn()
+              .mockResolvedValue([
+                { id: 'usr-accepted', email: 'acc@corp.com', role: 'member', passwordHash: 'hash' },
+              ]),
           })),
         })),
         update: vi.fn(() => ({
@@ -370,7 +376,9 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
 
       // 1. Not found
       mockDb.query.invitations.findFirst.mockResolvedValueOnce(null);
-      await expect(service.getInvitationByToken('unknown')).rejects.toThrow('Convite não encontrado.');
+      await expect(service.getInvitationByToken('unknown')).rejects.toThrow(
+        'Convite não encontrado.'
+      );
 
       // 2. Already accepted
       mockDb.query.invitations.findFirst.mockResolvedValueOnce({
@@ -378,7 +386,9 @@ describe('Member Invitations & Plan Limits (T-05)', () => {
         status: 'accepted',
         expiresAt: new Date(Date.now() + 100000),
       });
-      await expect(service.getInvitationByToken('tok')).rejects.toThrow('Este convite já foi aceito.');
+      await expect(service.getInvitationByToken('tok')).rejects.toThrow(
+        'Este convite já foi aceito.'
+      );
 
       // 3. Expired
       mockDb.query.invitations.findFirst.mockResolvedValueOnce({

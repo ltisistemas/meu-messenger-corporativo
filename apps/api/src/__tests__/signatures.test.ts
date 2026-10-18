@@ -34,7 +34,9 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
 
   const conversationId = '99999999-9999-9999-9999-999999999999';
 
-  const samplePdfBase64 = Buffer.from('%PDF-1.4 Mock Electronic Signature Contract for T-32 Integration').toString('base64');
+  const samplePdfBase64 = Buffer.from(
+    '%PDF-1.4 Mock Electronic Signature Contract for T-32 Integration'
+  ).toString('base64');
 
   // In-memory mock DB stores
   const accountStore = new Map<string, any>();
@@ -209,29 +211,35 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       return await callback(mockTx);
     });
 
-    vi.spyOn(db, 'insert').mockImplementation((table: any) => ({
-      values: (val: any) => {
-        const id = val.id || crypto.randomUUID();
-        const row = { ...val, id, createdAt: new Date(), updatedAt: new Date() };
-        if (table === signatureEvidence) {
-          signatureEvidenceStore.set(id, row);
-        }
-        return {
-          returning: () => [row],
-          then: (resolve: any) => resolve([row]),
-        };
-      },
-    }) as any);
+    vi.spyOn(db, 'insert').mockImplementation(
+      (table: any) =>
+        ({
+          values: (val: any) => {
+            const id = val.id || crypto.randomUUID();
+            const row = { ...val, id, createdAt: new Date(), updatedAt: new Date() };
+            if (table === signatureEvidence) {
+              signatureEvidenceStore.set(id, row);
+            }
+            return {
+              returning: () => [row],
+              then: (resolve: any) => resolve([row]),
+            };
+          },
+        }) as any
+    );
 
-    vi.spyOn(db, 'update').mockImplementation((table: any) => ({
-      set: (val: any) => ({
-        where: (cond: any) => {
-          return {
-            then: (resolve: any) => resolve([]),
-          };
-        },
-      }),
-    }) as any);
+    vi.spyOn(db, 'update').mockImplementation(
+      (table: any) =>
+        ({
+          set: (val: any) => ({
+            where: (cond: any) => {
+              return {
+                then: (resolve: any) => resolve([]),
+              };
+            },
+          }),
+        }) as any
+    );
 
     clicksignService = new ClicksignProviderService('mock-clicksign-key');
     signatureService = new SignatureService(clicksignService);
@@ -246,13 +254,16 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
   describe('1. Enterprise Feature Gating & Permissions', () => {
     it('blocks Free plan users with 403 Forbidden', async () => {
       // Mock account lookup for free user
-      vi.spyOn(db, 'select').mockImplementationOnce(() => ({
-        from: () => ({
-          where: () => ({
-            limit: () => [accountStore.get(freeAccountId)],
-          }),
-        }),
-      }) as any);
+      vi.spyOn(db, 'select').mockImplementationOnce(
+        () =>
+          ({
+            from: () => ({
+              where: () => ({
+                limit: () => [accountStore.get(freeAccountId)],
+              }),
+            }),
+          }) as any
+      );
 
       const token = app.jwt.sign({
         userId: freeUserId,
@@ -280,13 +291,16 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
     });
 
     it('blocks Pro plan users with 403 Forbidden', async () => {
-      vi.spyOn(db, 'select').mockImplementationOnce(() => ({
-        from: () => ({
-          where: () => ({
-            limit: () => [accountStore.get(proAccountId)],
-          }),
-        }),
-      }) as any);
+      vi.spyOn(db, 'select').mockImplementationOnce(
+        () =>
+          ({
+            from: () => ({
+              where: () => ({
+                limit: () => [accountStore.get(proAccountId)],
+              }),
+            }),
+          }) as any
+      );
 
       const token = app.jwt.sign({
         userId: proUserId,
@@ -314,13 +328,16 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
     });
 
     it('blocks Enterprise users if account is over_quota', async () => {
-      vi.spyOn(db, 'select').mockImplementationOnce(() => ({
-        from: () => ({
-          where: () => ({
-            limit: () => [accountStore.get(overQuotaAccountId)],
-          }),
-        }),
-      }) as any);
+      vi.spyOn(db, 'select').mockImplementationOnce(
+        () =>
+          ({
+            from: () => ({
+              where: () => ({
+                limit: () => [accountStore.get(overQuotaAccountId)],
+              }),
+            }),
+          }) as any
+      );
 
       const token = app.jwt.sign({
         userId: enterpriseUserId,
@@ -352,27 +369,36 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
     it('creates document with SHA-256 hash, registers signers, creates message and emits WebSocket event', async () => {
       // Mock account and membership checks
       vi.spyOn(db, 'select')
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [accountStore.get(enterpriseAccountId)],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [memberStore.get(`${conversationId}:${enterpriseUserId}`)],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [userStore.get(enterpriseUserId)],
-            }),
-          }),
-        }) as any);
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [accountStore.get(enterpriseAccountId)],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [memberStore.get(`${conversationId}:${enterpriseUserId}`)],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [userStore.get(enterpriseUserId)],
+                }),
+              }),
+            }) as any
+        );
 
       const token = app.jwt.sign({
         userId: enterpriseUserId,
@@ -474,25 +500,34 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       };
 
       vi.spyOn(db, 'select')
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [mockReq],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => Promise.resolve([mockSigner]),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [userStore.get(enterpriseUserId)],
-            }),
-          }),
-        }) as any);
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [mockReq],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => Promise.resolve([mockSigner]),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [userStore.get(enterpriseUserId)],
+                }),
+              }),
+            }) as any
+        );
 
       const token = app.jwt.sign({
         userId: enterpriseUserId,
@@ -519,27 +554,36 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
     it('simulates signature execution, updates signer status and auto-closes when all signers sign', async () => {
       // 1. Create a signature request through service directly
       vi.spyOn(db, 'select')
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [accountStore.get(enterpriseAccountId)],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [memberStore.get(`${conversationId}:${enterpriseUserId}`)],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [userStore.get(enterpriseUserId)],
-            }),
-          }),
-        }) as any);
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [accountStore.get(enterpriseAccountId)],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [memberStore.get(`${conversationId}:${enterpriseUserId}`)],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [userStore.get(enterpriseUserId)],
+                }),
+              }),
+            }) as any
+        );
 
       const created = await signatureService.createSignatureRequest(
         enterpriseAccountId,
@@ -594,44 +638,62 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       };
 
       vi.spyOn(db, 'select')
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [reqRow],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [signerRow],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => Promise.resolve([signerRow]),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [{ ...reqRow, status: 'closed' }],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => Promise.resolve([{ ...signerRow, status: 'signed' }]),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [userStore.get(enterpriseUserId)],
-            }),
-          }),
-        }) as any);
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [reqRow],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [signerRow],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => Promise.resolve([signerRow]),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [{ ...reqRow, status: 'closed' }],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => Promise.resolve([{ ...signerRow, status: 'signed' }]),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [userStore.get(enterpriseUserId)],
+                }),
+              }),
+            }) as any
+        );
 
       const token = app.jwt.sign({
         userId: enterpriseUserId,
@@ -769,56 +831,71 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
 
     it('simulateSign throws error when request, signer or status is invalid', async () => {
       // 1. Missing request
-      vi.spyOn(db, 'select').mockImplementationOnce(() => ({
-        from: () => ({
-          where: () => ({
-            limit: () => [],
-          }),
-        }),
-      }) as any);
+      vi.spyOn(db, 'select').mockImplementationOnce(
+        () =>
+          ({
+            from: () => ({
+              where: () => ({
+                limit: () => [],
+              }),
+            }),
+          }) as any
+      );
       await expect(
         signatureService.simulateSign('acc-1', 'missing-sig', 's-1', {})
       ).rejects.toThrow('Solicitação de assinatura não encontrada.');
 
       // 2. Missing signer
       vi.spyOn(db, 'select')
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [{ id: 'sig-1', externalDocumentKey: 'doc_1' }],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [],
-            }),
-          }),
-        }) as any);
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [{ id: 'sig-1', externalDocumentKey: 'doc_1' }],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [],
+                }),
+              }),
+            }) as any
+        );
       await expect(
         signatureService.simulateSign('acc-1', 'sig-1', 'missing-signer', {})
       ).rejects.toThrow('Signatário não encontrado.');
 
       // 3. Already signed
       vi.spyOn(db, 'select')
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [{ id: 'sig-1', externalDocumentKey: 'doc_1' }],
-            }),
-          }),
-        }) as any)
-        .mockImplementationOnce(() => ({
-          from: () => ({
-            where: () => ({
-              limit: () => [{ id: 's-1', status: 'signed' }],
-            }),
-          }),
-        }) as any);
-      await expect(
-        signatureService.simulateSign('acc-1', 'sig-1', 's-1', {})
-      ).rejects.toThrow('Este signatário já realizou a assinatura.');
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [{ id: 'sig-1', externalDocumentKey: 'doc_1' }],
+                }),
+              }),
+            }) as any
+        )
+        .mockImplementationOnce(
+          () =>
+            ({
+              from: () => ({
+                where: () => ({
+                  limit: () => [{ id: 's-1', status: 'signed' }],
+                }),
+              }),
+            }) as any
+        );
+      await expect(signatureService.simulateSign('acc-1', 'sig-1', 's-1', {})).rejects.toThrow(
+        'Este signatário já realizou a assinatura.'
+      );
     });
 
     it('verifyDocumentHash handles missing input, base64 computation and signed match', async () => {
@@ -830,9 +907,9 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       } as any);
 
       // 1. Missing both sha256 and contentBase64
-      await expect(
-        signatureService.verifyDocumentHash('acc-1', 'sig-1', {})
-      ).rejects.toThrow('Informe o hash SHA-256 ou o conteúdo base64 para verificação.');
+      await expect(signatureService.verifyDocumentHash('acc-1', 'sig-1', {})).rejects.toThrow(
+        'Informe o hash SHA-256 ou o conteúdo base64 para verificação.'
+      );
 
       // 2. Matches signed hash
       const resSigned = await signatureService.verifyDocumentHash('acc-1', 'sig-1', {
@@ -883,9 +960,9 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
         status: 'running',
         externalDocumentKey: 'doc-key',
       } as any);
-      await expect(
-        signatureService.downloadSignedDocument('acc-1', 'sig-1')
-      ).rejects.toThrow('O documento ainda não foi finalizado por todos os signatários.');
+      await expect(signatureService.downloadSignedDocument('acc-1', 'sig-1')).rejects.toThrow(
+        'O documento ainda não foi finalizado por todos os signatários.'
+      );
 
       // 2. Returns document when status is closed
       vi.spyOn(signatureService, 'getSignatureRequest').mockResolvedValueOnce({
@@ -906,13 +983,15 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       vi.spyOn(db, 'select').mockReturnValue({
         from: () => ({
           where: () => ({
-            limit: () => [{
-              id: 'sig-1',
-              accountId: 'acc-1',
-              conversationId: 'conv-1',
-              externalDocumentKey: 'doc-key',
-              status: 'running',
-            }],
+            limit: () => [
+              {
+                id: 'sig-1',
+                accountId: 'acc-1',
+                conversationId: 'conv-1',
+                externalDocumentKey: 'doc-key',
+                status: 'running',
+              },
+            ],
           }),
         }),
       } as any);
@@ -943,11 +1022,13 @@ describe('Electronic Signature Flow API & Enterprise Access (T-32)', () => {
       vi.spyOn(db, 'select').mockReturnValueOnce({
         from: () => ({
           where: () => ({
-            limit: () => [{
-              id: 'acc-oq',
-              plan: 'enterprise',
-              status: 'over_quota',
-            }],
+            limit: () => [
+              {
+                id: 'acc-oq',
+                plan: 'enterprise',
+                status: 'over_quota',
+              },
+            ],
           }),
         }),
       } as any);

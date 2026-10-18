@@ -27,9 +27,24 @@ describe('S3 / R2 Pre-signed Uploads & Storage (T-19)', () => {
     const accountsMap: Record<string, any> = {
       [freeAccountId]: { id: freeAccountId, name: 'Free Org', plan: 'free', status: 'active' },
       [proAccountId]: { id: proAccountId, name: 'Pro Org', plan: 'pro', status: 'active' },
-      [entAccountId]: { id: entAccountId, name: 'Enterprise Org', plan: 'enterprise', status: 'active' },
-      [overQuotaAccountId]: { id: overQuotaAccountId, name: 'Over Quota Org', plan: 'pro', status: 'over_quota' },
-      [suspendedAccountId]: { id: suspendedAccountId, name: 'Suspended Org', plan: 'pro', status: 'suspended' },
+      [entAccountId]: {
+        id: entAccountId,
+        name: 'Enterprise Org',
+        plan: 'enterprise',
+        status: 'active',
+      },
+      [overQuotaAccountId]: {
+        id: overQuotaAccountId,
+        name: 'Over Quota Org',
+        plan: 'pro',
+        status: 'over_quota',
+      },
+      [suspendedAccountId]: {
+        id: suspendedAccountId,
+        name: 'Suspended Org',
+        plan: 'pro',
+        status: 'suspended',
+      },
     };
 
     mockDb = {
@@ -158,7 +173,9 @@ describe('S3 / R2 Pre-signed Uploads & Storage (T-19)', () => {
 
       expect(response.transferId).toBeDefined();
       expect(response.uploadUrl).toBeDefined();
-      expect(response.storageKey).toContain(`accounts/${proAccountId}/transfers/${response.transferId}/balanco-anual.pdf`);
+      expect(response.storageKey).toContain(
+        `accounts/${proAccountId}/transfers/${response.transferId}/balanco-anual.pdf`
+      );
       expect(response.headers['x-amz-server-side-encryption']).toBe('AES256');
       expect(response.maxSizeBytes).toBe(25 * MB);
 
@@ -267,9 +284,7 @@ describe('S3 / R2 Pre-signed Uploads & Storage (T-19)', () => {
     it('throws 404 if transfer does not exist or belongs to another account', async () => {
       mockDb.query.fileTransfers.findFirst.mockResolvedValueOnce(null);
 
-      await expect(
-        fileService.confirmUpload('other-acc', 'unknown-id')
-      ).rejects.toMatchObject({
+      await expect(fileService.confirmUpload('other-acc', 'unknown-id')).rejects.toMatchObject({
         code: 'FILE_TRANSFER_NOT_FOUND',
         statusCode: 404,
       });

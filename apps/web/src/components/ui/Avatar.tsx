@@ -83,8 +83,8 @@ export const Avatar: React.FC<AvatarProps> = ({
             src
               ? 'bg-slate-200 dark:bg-slate-800'
               : isGroup
-              ? 'bg-gradient-to-tr from-slate-700 to-slate-900 text-brand-400 border border-slate-700'
-              : `bg-gradient-to-tr ${gradient} text-white`,
+                ? 'bg-gradient-to-tr from-slate-700 to-slate-900 text-brand-400 border border-slate-700'
+                : `bg-gradient-to-tr ${gradient} text-white`,
             className
           )
         )}

@@ -4,8 +4,10 @@
  */
 
 // Regular expressions to match dangerous HTML blocks and script injection vectors
-const DANGEROUS_BLOCK_TAGS_REGEX = /<\s*(script|style|iframe|object|embed|applet|form|svg|math)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi;
-const DANGEROUS_SINGLE_TAGS_REGEX = /<\s*\/?\s*(script|iframe|object|embed|applet|style|meta|link|base|form|input|button|svg|math)[^>]*>/gi;
+const DANGEROUS_BLOCK_TAGS_REGEX =
+  /<\s*(script|style|iframe|object|embed|applet|form|svg|math)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi;
+const DANGEROUS_SINGLE_TAGS_REGEX =
+  /<\s*\/?\s*(script|iframe|object|embed|applet|style|meta|link|base|form|input|button|svg|math)[^>]*>/gi;
 const INLINE_EVENT_HANDLERS_REGEX = /\s*(on\w+)\s*=\s*(['"][^'"]*['"]|[^\s>]+)/gi;
 const DANGEROUS_PROTOCOLS_REGEX = /^\s*(javascript|data|vbscript|file):/i;
 

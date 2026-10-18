@@ -114,7 +114,9 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
     // 1. Check > 25 MB global cloud share suggestion
     if (file.size > 25 * 1024 * 1024) {
       setSelectedFile(null);
-      setFileError('Esse arquivo passa de 25 MB. Compartilhe pelo Google Drive e cole o link aqui.');
+      setFileError(
+        'Esse arquivo passa de 25 MB. Compartilhe pelo Google Drive e cole o link aqui.'
+      );
       return;
     }
 
@@ -240,7 +242,8 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
                 <p className="font-semibold text-amber-950 dark:text-amber-100">{fileError}</p>
                 {fileError.includes('25 MB') && (
                   <p className="opacity-85 text-[11px] mt-0.5 text-amber-900 dark:text-amber-300">
-                    O NextMsg reconhece automaticamente links de nuvem e exibe um cartão interativo com pré-visualização.
+                    O NextMsg reconhece automaticamente links de nuvem e exibe um cartão interativo
+                    com pré-visualização.
                   </p>
                 )}
               </div>
@@ -428,7 +431,9 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           }
           value={text}
           onChange={handleInputChange}
-          disabled={disabled || isSending || (Boolean(selectedFile) && transferStatus === 'streaming')}
+          disabled={
+            disabled || isSending || (Boolean(selectedFile) && transferStatus === 'streaming')
+          }
           className="flex-1 bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 border border-transparent focus:border-brand-500 transition"
         />
 

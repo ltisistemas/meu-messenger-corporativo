@@ -19,9 +19,7 @@ export const messages = pgTable(
     metadata: jsonb('metadata').default({}),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [
-    index('messages_conversation_created_idx').on(table.conversationId, table.createdAt),
-  ]
+  (table) => [index('messages_conversation_created_idx').on(table.conversationId, table.createdAt)]
 );
 
 export const messagesRelations = relations(messages, ({ one, many }) => ({

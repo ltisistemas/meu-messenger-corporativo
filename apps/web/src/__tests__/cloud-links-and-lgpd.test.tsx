@@ -14,7 +14,10 @@ vi.mock('../services/api', () => ({
     delete: vi.fn(),
   },
   ApiError: class ApiError extends Error {
-    constructor(message: string, public status: number) {
+    constructor(
+      message: string,
+      public status: number
+    ) {
       super(message);
       this.name = 'ApiError';
     }
@@ -126,7 +129,14 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
 
     beforeEach(() => {
       useAuthStore.setState({
-        user: { id: 'u-1', name: 'Alice', email: 'alice@empresa.com', role: 'owner', status: 'active', accountId: 'acc-1' },
+        user: {
+          id: 'u-1',
+          name: 'Alice',
+          email: 'alice@empresa.com',
+          role: 'owner',
+          status: 'active',
+          accountId: 'acc-1',
+        },
       });
       vi.mocked(api.get).mockResolvedValue(mockPolicy);
     });
@@ -157,7 +167,9 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
 
       await waitFor(() => {
         expect(api.get).toHaveBeenCalledWith('/lgpd/export');
-        expect(screen.getByText(/Arquivo JSON gerado e download iniciado com sucesso!/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Arquivo JSON gerado e download iniciado com sucesso!/i)
+        ).toBeInTheDocument();
       });
     });
 
@@ -224,7 +236,12 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
       // Figma & Notion
       rerender(
         <CloudLinkCard
-          link={{ ...genericLink, provider: 'figma', providerName: 'Figma', title: 'Design System' }}
+          link={{
+            ...genericLink,
+            provider: 'figma',
+            providerName: 'Figma',
+            title: 'Design System',
+          }}
           isSelf={true}
         />
       );
@@ -327,11 +344,7 @@ describe('CloudLinkCard & LGPD Privacy Section Deep Coverage', () => {
     it('renders QuotaWarningBanner trial state with upgrade action', () => {
       const onUpgrade = vi.fn();
       render(
-        <QuotaWarningBanner
-          isTrialing={true}
-          trialDaysRemaining={7}
-          onUpgradeClick={onUpgrade}
-        />
+        <QuotaWarningBanner isTrialing={true} trialDaysRemaining={7} onUpgradeClick={onUpgrade} />
       );
 
       expect(screen.getByText(/Trial Pro de 14 dias/i)).toBeInTheDocument();

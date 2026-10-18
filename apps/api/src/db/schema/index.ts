@@ -11,3 +11,4 @@ export * from './polls';
 export * from './subscriptions';
 export * from './invoices';
 export * from './signatures';
+export * from './webhook-events';

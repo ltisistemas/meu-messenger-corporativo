@@ -25,9 +25,24 @@ describe('File Limits Validation Service & Route (T-15)', () => {
     const accountsMap: Record<string, any> = {
       [freeAccountId]: { id: freeAccountId, name: 'Free Account', plan: 'free', status: 'active' },
       [proAccountId]: { id: proAccountId, name: 'Pro Account', plan: 'pro', status: 'active' },
-      [entAccountId]: { id: entAccountId, name: 'Ent Account', plan: 'enterprise', status: 'active' },
-      [overQuotaAccountId]: { id: overQuotaAccountId, name: 'Over Quota Acc', plan: 'free', status: 'over_quota' },
-      [suspendedAccountId]: { id: suspendedAccountId, name: 'Suspended Acc', plan: 'pro', status: 'suspended' },
+      [entAccountId]: {
+        id: entAccountId,
+        name: 'Ent Account',
+        plan: 'enterprise',
+        status: 'active',
+      },
+      [overQuotaAccountId]: {
+        id: overQuotaAccountId,
+        name: 'Over Quota Acc',
+        plan: 'free',
+        status: 'over_quota',
+      },
+      [suspendedAccountId]: {
+        id: suspendedAccountId,
+        name: 'Suspended Acc',
+        plan: 'pro',
+        status: 'suspended',
+      },
     };
 
     mockDb = {
@@ -148,7 +163,9 @@ describe('File Limits Validation Service & Route (T-15)', () => {
 
       expect(result.valid).toBe(false);
       expect(result.code).toBe('OFFLINE_RECIPIENT_NOT_ALLOWED');
-      expect(result.error).toContain('Carlos Offline está offline. No plano Free, arquivos só são enviados para quem está online.');
+      expect(result.error).toContain(
+        'Carlos Offline está offline. No plano Free, arquivos só são enviados para quem está online.'
+      );
     });
 
     it('allows offline recipient on Pro plan (store-and-forward)', async () => {

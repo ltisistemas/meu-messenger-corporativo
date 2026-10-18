@@ -18,9 +18,7 @@ export const conversationMembers = pgTable(
     role: varchar('role', { length: 50 }).notNull().default('member'), // 'admin' | 'member'
     joinedAt: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [
-    uniqueIndex('conv_members_conv_user_idx').on(table.conversationId, table.userId),
-  ]
+  (table) => [uniqueIndex('conv_members_conv_user_idx').on(table.conversationId, table.userId)]
 );
 
 export const conversationMembersRelations = relations(conversationMembers, ({ one }) => ({

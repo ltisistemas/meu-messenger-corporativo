@@ -20,7 +20,8 @@ export const LandingFooter: React.FC = () => {
               <span className="text-xl font-extrabold text-white tracking-tight">NextMsg</span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              O mensageiro corporativo sem ruídos, sem áudios e sem retenção indevida de arquivos. Comunicação ágil e segura para equipes de alta performance.
+              O mensageiro corporativo sem ruídos, sem áudios e sem retenção indevida de arquivos.
+              Comunicação ágil e segura para equipes de alta performance.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
               <ShieldCheck className="w-4 h-4" />

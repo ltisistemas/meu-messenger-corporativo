@@ -68,10 +68,7 @@ export class MessageService {
 
     // 2. Verify conversation belongs to account and user is a member
     const conversation = await this.db.query.conversations.findFirst({
-      where: and(
-        eq(conversations.id, dto.conversationId),
-        eq(conversations.accountId, accountId)
-      ),
+      where: and(eq(conversations.id, dto.conversationId), eq(conversations.accountId, accountId)),
       with: {
         members: true,
       },
@@ -101,7 +98,9 @@ export class MessageService {
         where: eq(users.id, senderId),
       });
       if (!senderUser || (senderUser.role !== 'owner' && senderUser.role !== 'admin')) {
-        throw new Error('Destinatários não podem responder em canais de transmissão de comunicados.');
+        throw new Error(
+          'Destinatários não podem responder em canais de transmissão de comunicados.'
+        );
       }
     }
 
@@ -175,9 +174,7 @@ export class MessageService {
     // 5. Broadcast to conversation room and online users
     if (this.io) {
       // Emit to conversation room (for users currently inside the chat)
-      this.io
-        .to(`conv:${dto.conversationId}`)
-        .emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
+      this.io.to(`conv:${dto.conversationId}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
 
       // Emit to online users personal rooms (for badges / unread counts)
       for (const uid of onlineRecipientIds) {
@@ -194,10 +191,7 @@ export class MessageService {
   async syncOfflineMessages(userId: string, socket?: Socket): Promise<FormattedMessage[]> {
     // 1. Find all undelivered receipts for this user
     const pendingReceipts = await this.db.query.messageReceipts.findMany({
-      where: and(
-        eq(messageReceipts.userId, userId),
-        isNull(messageReceipts.deliveredAt)
-      ),
+      where: and(eq(messageReceipts.userId, userId), isNull(messageReceipts.deliveredAt)),
       with: {
         message: {
           with: {
@@ -219,10 +213,7 @@ export class MessageService {
       .update(messageReceipts)
       .set({ deliveredAt: now })
       .where(
-        and(
-          eq(messageReceipts.userId, userId),
-          inArray(messageReceipts.messageId, messageIds)
-        )
+        and(eq(messageReceipts.userId, userId), inArray(messageReceipts.messageId, messageIds))
       );
 
     const formattedList: FormattedMessage[] = pendingReceipts.map((r) => ({
@@ -306,10 +297,7 @@ export class MessageService {
 
     // 2. Find target receipts in this conversation for this user that are unread
     let unreadReceipts = await this.db.query.messageReceipts.findMany({
-      where: and(
-        eq(messageReceipts.userId, userId),
-        isNull(messageReceipts.readAt)
-      ),
+      where: and(eq(messageReceipts.userId, userId), isNull(messageReceipts.readAt)),
       with: {
         message: true,
       },
@@ -357,9 +345,7 @@ export class MessageService {
 
       // Notify senders individually
       const senders = new Set(
-        unreadReceipts
-          .map((r) => r.message.senderId)
-          .filter((id): id is string => Boolean(id))
+        unreadReceipts.map((r) => r.message.senderId).filter((id): id is string => Boolean(id))
       );
 
       for (const senderId of senders) {

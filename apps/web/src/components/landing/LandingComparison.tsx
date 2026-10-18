@@ -9,7 +9,8 @@ export const LandingComparison: React.FC = () => {
     },
     {
       feature: 'Retenção de Arquivos',
-      whatsapp: 'Arquivos corporativos salvos indefinidamente em celulares pessoais de funcionários',
+      whatsapp:
+        'Arquivos corporativos salvos indefinidamente em celulares pessoais de funcionários',
       nextmsg: 'Privacidade radical: zero gravação em disco no Free e expiração em 5 dias no Pro',
     },
     {
@@ -47,7 +48,8 @@ export const LandingComparison: React.FC = () => {
             Por que empresas de alta performance estão saindo do WhatsApp?
           </h2>
           <p className="text-base sm:text-lg text-slate-400 leading-relaxed">
-            Misturar comunicação pessoal com trabalho gera distrações contínuas, vazamentos e riscos trabalhistas. O NextMsg devolve o controle e o foco à sua empresa.
+            Misturar comunicação pessoal com trabalho gera distrações contínuas, vazamentos e riscos
+            trabalhistas. O NextMsg devolve o controle e o foco à sua empresa.
           </p>
         </div>
 

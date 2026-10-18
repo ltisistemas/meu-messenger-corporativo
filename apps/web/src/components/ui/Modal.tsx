@@ -70,9 +70,7 @@ export const Modal: React.FC<ModalProps> = ({
               </h3>
             )}
             {description && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {description}
-              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
             )}
           </div>
 

@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  BarChart2,
-  Check,
-  Clock,
-  Lock,
-  Users,
-  AlertCircle,
-  XCircle,
-} from 'lucide-react';
+import { BarChart2, Check, Clock, Lock, Users, AlertCircle, XCircle } from 'lucide-react';
 import { PollDetailsResponse } from '@corpchat/shared';
 import { useChatStore } from '../../stores/chat.store';
 import { useAuthStore } from '../../stores/auth.store';
@@ -42,9 +34,7 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
 
     if (poll.allowMultiple) {
       setSelectedOptionIds((prev) =>
-        prev.includes(optionId)
-          ? prev.filter((id) => id !== optionId)
-          : [...prev, optionId]
+        prev.includes(optionId) ? prev.filter((id) => id !== optionId) : [...prev, optionId]
       );
     } else {
       setSelectedOptionIds([optionId]);
@@ -68,7 +58,9 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
 
   const handleClosePoll = async () => {
     if (!canClose) return;
-    if (!window.confirm('Tem certeza que deseja encerrar esta enquete? Ninguém mais poderá votar.')) {
+    if (
+      !window.confirm('Tem certeza que deseja encerrar esta enquete? Ninguém mais poderá votar.')
+    ) {
       return;
     }
 
@@ -215,12 +207,12 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
                 isClosed
                   ? 'cursor-default opacity-90'
                   : isSelected
-                  ? isSelf
-                    ? 'border-cyan-300 bg-brand-600/70 shadow-sm'
-                    : 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/30 shadow-sm'
-                  : isSelf
-                  ? 'border-brand-500/30 bg-brand-800/40 hover:bg-brand-800/70'
-                  : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30'
+                    ? isSelf
+                      ? 'border-cyan-300 bg-brand-600/70 shadow-sm'
+                      : 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/30 shadow-sm'
+                    : isSelf
+                      ? 'border-brand-500/30 bg-brand-800/40 hover:bg-brand-800/70'
+                      : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30'
               }`}
             >
               {/* Animated Vote Percentage Bar Background */}
@@ -231,8 +223,8 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
                       ? 'bg-cyan-500/30'
                       : 'bg-white/10'
                     : isSelected
-                    ? 'bg-brand-500/20 dark:bg-brand-500/30'
-                    : 'bg-slate-200/50 dark:bg-slate-700/40'
+                      ? 'bg-brand-500/20 dark:bg-brand-500/30'
+                      : 'bg-slate-200/50 dark:bg-slate-700/40'
                 }`}
                 style={{ width: `${percentage}%` }}
               />
@@ -249,8 +241,8 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
                           ? 'bg-cyan-400 border-cyan-400 text-brand-900'
                           : 'bg-brand-500 border-brand-500 text-white'
                         : isSelf
-                        ? 'border-brand-400/50'
-                        : 'border-slate-400 dark:border-slate-600'
+                          ? 'border-brand-400/50'
+                          : 'border-slate-400 dark:border-slate-600'
                     }`}
                   >
                     {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
@@ -275,9 +267,7 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
 
                 {/* Vote stats */}
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold tabular-nums">
-                    {percentage.toFixed(0)}%
-                  </span>
+                  <span className="text-xs font-bold tabular-nums">{percentage.toFixed(0)}%</span>
                   <span
                     className={`text-[11px] tabular-nums ${
                       isSelf ? 'text-brand-200' : 'text-slate-400'
@@ -327,8 +317,8 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, isSelf = false }) => {
         >
           <Users className="w-3.5 h-3.5" />
           <span>
-            {poll.totalVotersCount} {poll.totalVotersCount === 1 ? 'participante' : 'participantes'} (
-            {poll.totalVotes} {poll.totalVotes === 1 ? 'voto' : 'votos'})
+            {poll.totalVotersCount} {poll.totalVotersCount === 1 ? 'participante' : 'participantes'}{' '}
+            ({poll.totalVotes} {poll.totalVotes === 1 ? 'voto' : 'votos'})
           </span>
         </div>
 

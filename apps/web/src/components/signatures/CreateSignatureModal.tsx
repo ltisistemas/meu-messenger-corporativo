@@ -250,7 +250,9 @@ export const CreateSignatureModal: React.FC<CreateSignatureModalProps> = ({
               Recurso Exclusivo do Plano Enterprise
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
-              O módulo de assinatura eletrônica com validade jurídica (Lei 14.063/2020), autenticação multifator e manifesto de evidências SHA-256 está disponível no plano Enterprise.
+              O módulo de assinatura eletrônica com validade jurídica (Lei 14.063/2020),
+              autenticação multifator e manifesto de evidências SHA-256 está disponível no plano
+              Enterprise.
             </p>
           </div>
 
@@ -305,7 +307,8 @@ export const CreateSignatureModal: React.FC<CreateSignatureModalProps> = ({
                   Clique para selecionar o contrato ou documento em PDF
                 </p>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Limite máximo de 25 MB. Criptografia em repouso e hash SHA-256 gerado automaticamente.
+                  Limite máximo de 25 MB. Criptografia em repouso e hash SHA-256 gerado
+                  automaticamente.
                 </p>
               </div>
             ) : (
@@ -383,7 +386,10 @@ export const CreateSignatureModal: React.FC<CreateSignatureModalProps> = ({
               onChange={(e) => setAutoClose(e.target.checked)}
               className="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
             />
-            <label htmlFor="autoClose" className="text-xs text-slate-600 dark:text-slate-400 cursor-pointer">
+            <label
+              htmlFor="autoClose"
+              className="text-xs text-slate-600 dark:text-slate-400 cursor-pointer"
+            >
               Finalizar documento e gerar certificado automaticamente após todas as assinaturas
             </label>
           </div>

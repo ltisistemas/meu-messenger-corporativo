@@ -69,7 +69,6 @@ export class FileRelayService {
     recipientUserIds: string[];
     deliverySummary: string;
   }> {
-
     // 1. Check account status & plan limits
     const account = await this.db.query.accounts.findFirst({
       where: eq(accounts.id, accountId),
@@ -105,10 +104,7 @@ export class FileRelayService {
 
     // 2. Check conversation membership & status
     const conversation = await this.db.query.conversations.findFirst({
-      where: and(
-        eq(conversations.id, dto.conversationId),
-        eq(conversations.accountId, accountId)
-      ),
+      where: and(eq(conversations.id, dto.conversationId), eq(conversations.accountId, accountId)),
       with: {
         members: {
           with: {
@@ -359,9 +355,7 @@ export class FileRelayService {
         receipts: receiptsToInsert,
       };
 
-      this.io
-        .to(`conv:${session.conversationId}`)
-        .emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
+      this.io.to(`conv:${session.conversationId}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
 
       for (const recipientId of session.recipientUserIds) {
         this.io.to(`user:${recipientId}`).emit(WS_EVENTS.MESSAGE_NEW, formattedMessage);
@@ -377,7 +371,6 @@ export class FileRelayService {
       deliverySummary,
     };
   }
-
 
   /**
    * Cancels or errors out a relay session and alerts participants

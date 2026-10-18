@@ -26,7 +26,10 @@ export const LandingLgpdTrust: React.FC = () => {
   ];
 
   return (
-    <section id="security" className="py-20 md:py-28 relative bg-slate-950/80 border-t border-slate-900">
+    <section
+      id="security"
+      className="py-20 md:py-28 relative bg-slate-950/80 border-t border-slate-900"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-3xl p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-slate-900/90 via-slate-900/50 to-slate-950 border border-slate-800 shadow-2xl relative overflow-hidden">
           {/* Subtle background glow */}
@@ -41,7 +44,9 @@ export const LandingLgpdTrust: React.FC = () => {
               Segurança jurídica e conformidade absoluta com a LGPD
             </h2>
             <p className="text-base text-slate-400 leading-relaxed">
-              Diferente de aplicativos pessoais onde conversas e arquivos de trabalho ficam dispersos em dispositivos de funcionários sem governança, o NextMsg garante conformidade corporativa e proteção contra passivos trabalhistas.
+              Diferente de aplicativos pessoais onde conversas e arquivos de trabalho ficam
+              dispersos em dispositivos de funcionários sem governança, o NextMsg garante
+              conformidade corporativa e proteção contra passivos trabalhistas.
             </p>
           </div>
 
@@ -69,11 +74,12 @@ export const LandingLgpdTrust: React.FC = () => {
           <div className="mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-slate-400" />
-              <span>Logs do sistema com redação automática: zero conteúdo de mensagens registrado em texto aberto.</span>
+              <span>
+                Logs do sistema com redação automática: zero conteúdo de mensagens registrado em
+                texto aberto.
+              </span>
             </div>
-            <span className="font-semibold text-emerald-400">
-              Auditoria e Proteção Ativa
-            </span>
+            <span className="font-semibold text-emerald-400">Auditoria e Proteção Ativa</span>
           </div>
         </div>
       </div>

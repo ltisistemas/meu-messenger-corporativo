@@ -65,13 +65,39 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
     const mockAccounts: Record<string, any> = {
       [proAccountId]: { id: proAccountId, name: 'Pro Corp', plan: 'pro', status: 'active' },
       [freeAccountId]: { id: freeAccountId, name: 'Free Startup', plan: 'free', status: 'active' },
-      [entAccountId]: { id: entAccountId, name: 'Big Enterprise', plan: 'enterprise', status: 'active' },
+      [entAccountId]: {
+        id: entAccountId,
+        name: 'Big Enterprise',
+        plan: 'enterprise',
+        status: 'active',
+      },
     };
 
     const mockUsersList = [
-      { id: adminUserId, accountId: proAccountId, name: 'Admin Pro', email: 'admin@pro.com', role: 'admin', status: 'active' },
-      { id: memberUser1Id, accountId: proAccountId, name: 'Member Online', email: 'm1@pro.com', role: 'member', status: 'active' },
-      { id: memberUser2Id, accountId: proAccountId, name: 'Member Offline', email: 'm2@pro.com', role: 'member', status: 'active' },
+      {
+        id: adminUserId,
+        accountId: proAccountId,
+        name: 'Admin Pro',
+        email: 'admin@pro.com',
+        role: 'admin',
+        status: 'active',
+      },
+      {
+        id: memberUser1Id,
+        accountId: proAccountId,
+        name: 'Member Online',
+        email: 'm1@pro.com',
+        role: 'member',
+        status: 'active',
+      },
+      {
+        id: memberUser2Id,
+        accountId: proAccountId,
+        name: 'Member Offline',
+        email: 'm2@pro.com',
+        role: 'member',
+        status: 'active',
+      },
     ];
 
     return {
@@ -88,7 +114,9 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
         users: {
           findMany: vi.fn(async ({ where }: any) => {
             const strings = getStringsFrom(where);
-            return mockUsersList.filter((u) => strings.includes(u.accountId) || strings.includes(u.id));
+            return mockUsersList.filter(
+              (u) => strings.includes(u.accountId) || strings.includes(u.id)
+            );
           }),
           findFirst: vi.fn(async ({ where }: any) => {
             const strings = getStringsFrom(where);
@@ -98,7 +126,10 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
         conversations: {
           findFirst: vi.fn(async ({ where }: any) => {
             const strings = getStringsFrom(where);
-            const conv = mockConversationsData.find((c) => strings.includes(c.id) || (strings.includes(c.accountId) && c.type === 'broadcast'));
+            const conv = mockConversationsData.find(
+              (c) =>
+                strings.includes(c.id) || (strings.includes(c.accountId) && c.type === 'broadcast')
+            );
             if (!conv) return null;
             return {
               ...conv,
@@ -193,7 +224,9 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
         broadcastService.sendBroadcast(proAccountId, memberUser1Id, 'member', {
           content: 'Tentativa de envio por membro comum',
         })
-      ).rejects.toThrow('Apenas administradores podem enviar comunicados via lista de transmissão.');
+      ).rejects.toThrow(
+        'Apenas administradores podem enviar comunicados via lista de transmissão.'
+      );
     });
 
     it('blocks regular members from posting in the Comunicados broadcast conversation', async () => {
@@ -222,7 +255,9 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
           conversationId: convId,
           content: 'Tentando responder ao comunicado',
         })
-      ).rejects.toThrow('Destinatários não podem responder em canais de transmissão de comunicados.');
+      ).rejects.toThrow(
+        'Destinatários não podem responder em canais de transmissão de comunicados.'
+      );
     });
   });
 
@@ -297,7 +332,12 @@ describe('Broadcast Lists & Delivery Reports (T-25)', () => {
         }
       );
 
-      const report = await broadcastService.getBroadcastReport(proAccountId, adminUserId, 'admin', msgId);
+      const report = await broadcastService.getBroadcastReport(
+        proAccountId,
+        adminUserId,
+        'admin',
+        msgId
+      );
 
       expect(report.summary.totalRecipients).toBe(2);
       expect(report.summary.deliveredCount).toBe(2);

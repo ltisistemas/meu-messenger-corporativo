@@ -23,10 +23,10 @@ export const fileTransfers = pgTable(
     accountId: uuid('account_id')
       .notNull()
       .references(() => accounts.id, { onDelete: 'cascade' }),
-    conversationId: uuid('conversation_id')
-      .references(() => conversations.id, { onDelete: 'cascade' }),
-    messageId: uuid('message_id')
-      .references(() => messages.id, { onDelete: 'set null' }),
+    conversationId: uuid('conversation_id').references(() => conversations.id, {
+      onDelete: 'cascade',
+    }),
+    messageId: uuid('message_id').references(() => messages.id, { onDelete: 'set null' }),
     uploaderId: uuid('uploader_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),

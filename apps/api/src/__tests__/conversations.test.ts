@@ -184,9 +184,9 @@ describe('Conversations & Multi-tenant Isolation (T-08)', () => {
         accountId: accountIdA,
         members: [{ userId: 'other-user' }],
       });
-      await expect(
-        service.getConversationDetails(accountIdA, userA1.id, 'c-1')
-      ).rejects.toThrow('Acesso negado a esta conversa.');
+      await expect(service.getConversationDetails(accountIdA, userA1.id, 'c-1')).rejects.toThrow(
+        'Acesso negado a esta conversa.'
+      );
     });
   });
 

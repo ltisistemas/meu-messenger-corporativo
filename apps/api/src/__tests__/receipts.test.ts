@@ -77,11 +77,7 @@ describe('Message Receipts & Typing Indicators (T-10)', () => {
   });
 
   it('should mark unread messages as read and broadcast message:receipt event in real time', async () => {
-    const result = await messageService.markConversationAsRead(
-      accountId,
-      readerId,
-      conversationId
-    );
+    const result = await messageService.markConversationAsRead(accountId, readerId, conversationId);
 
     expect(result.updatedCount).toBe(2);
     expect(result.readAt).toBeDefined();
@@ -99,11 +95,7 @@ describe('Message Receipts & Typing Indicators (T-10)', () => {
   it('should return 0 updated if there are no unread messages in conversation', async () => {
     mockDb.query.messageReceipts.findMany.mockResolvedValue([]);
 
-    const result = await messageService.markConversationAsRead(
-      accountId,
-      readerId,
-      conversationId
-    );
+    const result = await messageService.markConversationAsRead(accountId, readerId, conversationId);
 
     expect(result.updatedCount).toBe(0);
     expect(mockDb.update).not.toHaveBeenCalled();

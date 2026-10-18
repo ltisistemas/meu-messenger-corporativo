@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Search, UserCheck, UserX, Shield, ShieldCheck, User, UserPlus, AlertCircle } from 'lucide-react';
+import {
+  Search,
+  UserCheck,
+  UserX,
+  Shield,
+  ShieldCheck,
+  User,
+  UserPlus,
+  AlertCircle,
+} from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -113,7 +122,8 @@ export const MemberManagementSection: React.FC<MemberManagementSectionProps> = (
         <div className="mb-4 p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0 text-amber-500" />
           <span>
-            <strong>Limite de membros excedido:</strong> Sua organização possui mais membros ativos do que o limite do plano. Desative membros sobressalentes ou faça upgrade do plano.
+            <strong>Limite de membros excedido:</strong> Sua organização possui mais membros ativos
+            do que o limite do plano. Desative membros sobressalentes ou faça upgrade do plano.
           </span>
         </div>
       )}
@@ -152,7 +162,10 @@ export const MemberManagementSection: React.FC<MemberManagementSectionProps> = (
                 const isLoading = loadingUserId === member.id;
 
                 return (
-                  <tr key={member.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition">
+                  <tr
+                    key={member.id}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition"
+                  >
                     {/* User Info */}
                     <td className="py-3.5 pl-2">
                       <div className="flex items-center gap-3">
@@ -174,15 +187,24 @@ export const MemberManagementSection: React.FC<MemberManagementSectionProps> = (
                     {/* Role */}
                     <td className="py-3.5">
                       {isMemberOwner ? (
-                        <Badge variant="amber" className="text-[11px] font-medium flex items-center gap-1 w-fit">
+                        <Badge
+                          variant="amber"
+                          className="text-[11px] font-medium flex items-center gap-1 w-fit"
+                        >
                           <ShieldCheck className="w-3 h-3 text-amber-500" /> Proprietário
                         </Badge>
                       ) : isMemberAdmin ? (
-                        <Badge variant="brand" className="text-[11px] font-medium flex items-center gap-1 w-fit">
+                        <Badge
+                          variant="brand"
+                          className="text-[11px] font-medium flex items-center gap-1 w-fit"
+                        >
                           <Shield className="w-3 h-3 text-brand-500" /> Admin
                         </Badge>
                       ) : (
-                        <Badge variant="neutral" className="text-[11px] font-medium flex items-center gap-1 w-fit">
+                        <Badge
+                          variant="neutral"
+                          className="text-[11px] font-medium flex items-center gap-1 w-fit"
+                        >
                           <User className="w-3 h-3 text-slate-400" /> Membro
                         </Badge>
                       )}
@@ -211,7 +233,11 @@ export const MemberManagementSection: React.FC<MemberManagementSectionProps> = (
                                 onClick={() => handleToggleRole(member)}
                                 disabled={isLoading}
                                 className="text-xs py-1 px-2 h-7"
-                                title={isMemberAdmin ? 'Rebaixar para Membro' : 'Promover a Administrador'}
+                                title={
+                                  isMemberAdmin
+                                    ? 'Rebaixar para Membro'
+                                    : 'Promover a Administrador'
+                                }
                               >
                                 {isMemberAdmin ? 'Tornar Membro' : 'Tornar Admin'}
                               </Button>
@@ -224,7 +250,9 @@ export const MemberManagementSection: React.FC<MemberManagementSectionProps> = (
                               onClick={() => handleToggleStatus(member)}
                               disabled={isLoading}
                               className={`text-xs py-1 px-2.5 h-7 flex items-center gap-1 ${
-                                !isActive ? 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10' : ''
+                                !isActive
+                                  ? 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10'
+                                  : ''
                               }`}
                             >
                               {isActive ? (

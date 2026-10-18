@@ -85,8 +85,7 @@ export const lgpdRoutes: FastifyPluginAsync<LgpdRoutesOptions> = async (
         return reply.status(200).send(result);
       } catch (err: any) {
         const isForbidden =
-          err.message?.includes('único Proprietário') ||
-          err.message?.includes('Senha incorreta');
+          err.message?.includes('único Proprietário') || err.message?.includes('Senha incorreta');
 
         const statusCode = isForbidden ? 403 : 400;
         return reply.status(statusCode).send({

@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
-import { QrCode, CreditCard, FileText, Copy, Check, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  QrCode,
+  CreditCard,
+  FileText,
+  Copy,
+  Check,
+  ExternalLink,
+  AlertCircle,
+  Loader2,
+  CheckCircle2,
+  Zap,
+} from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { CreateSubscriptionDto, PLAN_CONFIGS } from '@corpchat/shared';
+import { useAccountStore } from '../../stores/account.store';
 
 export interface UpgradeCheckoutModalProps {
   isOpen: boolean;
@@ -12,6 +24,8 @@ export interface UpgradeCheckoutModalProps {
   billingCycle: 'monthly' | 'yearly';
   onSubmitCheckout: (dto: CreateSubscriptionDto) => Promise<void>;
   checkoutResult?: {
+    chargeId?: string;
+    subscriptionId?: string;
     pixQrCode?: string;
     pixCopyPaste?: string;
     bankSlipUrl?: string;
@@ -29,9 +43,12 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
   checkoutResult,
   isLoading = false,
 }) => {
+  const { checkCheckoutStatus, simulatePaymentConfirmation } = useAccountStore();
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'boleto'>('pix');
   const [copiedPix, setCopiedPix] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isPaid, setIsPaid] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   // Customer form state
   const [name, setName] = useState('');
@@ -60,11 +77,46 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
     currency: 'BRL',
   });
 
+  // Polling every 3 seconds while PIX QR code is waiting for confirmation
+  useEffect(() => {
+    if (!isOpen) {
+      setIsPaid(false);
+      setIsSimulating(false);
+      return;
+    }
+
+    if (!checkoutResult?.chargeId || isPaid) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await checkCheckoutStatus(checkoutResult.chargeId!);
+        if (res.status === 'PAID') {
+          setIsPaid(true);
+        }
+      } catch (_) {}
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isOpen, checkoutResult?.chargeId, isPaid, checkCheckoutStatus]);
+
   const handleCopyPix = () => {
     if (checkoutResult?.pixCopyPaste) {
       navigator.clipboard.writeText(checkoutResult.pixCopyPaste);
       setCopiedPix(true);
       setTimeout(() => setCopiedPix(false), 3000);
+    }
+  };
+
+  const handleSimulatePayment = async () => {
+    if (!checkoutResult?.chargeId) return;
+    try {
+      setIsSimulating(true);
+      await simulatePaymentConfirmation(checkoutResult.chargeId);
+      setIsPaid(true);
+    } catch (err: any) {
+      setFormError(err.message || 'Erro ao simular confirmação.');
+    } finally {
+      setIsSimulating(false);
     }
   };
 
@@ -78,7 +130,13 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
     }
 
     if (paymentMethod === 'credit_card') {
-      if (!holderName.trim() || !cardNumber.trim() || !expiryMonth.trim() || !expiryYear.trim() || !ccv.trim()) {
+      if (
+        !holderName.trim() ||
+        !cardNumber.trim() ||
+        !expiryMonth.trim() ||
+        !expiryYear.trim() ||
+        !ccv.trim()
+      ) {
         setFormError('Por favor preencha todos os dados do cartão de crédito.');
         return;
       }
@@ -115,16 +173,49 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
     }
   };
 
+  const qrImageSrc = checkoutResult?.pixQrCode
+    ? checkoutResult.pixQrCode.startsWith('data:')
+      ? checkoutResult.pixQrCode
+      : `data:image/png;base64,${checkoutResult.pixQrCode}`
+    : '';
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Assinatura Plano ${planConfig.name}`}
-      description={`Ciclo ${isYearly ? 'Anual (-10% off)' : 'Mensal'} • Gateway de Pagamento Asaas`}
+      title={isPaid ? 'Assinatura Confirmada!' : `Assinatura Plano ${planConfig.name}`}
+      description={
+        isPaid
+          ? 'Sua organização agora possui acesso completo aos recursos Pro'
+          : `Ciclo ${isYearly ? 'Anual (-10% off)' : 'Mensal'} • Gateway de Pagamento Asaas`
+      }
       maxWidth="lg"
     >
-      {/* 1. If PIX result generated, show QR Code view */}
-      {checkoutResult?.pixQrCode || checkoutResult?.pixCopyPaste ? (
+      {/* 0. If payment is confirmed, show Green Success Screen */}
+      {isPaid ? (
+        <div className="flex flex-col items-center text-center p-6 space-y-4">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center animate-bounce">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+            Parabéns! Sua Assinatura está Ativa
+          </h4>
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
+            O pagamento foi compensado pelo gateway Asaas e o{' '}
+            <strong>Plano {planConfig.name}</strong> foi ativado com sucesso para toda a sua equipe.
+          </p>
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 w-full flex justify-center">
+            <Button
+              variant="primary"
+              onClick={onClose}
+              className="px-8 shadow-lg shadow-emerald-500/20"
+            >
+              Ir para o Painel da Organização
+            </Button>
+          </div>
+        </div>
+      ) : checkoutResult?.pixQrCode || checkoutResult?.pixCopyPaste ? (
+        /* 1. If PIX result generated, show QR Code view with Live Polling */
         <div className="flex flex-col items-center text-center p-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-3">
             <QrCode className="w-6 h-6" />
@@ -137,13 +228,9 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
           </p>
 
           {/* QR Code Image */}
-          {checkoutResult.pixQrCode && (
+          {qrImageSrc && (
             <div className="my-5 p-3 bg-white rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm inline-block">
-              <img
-                src={`data:image/png;base64,${checkoutResult.pixQrCode}`}
-                alt="QR Code Pix"
-                className="w-48 h-48 object-contain"
-              />
+              <img src={qrImageSrc} alt="QR Code Pix" className="w-48 h-48 object-contain" />
             </div>
           )}
 
@@ -179,9 +266,24 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
             <span>Aguardando confirmação do pagamento pelo gateway Asaas...</span>
           </div>
 
+          {/* Sandbox Helper Simulation */}
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={handleSimulatePayment}
+              disabled={isSimulating}
+              className="text-xs text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1 opacity-75 hover:opacity-100 transition"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>
+                {isSimulating ? 'Confirmando...' : 'Simular Confirmação Instantânea (Sandbox)'}
+              </span>
+            </button>
+          </div>
+
           <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 w-full flex justify-end">
-            <Button variant="primary" onClick={onClose}>
-              Concluir & Fechar
+            <Button variant="outline" onClick={onClose}>
+              Fechar
             </Button>
           </div>
         </div>
@@ -195,7 +297,8 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
             Boleto Bancário Gerado com Sucesso!
           </h4>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
-            Seu boleto foi emitido. O plano será ativado assim que o pagamento for compensado pelo banco.
+            Seu boleto foi emitido. O plano será ativado assim que o pagamento for compensado pelo
+            banco.
           </p>
 
           <a
@@ -224,7 +327,9 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
                 Plano {planConfig.name} ({isYearly ? 'Anual' : 'Mensal'})
               </div>
               <div className="text-xs text-slate-500">
-                {isYearly ? `${yearlyPriceFormatted} por 12 meses` : `${monthlyPrice} cobrado mensalmente`}
+                {isYearly
+                  ? `${yearlyPriceFormatted} por 12 meses`
+                  : `${monthlyPrice} cobrado mensalmente`}
               </div>
             </div>
             <div className="text-right">
@@ -466,7 +571,9 @@ export const UpgradeCheckoutModal: React.FC<UpgradeCheckoutModalProps> = ({
               className="bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-medium shadow-md flex items-center gap-2"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{paymentMethod === 'credit_card' ? 'Pagar e Ativar Agora' : 'Gerar Cobrança Asaas'}</span>
+              <span>
+                {paymentMethod === 'credit_card' ? 'Pagar e Ativar Agora' : 'Gerar Cobrança Asaas'}
+              </span>
             </Button>
           </div>
         </form>

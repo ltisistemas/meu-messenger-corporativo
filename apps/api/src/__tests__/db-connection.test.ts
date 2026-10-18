@@ -34,7 +34,8 @@ describe('Database Connection & Serverless Pool Resilience (Ticket 03)', () => {
   it('falls back to POSTGRES_URL or PRISMA_DATABASE_URL if DATABASE_URL is not set', async () => {
     process.env.DATABASE_URL = '';
     process.env.POSTGRES_URL = '';
-    process.env.PRISMA_DATABASE_URL = 'postgres://user:pass@db.prisma.io:5432/postgres?sslmode=require';
+    process.env.PRISMA_DATABASE_URL =
+      'postgres://user:pass@db.prisma.io:5432/postgres?sslmode=require';
 
     const dbModule = await import('../db/index.js');
     expect((dbModule.pool as any).options.connectionString).toBe(process.env.PRISMA_DATABASE_URL);

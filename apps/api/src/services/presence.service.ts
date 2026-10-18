@@ -86,10 +86,7 @@ export class PresenceService {
 
         // Update database lastSeenAt
         try {
-          await this.db
-            .update(users)
-            .set({ lastSeenAt: now })
-            .where(eq(users.id, userId));
+          await this.db.update(users).set({ lastSeenAt: now }).where(eq(users.id, userId));
         } catch {
           // DB update failure during offline shouldn't break realtime
         }

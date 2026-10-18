@@ -41,22 +41,22 @@ export class SignatureService {
     dto: CreateSignatureRequestDto
   ): Promise<SignatureRequestResponse> {
     // 1. Fetch account and validate plan permissions
-    const [account] = await db
-      .select()
-      .from(accounts)
-      .where(eq(accounts.id, accountId))
-      .limit(1);
+    const [account] = await db.select().from(accounts).where(eq(accounts.id, accountId)).limit(1);
 
     if (!account) {
       throw new Error('Conta não encontrada.');
     }
 
     if (!can(account.plan as any, 'electronic_signature')) {
-      throw new Error('O envio de documentos para assinatura eletrônica é um recurso exclusivo do plano Enterprise.');
+      throw new Error(
+        'O envio de documentos para assinatura eletrônica é um recurso exclusivo do plano Enterprise.'
+      );
     }
 
     if (account.status === 'over_quota') {
-      throw new Error('Sua organização está com o limite de membros excedido. Faça upgrade ou desative usuários excedentes para utilizar a assinatura eletrônica.');
+      throw new Error(
+        'Sua organização está com o limite de membros excedido. Faça upgrade ou desative usuários excedentes para utilizar a assinatura eletrônica.'
+      );
     }
 
     if (account.status === 'suspended') {
@@ -527,14 +527,25 @@ export class SignatureService {
   /**
    * 5. Process Clicksign Webhook
    */
-  async handleClicksignWebhook(rawPayload: string, signatureHeader: string): Promise<{ handled: boolean; event: string }> {
+  async handleClicksignWebhook(
+    rawPayload: string,
+    signatureHeader: string
+  ): Promise<{ handled: boolean; event: string }> {
     const webhookSecret = process.env.CLICKSIGN_WEBHOOK_SECRET || 'clicksign-webhook-secret';
     const body = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload;
     const jsonString = typeof rawPayload === 'string' ? rawPayload : JSON.stringify(rawPayload);
 
-    let isValid = this.clicksignService.verifyWebhookSignature(jsonString, signatureHeader, webhookSecret);
+    let isValid = this.clicksignService.verifyWebhookSignature(
+      jsonString,
+      signatureHeader,
+      webhookSecret
+    );
     if (!isValid && typeof body === 'object') {
-      isValid = this.clicksignService.verifyWebhookSignature(JSON.stringify(body), signatureHeader, webhookSecret);
+      isValid = this.clicksignService.verifyWebhookSignature(
+        JSON.stringify(body),
+        signatureHeader,
+        webhookSecret
+      );
     }
 
     if (!isValid && !process.env.CLICKSIGN_SKIP_WEBHOOK_VERIFY) {
@@ -561,7 +572,8 @@ export class SignatureService {
     const now = new Date();
 
     if (eventName === 'document.signed' || eventName === 'sign') {
-      const requestSigKey = body.event?.data?.signature?.requestSignatureKey || body.signer?.request_signature_key;
+      const requestSigKey =
+        body.event?.data?.signature?.requestSignatureKey || body.signer?.request_signature_key;
       if (requestSigKey) {
         const [signer] = await db
           .select()
@@ -654,32 +666,38 @@ export class SignatureService {
     }
 
     // Format events list combining DB signers and audit events
-    const events = providerReport && providerReport.events.length > 0
-      ? providerReport.events
-      : dbEvidence.map((ev) => {
-          const signerMatch = sigReq.signers.find((s) => s.id === ev.signerId);
-          return {
-            signerName: signerMatch?.name || (ev.details as any)?.signerName || 'Sistema',
-            signerEmail: signerMatch?.email || (ev.details as any)?.signerEmail || 'system@corpchat.internal',
-            documentation: signerMatch?.documentation || undefined,
-            authType: (signerMatch?.authType || 'email') as any,
-            ipAddress: ev.ipAddress || '127.0.0.1',
-            userAgent: ev.userAgent || 'Corporate Messenger',
-            signedAt: ev.occurredAt.toISOString(),
-            token: ev.token || undefined,
-            signatureRole: (signerMatch?.signAs || 'sign') as any,
-          };
-        });
+    const events =
+      providerReport && providerReport.events.length > 0
+        ? providerReport.events
+        : dbEvidence.map((ev) => {
+            const signerMatch = sigReq.signers.find((s) => s.id === ev.signerId);
+            return {
+              signerName: signerMatch?.name || (ev.details as any)?.signerName || 'Sistema',
+              signerEmail:
+                signerMatch?.email ||
+                (ev.details as any)?.signerEmail ||
+                'system@corpchat.internal',
+              documentation: signerMatch?.documentation || undefined,
+              authType: (signerMatch?.authType || 'email') as any,
+              ipAddress: ev.ipAddress || '127.0.0.1',
+              userAgent: ev.userAgent || 'Corporate Messenger',
+              signedAt: ev.occurredAt.toISOString(),
+              token: ev.token || undefined,
+              signatureRole: (signerMatch?.signAs || 'sign') as any,
+            };
+          });
 
     return {
       documentKey: sigReq.externalDocumentKey,
       documentName: sigReq.documentName,
       originalDocSha256: sigReq.originalSha256,
-      signedDocSha256: sigReq.signedSha256 || providerReport?.signedDocSha256 || sigReq.originalSha256,
+      signedDocSha256:
+        sigReq.signedSha256 || providerReport?.signedDocSha256 || sigReq.originalSha256,
       status: sigReq.status,
       createdAt: sigReq.createdAt,
       closedAt: sigReq.closedAt,
-      legalFramework: 'Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020 (Assinatura Eletrônica Simples/Avançada)',
+      legalFramework:
+        'Medida Provisória nº 2.200-2/2001 e Lei Federal nº 14.063/2020 (Assinatura Eletrônica Simples/Avançada)',
       events,
     };
   }
@@ -791,4 +809,3 @@ export class SignatureService {
     };
   }
 }
-

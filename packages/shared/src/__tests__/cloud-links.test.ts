@@ -32,7 +32,8 @@ describe('Cloud Storage Link Detection & Card Parsing (T-23)', () => {
     });
 
     it('deduplicates identical URLs in the same message', () => {
-      const text = 'Link: https://drive.google.com/file/d/123 e de novo https://drive.google.com/file/d/123';
+      const text =
+        'Link: https://drive.google.com/file/d/123 e de novo https://drive.google.com/file/d/123';
       const urls = detectUrls(text);
       expect(urls).toHaveLength(1);
     });
@@ -48,7 +49,9 @@ describe('Cloud Storage Link Detection & Card Parsing (T-23)', () => {
     it('identifies Microsoft OneDrive and SharePoint domains', () => {
       expect(isCloudStorageUrl('https://onedrive.live.com/?id=root')).toBe(true);
       expect(isCloudStorageUrl('https://1drv.ms/u/s!AlmXyZ')).toBe(true);
-      expect(isCloudStorageUrl('https://mycompany.sharepoint.com/:x:/g/personal/doc.xlsx')).toBe(true);
+      expect(isCloudStorageUrl('https://mycompany.sharepoint.com/:x:/g/personal/doc.xlsx')).toBe(
+        true
+      );
     });
 
     it('identifies Dropbox domains', () => {
@@ -122,7 +125,9 @@ describe('Cloud Storage Link Detection & Card Parsing (T-23)', () => {
       expect(parsed?.resourceType).toBe('presentation');
       expect(parsed?.iconType).toBe('dropbox');
 
-      const pdfParsed = parseCloudLink('https://www.dropbox.com/scl/fi/abc/Contrato_Assinado.pdf?dl=0');
+      const pdfParsed = parseCloudLink(
+        'https://www.dropbox.com/scl/fi/abc/Contrato_Assinado.pdf?dl=0'
+      );
       expect(pdfParsed?.title).toBe('Contrato_Assinado.pdf');
       expect(pdfParsed?.resourceType).toBe('pdf');
       expect(pdfParsed?.resourceTypeLabel).toBe('Documento PDF');

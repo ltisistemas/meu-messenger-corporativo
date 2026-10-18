@@ -68,13 +68,7 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
   });
 
   it('runs authentication middleware and handles token absence, invalidity and validity', async () => {
-    createWebSocketServer(
-      dummyHttpServer,
-      mockFastify,
-      mockPresence,
-      mockMessage,
-      mockFileRelay
-    );
+    createWebSocketServer(dummyHttpServer, mockFastify, mockPresence, mockMessage, mockFileRelay);
 
     expect(registeredMiddleware).toBeDefined();
 
@@ -82,7 +76,9 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
     const socketNoToken: any = { handshake: { headers: {} }, data: {} };
     const next1 = vi.fn();
     await registeredMiddleware(socketNoToken, next1);
-    expect(next1).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('Token de acesso ausente') }));
+    expect(next1).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringContaining('Token de acesso ausente') })
+    );
 
     // 2. Invalid token
     const socketBadToken: any = {
@@ -109,13 +105,7 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
   });
 
   it('handles connection lifecycle, all socket listeners and error branches', async () => {
-    createWebSocketServer(
-      dummyHttpServer,
-      mockFastify,
-      mockPresence,
-      mockMessage,
-      mockFileRelay
-    );
+    createWebSocketServer(dummyHttpServer, mockFastify, mockPresence, mockMessage, mockFileRelay);
 
     expect(registeredConnectionHandler).toBeDefined();
 
@@ -136,8 +126,15 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
 
     expect(mockSocket.join).toHaveBeenCalledWith(`user:${mockUser.userId}`);
     expect(mockSocket.join).toHaveBeenCalledWith(`account:${mockUser.accountId}`);
-    expect(mockPresence.setUserOnline).toHaveBeenCalledWith(mockUser.accountId, mockUser.userId, 'sock-123');
-    expect(mockSocket.emit).toHaveBeenCalledWith(WS_EVENTS.AUTHENTICATED, expect.objectContaining({ userId: mockUser.userId }));
+    expect(mockPresence.setUserOnline).toHaveBeenCalledWith(
+      mockUser.accountId,
+      mockUser.userId,
+      'sock-123'
+    );
+    expect(mockSocket.emit).toHaveBeenCalledWith(
+      WS_EVENTS.AUTHENTICATED,
+      expect.objectContaining({ userId: mockUser.userId })
+    );
 
     // 1. heartbeat
     await listeners['heartbeat']();
@@ -197,7 +194,9 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
     // 7. file relay init
     const relayInitBadCb = vi.fn();
     await listeners[WS_EVENTS.FILE_RELAY_INIT]({ fileName: '' }, relayInitBadCb);
-    expect(relayInitBadCb).toHaveBeenCalledWith(expect.objectContaining({ error: expect.any(String) }));
+    expect(relayInitBadCb).toHaveBeenCalledWith(
+      expect.objectContaining({ error: expect.any(String) })
+    );
 
     const validRelayInit = {
       transferId: uuid,
@@ -213,7 +212,9 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
     mockFileRelay.initRelay.mockRejectedValueOnce(new Error('Tamanho excede plano'));
     const relayInitErrCb = vi.fn();
     await listeners[WS_EVENTS.FILE_RELAY_INIT](validRelayInit, relayInitErrCb);
-    expect(relayInitErrCb).toHaveBeenCalledWith(expect.objectContaining({ error: 'Tamanho excede plano' }));
+    expect(relayInitErrCb).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Tamanho excede plano' })
+    );
 
     // 8. file relay chunk
     const chunkBadCb = vi.fn();
@@ -233,7 +234,9 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
     // 9. file relay complete
     const compBadCb = vi.fn();
     await listeners[WS_EVENTS.FILE_RELAY_COMPLETE]({ transferId: 'bad' }, compBadCb);
-    expect(compBadCb).toHaveBeenCalledWith(expect.objectContaining({ error: 'Payload de conclusão inválido.' }));
+    expect(compBadCb).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Payload de conclusão inválido.' })
+    );
 
     const compGoodCb = vi.fn();
     await listeners[WS_EVENTS.FILE_RELAY_COMPLETE]({ transferId: uuid }, compGoodCb);
@@ -246,10 +249,18 @@ describe('WebSocket Server Unit & Handlers Deep Coverage', () => {
 
     // 10. file relay cancel
     listeners[WS_EVENTS.FILE_RELAY_CANCEL]({ transferId: uuid, reason: 'cancelado' });
-    expect(mockFileRelay.cancelOrErrorRelay).toHaveBeenCalledWith(uuid, mockUser.userId, 'cancelado');
+    expect(mockFileRelay.cancelOrErrorRelay).toHaveBeenCalledWith(
+      uuid,
+      mockUser.userId,
+      'cancelado'
+    );
 
     // 11. disconnect
     await listeners['disconnect']();
-    expect(mockPresence.setUserOffline).toHaveBeenCalledWith(mockUser.accountId, mockUser.userId, 'sock-123');
+    expect(mockPresence.setUserOffline).toHaveBeenCalledWith(
+      mockUser.accountId,
+      mockUser.userId,
+      'sock-123'
+    );
   });
 });

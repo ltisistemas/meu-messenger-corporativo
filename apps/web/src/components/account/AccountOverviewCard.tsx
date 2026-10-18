@@ -53,8 +53,8 @@ export const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
                   account.plan === 'enterprise'
                     ? 'amber'
                     : account.plan === 'pro'
-                    ? 'brand'
-                    : 'neutral'
+                      ? 'brand'
+                      : 'neutral'
                 }
                 className="uppercase tracking-wider font-semibold text-xs"
               >
@@ -62,8 +62,12 @@ export const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
               </Badge>
 
               {account.isTrialing && (
-                <Badge variant="brand" className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
-                  <Sparkles className="w-3 h-3 mr-1 inline" /> Trial Pro ({account.trialDaysRemaining}d)
+                <Badge
+                  variant="brand"
+                  className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs"
+                >
+                  <Sparkles className="w-3 h-3 mr-1 inline" /> Trial Pro (
+                  {account.trialDaysRemaining}d)
                 </Badge>
               )}
 
@@ -119,9 +123,7 @@ export const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
           </div>
           <div className="text-slate-900 dark:text-slate-100 font-semibold">
             {account.activeUsersCount} / {maxUsers} usuários{' '}
-            {!isUnlimited && (
-              <span className="text-slate-400 font-normal">({usagePercent}%)</span>
-            )}
+            {!isUnlimited && <span className="text-slate-400 font-normal">({usagePercent}%)</span>}
           </div>
         </div>
 
@@ -130,7 +132,9 @@ export const AccountOverviewCard: React.FC<AccountOverviewCardProps> = ({
           <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
-              style={{ width: `${Math.min(100, (account.activeUsersCount / account.maxUsers) * 100)}%` }}
+              style={{
+                width: `${Math.min(100, (account.activeUsersCount / account.maxUsers) * 100)}%`,
+              }}
             />
           </div>
         )}

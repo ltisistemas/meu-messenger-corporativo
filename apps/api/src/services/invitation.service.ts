@@ -3,7 +3,12 @@ import bcrypt from 'bcryptjs';
 import { eq, and, sql } from 'drizzle-orm';
 import { db as defaultDb } from '../db/index';
 import { accounts, users, invitations, Invitation, User } from '../db/schema/index';
-import { CreateInvitationDto, AcceptInvitationDto, validateUserLimit, PlanType } from '@corpchat/shared';
+import {
+  CreateInvitationDto,
+  AcceptInvitationDto,
+  validateUserLimit,
+  PlanType,
+} from '@corpchat/shared';
 
 const INVITATION_EXPIRATION_DAYS = 7;
 const SALT_ROUNDS = 10;
@@ -45,7 +50,9 @@ export class InvitationService {
     }
 
     if (account.status === 'over_quota') {
-      throw new Error('Sua conta atingiu o limite de usuários do plano. Desative os membros excedentes ou faça upgrade para voltar a convidar.');
+      throw new Error(
+        'Sua conta atingiu o limite de usuários do plano. Desative os membros excedentes ou faça upgrade para voltar a convidar.'
+      );
     }
 
     // 3. Count active members and validate user limit according to plan
@@ -104,7 +111,9 @@ export class InvitationService {
     }
 
     if (invitation.status !== 'pending') {
-      throw new Error(`Este convite já foi ${invitation.status === 'accepted' ? 'aceito' : 'revogado'}.`);
+      throw new Error(
+        `Este convite já foi ${invitation.status === 'accepted' ? 'aceito' : 'revogado'}.`
+      );
     }
 
     if (new Date() > invitation.expiresAt) {

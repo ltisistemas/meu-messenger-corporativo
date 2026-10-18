@@ -10,18 +10,18 @@ Mensageiro web/mobile para equipes, com foco em simplicidade e privacidade: **n�
 
 ## 2. Planos
 
-|  | Free | Pro | Enterprise |
-| --- | --- | --- | --- |
-| Preço/mês | R$ 0 | R$ 79,90 | R$ 259,90 |
-| Usuários por conta | até 12 | até 80 | ilimitado |
-| Tamanho por arquivo | 5 MB | 25 MB | 25 MB |
-| Arquivos por envio | 1 | 5 | 20 |
-| Teto total por envio | 5 MB | 125 MB | 100 MB * |
-| Envio para usuário offline | ❌ | ✅ | ✅ |
-| Grupos fixos e temporários | ✅ | ✅ | ✅ |
-| Lista de transmissão (todos da conta) | ❌ | ✅ | ✅ |
-| Enquetes | ❌ | ✅ | ✅ |
-| Assinatura eletrônica | ❌ | ❌ | ✅ |
+|                                       | Free   | Pro      | Enterprise |
+| ------------------------------------- | ------ | -------- | ---------- |
+| Preço/mês                             | R$ 0   | R$ 79,90 | R$ 259,90  |
+| Usuários por conta                    | até 12 | até 80   | ilimitado  |
+| Tamanho por arquivo                   | 5 MB   | 25 MB    | 25 MB      |
+| Arquivos por envio                    | 1      | 5        | 20         |
+| Teto total por envio                  | 5 MB   | 125 MB   | 100 MB *   |
+| Envio para usuário offline            | ❌     | ✅       | ✅         |
+| Grupos fixos e temporários            | ✅     | ✅       | ✅         |
+| Lista de transmissão (todos da conta) | ❌     | ✅       | ✅         |
+| Enquetes                              | ❌     | ✅       | ✅         |
+| Assinatura eletrônica                 | ❌     | ❌       | ✅         |
 
 \* Pendente de confirmação: teto total por envio no Enterprise (sugestão: 100 MB). Acima de 25 MB por arquivo, o app orienta compartilhar link do Google Drive/OneDrive/Dropbox.
 
@@ -97,22 +97,22 @@ Mensageiro web/mobile para equipes, com foco em simplicidade e privacidade: **n�
 
 ## 5. Arquitetura validada
 
-| Camada | Definição |
-| --- | --- |
-| Monorepo | pnpm Workspaces + Turborepo (`@corpchat/*`) |
-| Shared | TypeScript + Zod (validação compartilhada front/back) |
-| Frontend | React + TypeScript + Tailwind CSS + Zustand + TanStack Query + Vite (PWA) |
-| Backend | Node.js (Fastify) + TypeScript |
-| ORM / Banco | Drizzle ORM + PostgreSQL |
-| Tempo real | Socket.IO com Redis Adapter (pub/sub e presença) |
-| Relay Free | Streaming binário em chunks com backpressure (zero persistência em disco/heap) |
-| Arquivos (Pro/Ent) | Cloudflare R2 (S3 API) com URLs pré-assinadas e lifecycle policy |
-| Jobs | BullMQ + Redis (expiração de arquivos, grupos temporários, notificações) |
-| Auth | JWT + refresh token com rotação; convite por e-mail |
-| Pagamentos | Asaas (Pix recorrente, boleto, cartão de crédito e webhooks) |
-| Assinatura | Clicksign (API REST de assinatura eletrônica simples/avançada) |
-| Notificações | Web Push Notifications (VAPID / Service Worker no PWA) |
-| Infra | Docker Compose (local), deploy em Fly.io/Railway/AWS, CI com GitHub Actions |
+| Camada             | Definição                                                                      |
+| ------------------ | ------------------------------------------------------------------------------ |
+| Monorepo           | pnpm Workspaces + Turborepo (`@corpchat/*`)                                    |
+| Shared             | TypeScript + Zod (validação compartilhada front/back)                          |
+| Frontend           | React + TypeScript + Tailwind CSS + Zustand + TanStack Query + Vite (PWA)      |
+| Backend            | Node.js (Fastify) + TypeScript                                                 |
+| ORM / Banco        | Drizzle ORM + PostgreSQL                                                       |
+| Tempo real         | Socket.IO com Redis Adapter (pub/sub e presença)                               |
+| Relay Free         | Streaming binário em chunks com backpressure (zero persistência em disco/heap) |
+| Arquivos (Pro/Ent) | Cloudflare R2 (S3 API) com URLs pré-assinadas e lifecycle policy               |
+| Jobs               | BullMQ + Redis (expiração de arquivos, grupos temporários, notificações)       |
+| Auth               | JWT + refresh token com rotação; convite por e-mail                            |
+| Pagamentos         | Asaas (Pix recorrente, boleto, cartão de crédito e webhooks)                   |
+| Assinatura         | Clicksign (API REST de assinatura eletrônica simples/avançada)                 |
+| Notificações       | Web Push Notifications (VAPID / Service Worker no PWA)                         |
+| Infra              | Docker Compose (local), deploy em Fly.io/Railway/AWS, CI com GitHub Actions    |
 
 **Regras de negócio sempre validadas no servidor:** limites de plano (tamanho, quantidade, usuários) e recursos liberados por plano (feature flags por `plan`).
 
@@ -200,71 +200,71 @@ Mensageiro web/mobile para equipes, com foco em simplicidade e privacidade: **n�
 ### Como usar (para evitar alucinação)
 
 - Rode **um ticket por vez**, em uma conversa nova do Claude Code, passando só: a seção 5 (arquitetura), a seção 6 (modelo de dados) e o ticket em questão.
-- Instrução fixa a cada ticket: *"Implemente apenas este ticket. Não altere nada fora do escopo. Se algo não estiver especificado, pergunte antes de assumir."*
+- Instrução fixa a cada ticket: _"Implemente apenas este ticket. Não altere nada fora do escopo. Se algo não estiver especificado, pergunte antes de assumir."_
 - Ao terminar: rodar testes, revisar o diff e dar commit. Só então abrir o próximo.
 - Respeite as dependências. Cada ticket deve caber em uma sessão curta (meta: até \~10 arquivos alterados).
 - Mantenha um `CLAUDE.md` na raiz com as decisões já tomadas (stack, convenções, regras de plano).
 
-Formato: **ID** · título · *depende de* · escopo · **aceite**.
+Formato: **ID** · título · _depende de_ · escopo · **aceite**.
 
 ### Fase 0: Fundação
 
-- **T-01** · Setup do monorepo · *nenhuma* · Estrutura `apps/web`, `apps/api`, `packages/shared`, Docker Compose (Postgres + Redis), lint, formatação, CI básico. **Aceite:** `docker compose up` sobe tudo; CI roda lint e testes vazios.
-- **T-02** · Migrations iniciais · *T-01* · Tabelas `accounts`, `users`, `conversations`, `conversation_members`, `messages`, `message_receipts`. **Aceite:** migration sobe e desce sem erro.
-- **T-03** · Configuração de planos · *T-01* · Arquivo único com limites e recursos por plano (Free/Pro/Enterprise) e função `can(plan, feature)`. **Aceite:** testes unitários cobrindo todos os limites da tabela da seção 2.
+- **T-01** · Setup do monorepo · _nenhuma_ · Estrutura `apps/web`, `apps/api`, `packages/shared`, Docker Compose (Postgres + Redis), lint, formatação, CI básico. **Aceite:** `docker compose up` sobe tudo; CI roda lint e testes vazios.
+- **T-02** · Migrations iniciais · _T-01_ · Tabelas `accounts`, `users`, `conversations`, `conversation_members`, `messages`, `message_receipts`. **Aceite:** migration sobe e desce sem erro.
+- **T-03** · Configuração de planos · _T-01_ · Arquivo único com limites e recursos por plano (Free/Pro/Enterprise) e função `can(plan, feature)`. **Aceite:** testes unitários cobrindo todos os limites da tabela da seção 2.
 
 ### Fase 1: Base
 
-- **T-04** · Cadastro de conta e login · *T-02* · Criar conta + owner, login, JWT e refresh token. **Aceite:** testes de cadastro, login, token expirado.
-- **T-05** · Convite de membros · *T-04, T-03* · Convite por e-mail/link, papéis, bloqueio ao atingir limite de usuários. **Aceite:** Free bloqueia o 13º usuário; Pro, o 81º.
-- **T-06** · Servidor WebSocket e autenticação · *T-04* · Conexão autenticada, reconexão, heartbeat. **Aceite:** conexão sem token é recusada; queda e retorno restabelecem a sessão.
-- **T-07** · Presença online/offline · *T-06* · Redis para presença, eventos para os contatos. **Aceite:** status muda em até 30 s após queda.
-- **T-08** · Conversas 1:1 e grupos fixos (API) · *T-05* · Criar, listar, adicionar/remover membros. **Aceite:** isolamento por conta testado (usuário não acessa conta alheia).
-- **T-09** · Mensagens de texto em tempo real · *T-06, T-08* · Envio, persistência, entrega, fila para offline. **Aceite:** mensagem enviada a usuário offline chega ao reconectar.
-- **T-10** · Recibos de entrega e leitura · *T-09* · Enviado/entregue/lido e indicador de digitação. **Aceite:** estados atualizam em tempo real nos dois lados.
+- **T-04** · Cadastro de conta e login · _T-02_ · Criar conta + owner, login, JWT e refresh token. **Aceite:** testes de cadastro, login, token expirado.
+- **T-05** · Convite de membros · _T-04, T-03_ · Convite por e-mail/link, papéis, bloqueio ao atingir limite de usuários. **Aceite:** Free bloqueia o 13º usuário; Pro, o 81º.
+- **T-06** · Servidor WebSocket e autenticação · _T-04_ · Conexão autenticada, reconexão, heartbeat. **Aceite:** conexão sem token é recusada; queda e retorno restabelecem a sessão.
+- **T-07** · Presença online/offline · _T-06_ · Redis para presença, eventos para os contatos. **Aceite:** status muda em até 30 s após queda.
+- **T-08** · Conversas 1:1 e grupos fixos (API) · _T-05_ · Criar, listar, adicionar/remover membros. **Aceite:** isolamento por conta testado (usuário não acessa conta alheia).
+- **T-09** · Mensagens de texto em tempo real · _T-06, T-08_ · Envio, persistência, entrega, fila para offline. **Aceite:** mensagem enviada a usuário offline chega ao reconectar.
+- **T-10** · Recibos de entrega e leitura · _T-09_ · Enviado/entregue/lido e indicador de digitação. **Aceite:** estados atualizam em tempo real nos dois lados.
 
 ### Fase 2: Interface base (Claude Design + front)
 
-- **T-11** · Design system e layout base · *T-01* · Tokens (cores, tipografia), componentes básicos, tema claro/escuro, layout de duas colunas. **Aceite:** página de exemplo renderiza em mobile e desktop.
-- **T-12** · Telas de login, cadastro e convite · *T-04, T-11* · **Aceite:** fluxo completo funcionando contra a API.
-- **T-13** · Lista de conversas · *T-08, T-11* · Busca, não lidas, presença. **Aceite:** atualiza em tempo real.
-- **T-14** · Tela de chat e composer de texto · *T-09, T-10, T-13* · **Aceite:** conversa 1:1 e em grupo funcionam ponta a ponta.
+- **T-11** · Design system e layout base · _T-01_ · Tokens (cores, tipografia), componentes básicos, tema claro/escuro, layout de duas colunas. **Aceite:** página de exemplo renderiza em mobile e desktop.
+- **T-12** · Telas de login, cadastro e convite · _T-04, T-11_ · **Aceite:** fluxo completo funcionando contra a API.
+- **T-13** · Lista de conversas · _T-08, T-11_ · Busca, não lidas, presença. **Aceite:** atualiza em tempo real.
+- **T-14** · Tela de chat e composer de texto · _T-09, T-10, T-13_ · **Aceite:** conversa 1:1 e em grupo funcionam ponta a ponta.
 
 ### Fase 3: Arquivos
 
-- **T-15** · Validação de limites de arquivo · *T-03* · Módulo que valida tamanho, quantidade e teto total por plano. **Aceite:** testes de todos os casos de borda.
-- **T-16** · Relay em memória no Free · *T-09, T-15* · Envio por WebSocket sem gravar em disco, só para online. **Aceite:** nenhum arquivo em disco ou bucket; offline é recusado com erro claro.
-- **T-17** · Entrega parcial em grupo (Free) · *T-16* · "Entregue a X de Y". **Aceite:** só quem estava online recebe; contador correto.
-- **T-18** · UI de anexo no Free · *T-14, T-16* · Estados: desabilitado (offline), progresso, falha com reenviar, limite excedido. **Aceite:** todos os estados visíveis e testados.
-- **T-19** · Upload via URL pré-assinada (Pro/Enterprise) · *T-15* · Endpoint que gera URL, bucket R2/S3 com SSE. **Aceite:** upload direto funciona; Free não consegue gerar URL.
-- **T-20** · Download com confirmação e exclusão · *T-19* · URL de curta duração, confirmação do app, exclusão do objeto. **Aceite:** download interrompido não apaga; completo apaga.
-- **T-21** · Contador de pendentes em grupos · *T-20* · Apagar quando todos baixarem. **Aceite:** arquivo some só após o último destinatário.
-- **T-22** · Job de expiração em 5 dias · *T-20* · BullMQ + regra de lifecycle de backup. **Aceite:** arquivo não baixado é apagado aos 5 dias (testar com prazo reduzido).
-- **T-23** · Cartão de link (Drive/OneDrive/Dropbox) · *T-14* · Detecção de URL e pré-visualização; sugestão ao exceder 25 MB. **Aceite:** links reconhecidos viram cartão.
+- **T-15** · Validação de limites de arquivo · _T-03_ · Módulo que valida tamanho, quantidade e teto total por plano. **Aceite:** testes de todos os casos de borda.
+- **T-16** · Relay em memória no Free · _T-09, T-15_ · Envio por WebSocket sem gravar em disco, só para online. **Aceite:** nenhum arquivo em disco ou bucket; offline é recusado com erro claro.
+- **T-17** · Entrega parcial em grupo (Free) · _T-16_ · "Entregue a X de Y". **Aceite:** só quem estava online recebe; contador correto.
+- **T-18** · UI de anexo no Free · _T-14, T-16_ · Estados: desabilitado (offline), progresso, falha com reenviar, limite excedido. **Aceite:** todos os estados visíveis e testados.
+- **T-19** · Upload via URL pré-assinada (Pro/Enterprise) · _T-15_ · Endpoint que gera URL, bucket R2/S3 com SSE. **Aceite:** upload direto funciona; Free não consegue gerar URL.
+- **T-20** · Download com confirmação e exclusão · _T-19_ · URL de curta duração, confirmação do app, exclusão do objeto. **Aceite:** download interrompido não apaga; completo apaga.
+- **T-21** · Contador de pendentes em grupos · _T-20_ · Apagar quando todos baixarem. **Aceite:** arquivo some só após o último destinatário.
+- **T-22** · Job de expiração em 5 dias · _T-20_ · BullMQ + regra de lifecycle de backup. **Aceite:** arquivo não baixado é apagado aos 5 dias (testar com prazo reduzido).
+- **T-23** · Cartão de link (Drive/OneDrive/Dropbox) · _T-14_ · Detecção de URL e pré-visualização; sugestão ao exceder 25 MB. **Aceite:** links reconhecidos viram cartão.
 
 ### Fase 4: Recursos de grupo
 
-- **T-24** · Grupos temporários · *T-08, T-22* · Data de expiração, arquivamento, job de expiração. **Aceite:** ao expirar, grupo vira somente leitura.
-- **T-25** · Lista de transmissão · *T-09, T-03* · Envio a toda a conta, conversa "Comunicados", relatório de entrega. **Aceite:** Free bloqueado; Pro/Enterprise enviam; relatório correto.
-- **T-26** · Enquetes (API) · *T-09, T-03* · Criar, votar (único/múltiplo), prazo, anônima/identificada. **Aceite:** voto duplicado bloqueado; resultado em tempo real.
-- **T-27** · Telas de grupo, transmissão e enquete · *T-24, T-25, T-26* · **Aceite:** fluxos funcionando no front.
+- **T-24** · Grupos temporários · _T-08, T-22_ · Data de expiração, arquivamento, job de expiração. **Aceite:** ao expirar, grupo vira somente leitura.
+- **T-25** · Lista de transmissão · _T-09, T-03_ · Envio a toda a conta, conversa "Comunicados", relatório de entrega. **Aceite:** Free bloqueado; Pro/Enterprise enviam; relatório correto.
+- **T-26** · Enquetes (API) · _T-09, T-03_ · Criar, votar (único/múltiplo), prazo, anônima/identificada. **Aceite:** voto duplicado bloqueado; resultado em tempo real.
+- **T-27** · Telas de grupo, transmissão e enquete · _T-24, T-25, T-26_ · **Aceite:** fluxos funcionando no front.
 
 ### Fase 5: Monetização
 
-- **T-28** · Integração com gateway de pagamento · *T-03, T-04* · Assinatura, webhooks, status da conta. **Aceite:** pagamento aprovado muda o plano; cancelamento rebaixa ao fim do ciclo.
-- **T-29** · Upgrade, downgrade e inadimplência · *T-28* · Regras de limite ao rebaixar (ex.: conta com 50 usuários voltando ao Free). **Aceite:** comportamento definido e testado.
-- **T-30** · Telas de planos, faturas e painel da conta · *T-28, T-11* · **Aceite:** comparativo, upgrade e uso do limite visíveis.
+- **T-28** · Integração com gateway de pagamento · _T-03, T-04_ · Assinatura, webhooks, status da conta. **Aceite:** pagamento aprovado muda o plano; cancelamento rebaixa ao fim do ciclo.
+- **T-29** · Upgrade, downgrade e inadimplência · _T-28_ · Regras de limite ao rebaixar (ex.: conta com 50 usuários voltando ao Free). **Aceite:** comportamento definido e testado.
+- **T-30** · Telas de planos, faturas e painel da conta · _T-28, T-11_ · **Aceite:** comparativo, upgrade e uso do limite visíveis.
 
 ### Fase 6: Enterprise
 
-- **T-31** · Provedor de assinatura (spike) · *T-03* · Escolher entre Clicksign/D4Sign, testar API em sandbox. **Aceite:** documento assinado de ponta a ponta no sandbox.
-- **T-32** · Fluxo de assinatura na API · *T-31* · Solicitação, signatários, ordem, webhooks de status. **Aceite:** só Enterprise acessa; status atualiza.
-- **T-33** · Certificado de evidências e download · *T-32* · IP, data/hora, hash SHA-256. **Aceite:** hash confere com o documento original.
-- **T-34** · Telas de assinatura · *T-32, T-11* · **Aceite:** enviar, acompanhar e baixar.
+- **T-31** · Provedor de assinatura (spike) · _T-03_ · Escolher entre Clicksign/D4Sign, testar API em sandbox. **Aceite:** documento assinado de ponta a ponta no sandbox.
+- **T-32** · Fluxo de assinatura na API · _T-31_ · Solicitação, signatários, ordem, webhooks de status. **Aceite:** só Enterprise acessa; status atualiza.
+- **T-33** · Certificado de evidências e download · _T-32_ · IP, data/hora, hash SHA-256. **Aceite:** hash confere com o documento original.
+- **T-34** · Telas de assinatura · _T-32, T-11_ · **Aceite:** enviar, acompanhar e baixar.
 
 ### Fase 7: Endurecimento
 
-- **T-35** · Rate limit e validações de segurança · *T-09* · **Aceite:** abuso de envio é limitado.
-- **T-36** · LGPD · *T-04* · Política de privacidade, exportação e exclusão de dados do usuário. **Aceite:** exclusão remove dados pessoais.
-- **T-37** · Observabilidade e backups · *T-01* · Logs estruturados (sem conteúdo de mensagem), métricas, backup do Postgres. **Aceite:** restauração testada.
-- **T-38** · Teste de carga · *T-16, T-22* · Simular 80 usuários simultâneos com arquivos. **Aceite:** relatório de gargalos e custo de banda.
+- **T-35** · Rate limit e validações de segurança · _T-09_ · **Aceite:** abuso de envio é limitado.
+- **T-36** · LGPD · _T-04_ · Política de privacidade, exportação e exclusão de dados do usuário. **Aceite:** exclusão remove dados pessoais.
+- **T-37** · Observabilidade e backups · _T-01_ · Logs estruturados (sem conteúdo de mensagem), métricas, backup do Postgres. **Aceite:** restauração testada.
+- **T-38** · Teste de carga · _T-16, T-22_ · Simular 80 usuários simultâneos com arquivos. **Aceite:** relatório de gargalos e custo de banda.

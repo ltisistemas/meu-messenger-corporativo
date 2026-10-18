@@ -32,7 +32,7 @@ export function createWebSocketServer(
       methods: ['GET', 'POST'],
     },
     pingInterval: 10000, // 10s heartbeat
-    pingTimeout: 5000,   // 5s timeout
+    pingTimeout: 5000, // 5s timeout
     maxHttpBufferSize: 5 * 1024 * 1024, // 5 MB max buffer for Free relay chunks
   });
 
@@ -40,19 +40,14 @@ export function createWebSocketServer(
   messageService.setIoServer(io);
   fileRelayService.setIoServer(io);
 
-
   // Authentication Middleware for WebSocket handshakes
   io.use(async (socket, next) => {
     try {
       const authHeader = socket.handshake.headers.authorization;
-      const bearerToken = authHeader?.startsWith('Bearer ')
-        ? authHeader.substring(7)
-        : undefined;
+      const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : undefined;
 
       const token =
-        socket.handshake.auth?.token ||
-        bearerToken ||
-        (socket.handshake.query?.token as string);
+        socket.handshake.auth?.token || bearerToken || (socket.handshake.query?.token as string);
 
       if (!token) {
         return next(new Error('Authentication error: Token de acesso ausente.'));
@@ -74,7 +69,9 @@ export function createWebSocketServer(
 
       return next();
     } catch (err: any) {
-      return next(new Error(`Authentication error: ${err.message || 'Token expirado ou inválido.'}`));
+      return next(
+        new Error(`Authentication error: ${err.message || 'Token expirado ou inválido.'}`)
+      );
     }
   });
 
@@ -219,7 +216,8 @@ export function createWebSocketServer(
       if (!parsed.success) {
         if (typeof callback === 'function') {
           return callback({
-            error: parsed.error.issues[0]?.message || 'Dados inválidos para transferência de arquivo.',
+            error:
+              parsed.error.issues[0]?.message || 'Dados inválidos para transferência de arquivo.',
           });
         }
         return;
@@ -291,11 +289,14 @@ export function createWebSocketServer(
     });
 
     // File Streaming Relay: Cancel or Error
-    authSocket.on(WS_EVENTS.FILE_RELAY_CANCEL, (payload: { transferId?: string; reason?: string }) => {
-      if (payload?.transferId) {
-        fileRelayService.cancelOrErrorRelay(payload.transferId, user.userId, payload.reason);
+    authSocket.on(
+      WS_EVENTS.FILE_RELAY_CANCEL,
+      (payload: { transferId?: string; reason?: string }) => {
+        if (payload?.transferId) {
+          fileRelayService.cancelOrErrorRelay(payload.transferId, user.userId, payload.reason);
+        }
       }
-    });
+    );
 
     // Handle disconnect
 

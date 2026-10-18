@@ -84,7 +84,9 @@ export const InvoicesHistorySection: React.FC<InvoicesHistorySectionProps> = ({
                 {getStatusBadge(sub.status)}
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Ciclo {sub.billingCycle === 'yearly' ? 'Anual' : 'Mensal'} • {formatCents(sub.amountCents)} • Forma de pagamento: {sub.paymentMethod.toUpperCase()}
+                Ciclo {sub.billingCycle === 'yearly' ? 'Anual' : 'Mensal'} •{' '}
+                {formatCents(sub.amountCents)} • Forma de pagamento:{' '}
+                {sub.paymentMethod.toUpperCase()}
               </p>
             </div>
 
@@ -102,7 +104,9 @@ export const InvoicesHistorySection: React.FC<InvoicesHistorySectionProps> = ({
             <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>
-                Renovação cancelada. Seu plano permanecerá ativo até <strong>{formatDate(sub.currentPeriodEnd)}</strong>, retornando ao plano Free em seguida.
+                Renovação cancelada. Seu plano permanecerá ativo até{' '}
+                <strong>{formatDate(sub.currentPeriodEnd)}</strong>, retornando ao plano Free em
+                seguida.
               </span>
             </div>
           ) : (
@@ -113,11 +117,24 @@ export const InvoicesHistorySection: React.FC<InvoicesHistorySectionProps> = ({
 
               {isConfirmingCancel ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-600 dark:text-slate-300">Confirmar cancelamento?</span>
-                  <Button variant="danger" size="sm" onClick={handleCancel} disabled={isLoading} className="text-xs">
+                  <span className="text-xs text-slate-600 dark:text-slate-300">
+                    Confirmar cancelamento?
+                  </span>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                    className="text-xs"
+                  >
                     Sim, Cancelar
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => setIsConfirmingCancel(false)} className="text-xs">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsConfirmingCancel(false)}
+                    className="text-xs"
+                  >
                     Voltar
                   </Button>
                 </div>
@@ -167,10 +184,15 @@ export const InvoicesHistorySection: React.FC<InvoicesHistorySectionProps> = ({
                 </tr>
               ) : (
                 invoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition">
+                  <tr
+                    key={inv.id}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition"
+                  >
                     <td className="py-3.5 pl-2 text-xs text-slate-700 dark:text-slate-300">
                       <div>{formatDate(inv.createdAt)}</div>
-                      <div className="text-[11px] text-slate-400">Vence em {formatDate(inv.dueDate)}</div>
+                      <div className="text-[11px] text-slate-400">
+                        Vence em {formatDate(inv.dueDate)}
+                      </div>
                     </td>
 
                     <td className="py-3.5 font-semibold text-slate-900 dark:text-slate-100 text-xs">

@@ -22,10 +22,7 @@ export interface LgpdPrivacySectionProps {
   userEmail?: string;
 }
 
-export const LgpdPrivacySection: React.FC<LgpdPrivacySectionProps> = ({
-  userRole,
-  userEmail,
-}) => {
+export const LgpdPrivacySection: React.FC<LgpdPrivacySectionProps> = ({ userRole, userEmail }) => {
   const { logout } = useAuthStore();
   const [policy, setPolicy] = useState<LgpdPrivacyPolicyResponse | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -61,7 +58,8 @@ export const LgpdPrivacySection: React.FC<LgpdPrivacySectionProps> = ({
           retentionPolicies: {
             free: 'Zero retenção de arquivos em disco (streaming em memória somente para destinatários online).',
             pro: 'Arquivos com retenção temporária máxima de 5 dias em bucket seguro criptografado com exclusão automática.',
-            enterprise: 'Retenção corporativa configurável com trilha de auditoria SHA-256 e conformidade integral.',
+            enterprise:
+              'Retenção corporativa configurável com trilha de auditoria SHA-256 e conformidade integral.',
           },
           legalBases: [
             'Execução de contrato de prestação de serviços (Art. 7º, V da LGPD)',
@@ -189,7 +187,8 @@ export const LgpdPrivacySection: React.FC<LgpdPrivacySectionProps> = ({
               </h3>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-              Você pode exercer a qualquer momento os direitos garantidos pela legislação brasileira:
+              Você pode exercer a qualquer momento os direitos garantidos pela legislação
+              brasileira:
             </p>
             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
               {policy?.rights.map((right, idx) => (
@@ -216,15 +215,17 @@ export const LgpdPrivacySection: React.FC<LgpdPrivacySectionProps> = ({
               </h3>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-              Faça o download de uma cópia integral e estruturada em formato interoperável (JSON)
-              de todos os seus dados mantidos pela plataforma, incluindo perfil, mensagens enviadas,
+              Faça o download de uma cópia integral e estruturada em formato interoperável (JSON) de
+              todos os seus dados mantidos pela plataforma, incluindo perfil, mensagens enviadas,
               participações em conversas e confirmações de leitura.
             </p>
 
             <div className="bg-slate-50 dark:bg-slate-950/60 rounded-lg p-4 border border-slate-200 dark:border-slate-800/80 mb-4 text-xs space-y-1.5">
               <div className="flex items-center justify-between text-slate-500">
                 <span>Usuário solicitante:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{userEmail}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">
+                  {userEmail}
+                </span>
               </div>
               <div className="flex items-center justify-between text-slate-500">
                 <span>Formato de saída:</span>
@@ -315,8 +316,9 @@ export const LgpdPrivacySection: React.FC<LgpdPrivacySectionProps> = ({
             </p>
             {userRole === 'owner' && (
               <p className="text-[11px] text-amber-500 mt-2 font-medium">
-                Nota: Se você for o único Proprietário da organização, deverá transferir a propriedade
-                ou cancelar a conta corporativa antes de prosseguir com a exclusão individual.
+                Nota: Se você for o único Proprietário da organização, deverá transferir a
+                propriedade ou cancelar a conta corporativa antes de prosseguir com a exclusão
+                individual.
               </p>
             )}
           </div>

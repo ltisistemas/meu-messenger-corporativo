@@ -24,9 +24,7 @@ describe('Account & Signature Modals UI Coverage', () => {
       const onInviteMock = vi.fn().mockResolvedValue({ inviteUrl: '/invite/token-abc' });
       const onCloseMock = vi.fn();
 
-      render(
-        <InviteMemberModal isOpen={true} onClose={onCloseMock} onInvite={onInviteMock} />
-      );
+      render(<InviteMemberModal isOpen={true} onClose={onCloseMock} onInvite={onInviteMock} />);
 
       const input = screen.getByPlaceholderText(/exemplo@suaempresa\.com/i);
       fireEvent.change(input, { target: { value: 'novo@empresa.com' } });
@@ -60,9 +58,7 @@ describe('Account & Signature Modals UI Coverage', () => {
     it('displays error message on submission failure', async () => {
       const onInviteMock = vi.fn().mockRejectedValue(new Error('Limite de membros atingido'));
 
-      render(
-        <InviteMemberModal isOpen={true} onClose={vi.fn()} onInvite={onInviteMock} />
-      );
+      render(<InviteMemberModal isOpen={true} onClose={vi.fn()} onInvite={onInviteMock} />);
 
       const input = screen.getByPlaceholderText(/exemplo@suaempresa\.com/i);
       fireEvent.change(input, { target: { value: 'err@empresa.com' } });
@@ -179,18 +175,30 @@ describe('Account & Signature Modals UI Coverage', () => {
       fireEvent.click(screen.getByText('Cartão de Crédito'));
 
       // Fill basic customer info
-      fireEvent.change(screen.getByPlaceholderText(/Nome Completo/i), { target: { value: 'Tech Corp' } });
-      fireEvent.change(screen.getByPlaceholderText(/financeiro@empresa\.com/i), { target: { value: 'tech@corp.com' } });
-      fireEvent.change(screen.getByPlaceholderText(/000\.000\.000-00/i), { target: { value: '11222333000199' } });
+      fireEvent.change(screen.getByPlaceholderText(/Nome Completo/i), {
+        target: { value: 'Tech Corp' },
+      });
+      fireEvent.change(screen.getByPlaceholderText(/financeiro@empresa\.com/i), {
+        target: { value: 'tech@corp.com' },
+      });
+      fireEvent.change(screen.getByPlaceholderText(/000\.000\.000-00/i), {
+        target: { value: '11222333000199' },
+      });
 
       // Submit via form to trigger CC validation
       const form = container.querySelector('form')!;
       fireEvent.submit(form);
-      expect(screen.getByText(/Por favor preencha todos os dados do cartão de crédito/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Por favor preencha todos os dados do cartão de crédito/i)
+      ).toBeInTheDocument();
 
       // Fill CC fields
-      fireEvent.change(screen.getByPlaceholderText('NOME COMO NO CARTAO'), { target: { value: 'TECH CORP' } });
-      fireEvent.change(screen.getByPlaceholderText('0000 0000 0000 0000'), { target: { value: '4111111111111111' } });
+      fireEvent.change(screen.getByPlaceholderText('NOME COMO NO CARTAO'), {
+        target: { value: 'TECH CORP' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('0000 0000 0000 0000'), {
+        target: { value: '4111111111111111' },
+      });
       fireEvent.change(screen.getByPlaceholderText('12'), { target: { value: '11' } });
       fireEvent.change(screen.getByPlaceholderText('28'), { target: { value: '29' } });
       const ccvInput = container.querySelector('input[type="password"]') as HTMLInputElement;
@@ -250,9 +258,7 @@ describe('Account & Signature Modals UI Coverage', () => {
         verificationResult: null,
       });
 
-      render(
-        <VerifyHashModal isOpen={true} onClose={vi.fn()} signatureId="sig-1" />
-      );
+      render(<VerifyHashModal isOpen={true} onClose={vi.fn()} signatureId="sig-1" />);
 
       expect(screen.getByText(/Autenticidade e Integridade/i)).toBeInTheDocument();
 
@@ -283,9 +289,7 @@ describe('Account & Signature Modals UI Coverage', () => {
         },
       });
 
-      render(
-        <VerifyHashModal isOpen={true} onClose={vi.fn()} signatureId="sig-1" />
-      );
+      render(<VerifyHashModal isOpen={true} onClose={vi.fn()} signatureId="sig-1" />);
 
       expect(screen.getByText(/Autenticidade Confirmada!/i)).toBeInTheDocument();
       expect(screen.getByText(/VÁLIDO/i)).toBeInTheDocument();
@@ -306,9 +310,7 @@ describe('Account & Signature Modals UI Coverage', () => {
         },
       });
 
-      render(
-        <VerifyHashModal isOpen={true} onClose={vi.fn()} signatureId="sig-1" />
-      );
+      render(<VerifyHashModal isOpen={true} onClose={vi.fn()} signatureId="sig-1" />);
 
       expect(screen.getByText(/Hash Divergente ou Documento Adulterado/i)).toBeInTheDocument();
       expect(screen.getByText(/INVÁLIDO/i)).toBeInTheDocument();
@@ -324,7 +326,9 @@ describe('Account & Signature Modals UI Coverage', () => {
 
       const testFile = new File(['conteudo para hash'], 'arquivo.pdf', { type: 'application/pdf' });
       // Mock arrayBuffer
-      testFile.arrayBuffer = vi.fn().mockResolvedValue(new TextEncoder().encode('conteudo para hash'));
+      testFile.arrayBuffer = vi
+        .fn()
+        .mockResolvedValue(new TextEncoder().encode('conteudo para hash'));
 
       fireEvent.change(fileInput, { target: { files: [testFile] } });
 
@@ -436,13 +440,7 @@ describe('Account & Signature Modals UI Coverage', () => {
         simulateSign: simulateSignMock,
       });
 
-      render(
-        <SignatureDetailsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          signatureId="sig-test-2"
-        />
-      );
+      render(<SignatureDetailsModal isOpen={true} onClose={vi.fn()} signatureId="sig-test-2" />);
 
       // Copy sign link
       const copyLinkBtn = screen.getByTitle(/Copiar link de assinatura/i);

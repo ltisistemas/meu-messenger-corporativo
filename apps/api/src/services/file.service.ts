@@ -198,7 +198,9 @@ export class FileService {
     }
 
     if (account.status === 'over_quota') {
-      const err: any = new Error('A organização atingiu o limite de usuários e está em modo somente leitura.');
+      const err: any = new Error(
+        'A organização atingiu o limite de usuários e está em modo somente leitura.'
+      );
       err.statusCode = 403;
       err.code = 'ACCOUNT_OVER_QUOTA';
       throw err;
@@ -282,16 +284,9 @@ export class FileService {
   /**
    * Confirms client has finished direct S3 upload (T-19/T-20)
    */
-  async confirmUpload(
-    accountId: string,
-    transferId: string,
-    messageId?: string
-  ) {
+  async confirmUpload(accountId: string, transferId: string, messageId?: string) {
     const transfer = await this.db.query.fileTransfers.findFirst({
-      where: and(
-        eq(fileTransfers.id, transferId),
-        eq(fileTransfers.accountId, accountId)
-      ),
+      where: and(eq(fileTransfers.id, transferId), eq(fileTransfers.accountId, accountId)),
     });
 
     if (!transfer) {
@@ -323,10 +318,7 @@ export class FileService {
     transferId: string
   ): Promise<DownloadUrlResponse> {
     const transfer = await this.db.query.fileTransfers.findFirst({
-      where: and(
-        eq(fileTransfers.id, transferId),
-        eq(fileTransfers.accountId, accountId)
-      ),
+      where: and(eq(fileTransfers.id, transferId), eq(fileTransfers.accountId, accountId)),
     });
 
     if (!transfer) {
@@ -336,14 +328,22 @@ export class FileService {
       throw err;
     }
 
-    if (transfer.status === 'deleted' || (transfer.status === 'completed' && transfer.pendingDownloadsCount === 0)) {
-      const err: any = new Error('Este arquivo já foi baixado por todos os destinatários ou foi excluído.');
+    if (
+      transfer.status === 'deleted' ||
+      (transfer.status === 'completed' && transfer.pendingDownloadsCount === 0)
+    ) {
+      const err: any = new Error(
+        'Este arquivo já foi baixado por todos os destinatários ou foi excluído.'
+      );
       err.statusCode = 410;
       err.code = 'FILE_ALREADY_DELETED';
       throw err;
     }
 
-    if (transfer.status === 'expired' || (transfer.expiresAt && new Date(transfer.expiresAt) < new Date())) {
+    if (
+      transfer.status === 'expired' ||
+      (transfer.expiresAt && new Date(transfer.expiresAt) < new Date())
+    ) {
       const err: any = new Error('Este arquivo expirou após o prazo de retenção de 5 dias.');
       err.statusCode = 410;
       err.code = 'FILE_EXPIRED';
@@ -399,10 +399,7 @@ export class FileService {
     const { completed = true } = options;
 
     const transfer = await this.db.query.fileTransfers.findFirst({
-      where: and(
-        eq(fileTransfers.id, transferId),
-        eq(fileTransfers.accountId, accountId)
-      ),
+      where: and(eq(fileTransfers.id, transferId), eq(fileTransfers.accountId, accountId)),
     });
 
     if (!transfer) {
@@ -425,7 +422,10 @@ export class FileService {
     }
 
     // If already deleted/completed with 0 pending
-    if (transfer.status === 'deleted' || (transfer.status === 'completed' && transfer.pendingDownloadsCount <= 0)) {
+    if (
+      transfer.status === 'deleted' ||
+      (transfer.status === 'completed' && transfer.pendingDownloadsCount <= 0)
+    ) {
       return {
         success: true,
         transferId: transfer.id,
@@ -518,10 +518,7 @@ export class FileService {
     transferId: string
   ): Promise<FileTransferStatusResponse> {
     const transfer = await this.db.query.fileTransfers.findFirst({
-      where: and(
-        eq(fileTransfers.id, transferId),
-        eq(fileTransfers.accountId, accountId)
-      ),
+      where: and(eq(fileTransfers.id, transferId), eq(fileTransfers.accountId, accountId)),
     });
 
     if (!transfer) {
@@ -547,7 +544,10 @@ export class FileService {
       }
     }
 
-    const downloadedCount = Math.max(0, transfer.totalRecipientsCount - transfer.pendingDownloadsCount);
+    const downloadedCount = Math.max(
+      0,
+      transfer.totalRecipientsCount - transfer.pendingDownloadsCount
+    );
     const isAvailable =
       (transfer.status === 'uploaded' || transfer.status === 'pending') &&
       transfer.pendingDownloadsCount > 0 &&

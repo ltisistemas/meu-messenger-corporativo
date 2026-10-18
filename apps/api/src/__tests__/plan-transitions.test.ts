@@ -31,7 +31,8 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
         },
         users: {
           findFirst: vi.fn(async (query: any) => {
-            const targetId = query?.where?.value ?? query?.where?.right?.value ?? query?.where?.right;
+            const targetId =
+              query?.where?.value ?? query?.where?.right?.value ?? query?.where?.right;
             if (targetId && typeof targetId === 'string') {
               const found = mockUsersData.find((x) => x.id === targetId || x.email === targetId);
               if (found) return { ...found };
@@ -96,11 +97,16 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
             const execute = async () => {
               if (values.plan !== undefined) mockAccountData.plan = values.plan;
               if (values.status !== undefined) {
-                if (values.status === 'active' || values.status === 'over_quota' || values.status === 'suspended') {
+                if (
+                  values.status === 'active' ||
+                  values.status === 'over_quota' ||
+                  values.status === 'suspended'
+                ) {
                   mockAccountData.status = values.status;
                 }
               }
-              const targetId = whereClause?.value ?? whereClause?.right?.value ?? whereClause?.right;
+              const targetId =
+                whereClause?.value ?? whereClause?.right?.value ?? whereClause?.right;
               if (targetId && typeof targetId === 'string') {
                 const u = mockUsersData.find((x) => x.id === targetId);
                 if (u) {
@@ -210,9 +216,9 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
       const mockDb = createMockDb();
       const accountService = new AccountService(mockDb);
 
-      await expect(
-        accountService.changePlan(accountId, 'member', 'free')
-      ).rejects.toThrow(/Apenas Administradores e o Proprietário/i);
+      await expect(accountService.changePlan(accountId, 'member', 'free')).rejects.toThrow(
+        /Apenas Administradores e o Proprietário/i
+      );
     });
 
     it('deactivating excess members restores account status from over_quota back to active', async () => {
@@ -275,7 +281,13 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
       const accountService = new AccountService(mockDb);
 
       await expect(
-        accountService.updateMemberStatus(accountId, adminUserId, 'admin', inactiveUser.id, 'active')
+        accountService.updateMemberStatus(
+          accountId,
+          adminUserId,
+          'admin',
+          inactiveUser.id,
+          'active'
+        )
       ).rejects.toThrow(/Limite de 12 usuários atingido/i);
     });
 
@@ -554,7 +566,13 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
       };
       const customAccountService = new AccountService(mockDbMissing);
       await expect(
-        customAccountService.updateMemberRole('acc-test-id', 'caller-1', 'owner', 'missing-user-id', 'admin')
+        customAccountService.updateMemberRole(
+          'acc-test-id',
+          'caller-1',
+          'owner',
+          'missing-user-id',
+          'admin'
+        )
       ).rejects.toThrow('Membro não encontrado nesta organização.');
 
       // 2. processTrialExpirations for suspended and over_quota accounts
@@ -562,8 +580,18 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
         query: {
           accounts: {
             findMany: vi.fn().mockResolvedValue([
-              { id: 'acc-susp', plan: 'pro', status: 'suspended', trialUntil: new Date(Date.now() - 1000) },
-              { id: 'acc-over', plan: 'pro', status: 'active', trialUntil: new Date(Date.now() - 1000) },
+              {
+                id: 'acc-susp',
+                plan: 'pro',
+                status: 'suspended',
+                trialUntil: new Date(Date.now() - 1000),
+              },
+              {
+                id: 'acc-over',
+                plan: 'pro',
+                status: 'active',
+                trialUntil: new Date(Date.now() - 1000),
+              },
             ]),
           },
           subscriptions: {
@@ -583,6 +611,21 @@ describe('Plan Transitions, Downgrades, Over Quota & Inadimplência (T-29)', () 
       const svc = new AccountService(mockDb);
       const result = await svc.processTrialExpirations();
       expect(result.processedCount).toBe(2);
+    });
+
+    it('rejects unauthenticated requests to /me, /members, and /members/:id/status with 401', async () => {
+      const resMe = await app.inject({ method: 'GET', url: '/api/accounts/me' });
+      expect(resMe.statusCode).toBe(401);
+
+      const resMembers = await app.inject({ method: 'GET', url: '/api/accounts/members' });
+      expect(resMembers.statusCode).toBe(401);
+
+      const resStatus = await app.inject({
+        method: 'PATCH',
+        url: '/api/accounts/members/123/status',
+        payload: { status: 'inactive' },
+      });
+      expect(resStatus.statusCode).toBe(401);
     });
   });
 });

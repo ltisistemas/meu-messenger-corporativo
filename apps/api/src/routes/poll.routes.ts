@@ -38,7 +38,8 @@ export const pollRoutes: FastifyPluginAsync<PollRoutesOptions> = async (
         return reply.status(400).send({
           statusCode: 400,
           error: 'Bad Request',
-          message: parseResult.error.errors[0]?.message || 'Dados inválidos para criação da enquete.',
+          message:
+            parseResult.error.errors[0]?.message || 'Dados inválidos para criação da enquete.',
         });
       }
 
@@ -102,12 +103,7 @@ export const pollRoutes: FastifyPluginAsync<PollRoutesOptions> = async (
       }
 
       try {
-        const updated = await pollService.votePoll(
-          accountId,
-          userId,
-          pollId,
-          parseResult.data
-        );
+        const updated = await pollService.votePoll(accountId, userId, pollId, parseResult.data);
         return reply.status(200).send(updated);
       } catch (err: any) {
         return reply.status(400).send({

@@ -47,7 +47,13 @@ export const ChatPage: React.FC = () => {
     return () => {
       disconnectSocket();
     };
-  }, [connectSocket, disconnectSocket, initializeSocketListeners, fetchConversations, fetchAccountDetails]);
+  }, [
+    connectSocket,
+    disconnectSocket,
+    initializeSocketListeners,
+    fetchConversations,
+    fetchAccountDetails,
+  ]);
 
   const handleSelectTab = (tab: NavItemKey) => {
     if (tab === 'settings') {
@@ -57,8 +63,7 @@ export const ChatPage: React.FC = () => {
     setActiveTab(tab);
   };
 
-  const activeConversation =
-    conversations.find((c) => c.id === activeConversationId) || null;
+  const activeConversation = conversations.find((c) => c.id === activeConversationId) || null;
   const activeMessages = activeConversationId ? messages[activeConversationId] || [] : [];
 
   const handleSelectConversation = (id: string) => {
@@ -76,11 +81,7 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  const handleCreateGroup = async (
-    options: any,
-    memberIds?: string[],
-    retentionHours?: number
-  ) => {
+  const handleCreateGroup = async (options: any, memberIds?: string[], retentionHours?: number) => {
     await createGroupConversation(options, memberIds, retentionHours);
   };
 
@@ -159,4 +160,3 @@ export const ChatPage: React.FC = () => {
     </>
   );
 };
-

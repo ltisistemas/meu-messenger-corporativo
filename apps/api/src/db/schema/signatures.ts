@@ -1,4 +1,14 @@
-import { pgTable, uuid, varchar, text, boolean, integer, timestamp, jsonb, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  boolean,
+  integer,
+  timestamp,
+  jsonb,
+  index,
+} from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { accounts } from './accounts';
 import { conversations } from './conversations';
@@ -17,10 +27,8 @@ export const signatureRequests = pgTable(
     conversationId: uuid('conversation_id')
       .notNull()
       .references(() => conversations.id, { onDelete: 'cascade' }),
-    messageId: uuid('message_id')
-      .references(() => messages.id, { onDelete: 'set null' }),
-    creatorId: uuid('creator_id')
-      .references(() => users.id, { onDelete: 'set null' }),
+    messageId: uuid('message_id').references(() => messages.id, { onDelete: 'set null' }),
+    creatorId: uuid('creator_id').references(() => users.id, { onDelete: 'set null' }),
     title: varchar('title', { length: 255 }).notNull(),
     documentName: varchar('document_name', { length: 255 }).notNull(),
     provider: varchar('provider', { length: 50 }).notNull().default('clicksign'),
@@ -53,8 +61,7 @@ export const signatureSigners = pgTable(
     signatureRequestId: uuid('signature_request_id')
       .notNull()
       .references(() => signatureRequests.id, { onDelete: 'cascade' }),
-    userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'set null' }),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
     externalSignerKey: varchar('external_signer_key', { length: 255 }).notNull(),
     requestSignatureKey: varchar('request_signature_key', { length: 255 }).notNull(),
     name: varchar('name', { length: 255 }).notNull(),
@@ -84,8 +91,7 @@ export const signatureEvidence = pgTable(
     signatureRequestId: uuid('signature_request_id')
       .notNull()
       .references(() => signatureRequests.id, { onDelete: 'cascade' }),
-    signerId: uuid('signer_id')
-      .references(() => signatureSigners.id, { onDelete: 'set null' }),
+    signerId: uuid('signer_id').references(() => signatureSigners.id, { onDelete: 'set null' }),
     eventType: varchar('event_type', { length: 100 }).notNull(),
     ipAddress: varchar('ip_address', { length: 100 }),
     userAgent: text('user_agent'),
@@ -94,9 +100,7 @@ export const signatureEvidence = pgTable(
     occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [
-    index('sig_evidence_req_idx').on(table.signatureRequestId),
-  ]
+  (table) => [index('sig_evidence_req_idx').on(table.signatureRequestId)]
 );
 
 export const signatureRequestsRelations = relations(signatureRequests, ({ one, many }) => ({

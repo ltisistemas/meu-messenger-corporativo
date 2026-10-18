@@ -50,9 +50,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           />
 
           {rightIcon && (
-            <div className="absolute right-3.5 text-slate-400 dark:text-slate-500">
-              {rightIcon}
-            </div>
+            <div className="absolute right-3.5 text-slate-400 dark:text-slate-500">{rightIcon}</div>
           )}
         </div>
 

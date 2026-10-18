@@ -28,43 +28,39 @@ export const fileRoutes: FastifyPluginAsync<FileRoutesOptions> = async (server, 
     new (await import('../jobs/file-expiration.job')).FileExpirationService();
 
   // POST /api/files/validate - Validate file batch limits and presence against account plan
-  server.post(
-    '/validate',
-    { preHandler: [server.authenticate] },
-    async (request, reply) => {
-      const { accountId } = request.user;
-      const parsed = ValidateFilesBodySchema.safeParse(request.body);
+  server.post('/validate', { preHandler: [server.authenticate] }, async (request, reply) => {
+    const { accountId } = request.user;
+    const parsed = ValidateFilesBodySchema.safeParse(request.body);
 
-      if (!parsed.success) {
-        return reply.status(400).send({
-          valid: false,
-          error: parsed.error.issues[0]?.message || 'Dados inválidos.',
-          details: parsed.error.issues,
-        });
-      }
-
-      const result = await fileService.validateFiles(accountId, {
-        files: parsed.data.files,
-        recipientUserId: parsed.data.recipientUserId,
-        isRecipientOnline: parsed.data.isRecipientOnline,
-        recipientName: parsed.data.recipientName,
-        requireFiles: true,
+    if (!parsed.success) {
+      return reply.status(400).send({
+        valid: false,
+        error: parsed.error.issues[0]?.message || 'Dados inválidos.',
+        details: parsed.error.issues,
       });
-
-      if (!result.valid) {
-        const statusCode =
-          result.code === 'OFFLINE_RECIPIENT_NOT_ALLOWED' ||
-          result.code === 'ACCOUNT_OVER_QUOTA' ||
-          result.code === 'ACCOUNT_SUSPENDED'
-            ? 403
-            : 400;
-
-        return reply.status(statusCode).send(result);
-      }
-
-      return reply.status(200).send(result);
     }
-  );
+
+    const result = await fileService.validateFiles(accountId, {
+      files: parsed.data.files,
+      recipientUserId: parsed.data.recipientUserId,
+      isRecipientOnline: parsed.data.isRecipientOnline,
+      recipientName: parsed.data.recipientName,
+      requireFiles: true,
+    });
+
+    if (!result.valid) {
+      const statusCode =
+        result.code === 'OFFLINE_RECIPIENT_NOT_ALLOWED' ||
+        result.code === 'ACCOUNT_OVER_QUOTA' ||
+        result.code === 'ACCOUNT_SUSPENDED'
+          ? 403
+          : 400;
+
+      return reply.status(statusCode).send(result);
+    }
+
+    return reply.status(200).send(result);
+  });
 
   // POST /api/files/upload-url & /api/files/presign-upload - Generate S3 / R2 presigned PUT URL (Pro/Enterprise) (T-19)
   const handlePresignedUpload = async (request: any, reply: any) => {
@@ -73,7 +69,8 @@ export const fileRoutes: FastifyPluginAsync<FileRoutesOptions> = async (server, 
 
     if (!parsed.success) {
       return reply.status(400).send({
-        error: parsed.error.issues[0]?.message || 'Dados inválidos para geração de URL pré-assinada.',
+        error:
+          parsed.error.issues[0]?.message || 'Dados inválidos para geração de URL pré-assinada.',
         details: parsed.error.issues,
       });
     }
@@ -119,71 +116,64 @@ export const fileRoutes: FastifyPluginAsync<FileRoutesOptions> = async (server, 
   );
 
   // POST /api/files/confirm-upload - Confirm successful client direct upload (T-19/T-20)
-  server.post(
-    '/confirm-upload',
-    { preHandler: [server.authenticate] },
-    async (request, reply) => {
-      const { accountId } = request.user;
-      const parsed = ConfirmUploadDtoSchema.safeParse(request.body);
+  server.post('/confirm-upload', { preHandler: [server.authenticate] }, async (request, reply) => {
+    const { accountId } = request.user;
+    const parsed = ConfirmUploadDtoSchema.safeParse(request.body);
 
-      if (!parsed.success) {
-        return reply.status(400).send({
-          error: parsed.error.issues[0]?.message || 'Dados inválidos.',
-          details: parsed.error.issues,
-        });
-      }
-
-      try {
-        const transfer = await fileService.confirmUpload(
-          accountId,
-          parsed.data.transferId,
-          parsed.data.messageId
-        );
-        return reply.status(200).send({
-          success: true,
-          transfer,
-        });
-      } catch (err: any) {
-        const statusCode = err.statusCode || 400;
-        return reply.status(statusCode).send({
-          error: err.message,
-          code: err.code,
-        });
-      }
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: parsed.error.issues[0]?.message || 'Dados inválidos.',
+        details: parsed.error.issues,
+      });
     }
-  );
+
+    try {
+      const transfer = await fileService.confirmUpload(
+        accountId,
+        parsed.data.transferId,
+        parsed.data.messageId
+      );
+      return reply.status(200).send({
+        success: true,
+        transfer,
+      });
+    } catch (err: any) {
+      const statusCode = err.statusCode || 400;
+      return reply.status(statusCode).send({
+        error: err.message,
+        code: err.code,
+      });
+    }
+  });
 
   // POST /api/files/download-url - Request short-lived pre-signed download URL (T-20)
-  server.post(
-    '/download-url',
-    { preHandler: [server.authenticate] },
-    async (request, reply) => {
-      const { accountId, userId } = request.user;
-      const parsed = RequestDownloadUrlDtoSchema.safeParse(request.body);
+  server.post('/download-url', { preHandler: [server.authenticate] }, async (request, reply) => {
+    const { accountId, userId } = request.user;
+    const parsed = RequestDownloadUrlDtoSchema.safeParse(request.body);
 
-      if (!parsed.success) {
-        return reply.status(400).send({
-          error: parsed.error.issues[0]?.message || 'Dados inválidos para geração de URL de download.',
-          details: parsed.error.issues,
-        });
-      }
-
-      try {
-        const response = await fileService.requestDownloadUrl(
-          accountId,
-          userId,
-          parsed.data.transferId
-        );
-        return reply.status(200).send(response);
-      } catch (err: any) {
-        const statusCode = err.statusCode || 400;
-        return reply.status(statusCode).send({
-          error: err.message,
-          code: err.code,
-        });
-      }
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error:
+          parsed.error.issues[0]?.message || 'Dados inválidos para geração de URL de download.',
+        details: parsed.error.issues,
+      });
     }
-  );
+
+    try {
+      const response = await fileService.requestDownloadUrl(
+        accountId,
+        userId,
+        parsed.data.transferId
+      );
+      return reply.status(200).send(response);
+    } catch (err: any) {
+      const statusCode = err.statusCode || 400;
+      return reply.status(statusCode).send({
+        error: err.message,
+        code: err.code,
+      });
+    }
+  });
 
   // POST /api/files/confirm-download - Confirm download completion or report interrupted state (T-20/T-21)
   server.post(

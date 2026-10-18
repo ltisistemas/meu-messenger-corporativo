@@ -6,6 +6,7 @@ import {
   BillingSummaryResponse,
   CreateSubscriptionDto,
   CancelSubscriptionDto,
+  CheckoutStatusResponse,
   PlanType,
 } from '@corpchat/shared';
 
@@ -17,6 +18,8 @@ export interface AccountState {
   isSubscribing: boolean;
   error: string | null;
   checkoutResult: {
+    chargeId?: string;
+    subscriptionId?: string;
     pixQrCode?: string;
     pixCopyPaste?: string;
     bankSlipUrl?: string;
@@ -31,6 +34,8 @@ export interface AccountState {
   updateMemberRole: (userId: string, role: 'admin' | 'member') => Promise<void>;
   inviteMember: (email: string, role: 'admin' | 'member') => Promise<{ inviteUrl: string }>;
   subscribePlan: (dto: CreateSubscriptionDto) => Promise<void>;
+  checkCheckoutStatus: (chargeId: string) => Promise<CheckoutStatusResponse>;
+  simulatePaymentConfirmation: (chargeId: string) => Promise<CheckoutStatusResponse>;
   cancelSubscription: (dto?: CancelSubscriptionDto) => Promise<void>;
   downgradePlan: (plan: PlanType) => Promise<void>;
   clearCheckoutResult: () => void;
@@ -79,8 +84,11 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   updateMemberStatus: async (userId: string, status: 'active' | 'inactive') => {
     try {
       set({ isLoading: true, error: null });
-      const res = await api.patch<{ member: MemberItemResponse }>(`/accounts/members/${userId}/status`, { status });
-      
+      const res = await api.patch<{ member: MemberItemResponse }>(
+        `/accounts/members/${userId}/status`,
+        { status }
+      );
+
       // Update local members list
       const updatedMembers = get().members.map((m) => (m.id === userId ? res.member : m));
       set({ members: updatedMembers, isLoading: false });
@@ -96,8 +104,11 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   updateMemberRole: async (userId: string, role: 'admin' | 'member') => {
     try {
       set({ isLoading: true, error: null });
-      const res = await api.patch<{ member: MemberItemResponse }>(`/accounts/members/${userId}/role`, { role });
-      
+      const res = await api.patch<{ member: MemberItemResponse }>(
+        `/accounts/members/${userId}/role`,
+        { role }
+      );
+
       const updatedMembers = get().members.map((m) => (m.id === userId ? res.member : m));
       set({ members: updatedMembers, isLoading: false });
     } catch (err: any) {
@@ -109,8 +120,11 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   inviteMember: async (email: string, role: 'admin' | 'member') => {
     try {
       set({ error: null });
-      const res = await api.post<{ invitation: any; inviteUrl: string }>('/invitations', { email, role });
-      
+      const res = await api.post<{ invitation: any; inviteUrl: string }>('/invitations', {
+        email,
+        role,
+      });
+
       // Refresh members and account details
       await Promise.all([get().fetchMembers(), get().fetchAccountDetails()]);
       return { inviteUrl: res.inviteUrl };
@@ -134,8 +148,14 @@ export const useAccountStore = create<AccountState>((set, get) => ({
         };
       }>('/billing/subscribe', dto);
 
+      const chargeId = res.invoice?.gatewayInvoiceId || res.invoice?.id;
+
       set({
-        checkoutResult: res.checkout || null,
+        checkoutResult: {
+          ...res.checkout,
+          chargeId,
+          subscriptionId: res.subscription?.id,
+        },
         isSubscribing: false,
       });
 
@@ -145,6 +165,25 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       set({ error: err.message || 'Erro ao processar assinatura', isSubscribing: false });
       throw err;
     }
+  },
+
+  checkCheckoutStatus: async (chargeId: string): Promise<CheckoutStatusResponse> => {
+    const res = await api.get<CheckoutStatusResponse>(
+      `/billing/checkout/status?chargeId=${encodeURIComponent(chargeId)}`
+    );
+    if (res.status === 'PAID') {
+      await Promise.all([get().fetchAccountDetails(), get().fetchBillingSummary()]);
+    }
+    return res;
+  },
+
+  simulatePaymentConfirmation: async (chargeId: string): Promise<CheckoutStatusResponse> => {
+    const res = await api.post<CheckoutStatusResponse>('/billing/checkout/status', {
+      chargeId,
+      simulatePaid: true,
+    });
+    await Promise.all([get().fetchAccountDetails(), get().fetchBillingSummary()]);
+    return res;
   },
 
   cancelSubscription: async (dto?: CancelSubscriptionDto) => {

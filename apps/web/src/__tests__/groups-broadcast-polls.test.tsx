@@ -155,7 +155,10 @@ describe('Groups, Broadcast & Polls Frontend System (T-27)', () => {
 
   describe('T-25: Broadcast Transmission List & Delivery Report', () => {
     it('allows creating a broadcast transmission from NewChatModal in Pro plan', async () => {
-      const createBroadcastMock = vi.fn(async () => ({ success: true, conversationId: 'conv-broadcast' }));
+      const createBroadcastMock = vi.fn(async () => ({
+        success: true,
+        conversationId: 'conv-broadcast',
+      }));
       useChatStore.setState({ createBroadcast: createBroadcastMock });
 
       render(
@@ -272,13 +275,7 @@ describe('Groups, Broadcast & Polls Frontend System (T-27)', () => {
         fetchBroadcastReport: vi.fn(async () => mockReportData),
       });
 
-      render(
-        <BroadcastReportModal
-          isOpen={true}
-          onClose={vi.fn()}
-          messageId="msg-b1"
-        />
-      );
+      render(<BroadcastReportModal isOpen={true} onClose={vi.fn()} messageId="msg-b1" />);
 
       await waitFor(() => {
         expect(screen.getByText('Relatório de Entrega da Transmissão')).toBeInTheDocument();
@@ -391,13 +388,7 @@ describe('Groups, Broadcast & Polls Frontend System (T-27)', () => {
       useChatStore.setState({ createPoll: createPollMock });
       const onClose = vi.fn();
 
-      render(
-        <CreatePollModal
-          isOpen={true}
-          onClose={onClose}
-          conversationId="conv-1"
-        />
-      );
+      render(<CreatePollModal isOpen={true} onClose={onClose} conversationId="conv-1" />);
 
       // Fill question
       const questionInput = screen.getByLabelText(/Pergunta da Enquete/i);

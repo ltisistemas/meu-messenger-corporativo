@@ -71,7 +71,8 @@ export const InviteMemberModal: React.FC<InviteMemberModalProps> = ({
               Convite Criado com Sucesso!
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Compartilhe o link abaixo com <strong>{email}</strong> para que ele possa aceitar o convite e criar sua senha.
+              Compartilhe o link abaixo com <strong>{email}</strong> para que ele possa aceitar o
+              convite e criar sua senha.
             </p>
           </div>
 

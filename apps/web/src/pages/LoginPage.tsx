@@ -57,9 +57,7 @@ export const LoginPage: React.FC = () => {
         <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-white">Acesse sua conta</h2>
-            <p className="text-xs text-slate-400">
-              Digite suas credenciais de acesso corporativo.
-            </p>
+            <p className="text-xs text-slate-400">Digite suas credenciais de acesso corporativo.</p>
           </div>
 
           {displayError && (

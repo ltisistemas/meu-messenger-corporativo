@@ -18,9 +18,7 @@ export const messageReceipts = pgTable(
     deliveredAt: timestamp('delivered_at', { withTimezone: true }),
     readAt: timestamp('read_at', { withTimezone: true }),
   },
-  (table) => [
-    uniqueIndex('receipts_message_user_idx').on(table.messageId, table.userId),
-  ]
+  (table) => [uniqueIndex('receipts_message_user_idx').on(table.messageId, table.userId)]
 );
 
 export const messageReceiptsRelations = relations(messageReceipts, ({ one }) => ({

@@ -181,11 +181,7 @@ describe('File Download with Confirmation and Deletion (T-20)', () => {
 
   describe('FileService.requestDownloadUrl', () => {
     it('generates short-lived download URL with metadata for authorized conversation member', async () => {
-      const result = await fileService.requestDownloadUrl(
-        accountId,
-        recipientId,
-        transferValidId
-      );
+      const result = await fileService.requestDownloadUrl(accountId, recipientId, transferValidId);
 
       expect(result.transferId).toBe(transferValidId);
       expect(result.fileName).toBe('proposta-comercial.pdf');
@@ -238,12 +234,9 @@ describe('File Download with Confirmation and Deletion (T-20)', () => {
 
   describe('FileService.confirmDownload (Acceptance: Interrupted does NOT delete; Complete deletes)', () => {
     it('does NOT delete file from bucket when download is interrupted (completed: false)', async () => {
-      const result = await fileService.confirmDownload(
-        accountId,
-        recipientId,
-        transferValidId,
-        { completed: false }
-      );
+      const result = await fileService.confirmDownload(accountId, recipientId, transferValidId, {
+        completed: false,
+      });
 
       expect(result.success).toBe(true);
       expect(result.interrupted).toBe(true);
@@ -255,12 +248,9 @@ describe('File Download with Confirmation and Deletion (T-20)', () => {
     });
 
     it('deletes file from bucket and marks completed when last recipient finishes download (completed: true)', async () => {
-      const result = await fileService.confirmDownload(
-        accountId,
-        recipientId,
-        transferValidId,
-        { completed: true }
-      );
+      const result = await fileService.confirmDownload(accountId, recipientId, transferValidId, {
+        completed: true,
+      });
 
       expect(result.success).toBe(true);
       expect(result.deletedFromStorage).toBe(true);
@@ -273,12 +263,9 @@ describe('File Download with Confirmation and Deletion (T-20)', () => {
     });
 
     it('decrements pending count without deleting from bucket when other recipients are still pending (T-21 foundation)', async () => {
-      const result = await fileService.confirmDownload(
-        accountId,
-        recipientId,
-        transferGroupId,
-        { completed: true }
-      );
+      const result = await fileService.confirmDownload(accountId, recipientId, transferGroupId, {
+        completed: true,
+      });
 
       expect(result.success).toBe(true);
       expect(result.deletedFromStorage).toBe(false);

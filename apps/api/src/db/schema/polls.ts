@@ -1,4 +1,14 @@
-import { pgTable, uuid, varchar, text, boolean, integer, timestamp, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  text,
+  boolean,
+  integer,
+  timestamp,
+  uniqueIndex,
+  index,
+} from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import { conversations } from './conversations';
 import { messages } from './messages';
@@ -13,10 +23,8 @@ export const polls = pgTable(
     conversationId: uuid('conversation_id')
       .notNull()
       .references(() => conversations.id, { onDelete: 'cascade' }),
-    messageId: uuid('message_id')
-      .references(() => messages.id, { onDelete: 'cascade' }),
-    creatorId: uuid('creator_id')
-      .references(() => users.id, { onDelete: 'set null' }),
+    messageId: uuid('message_id').references(() => messages.id, { onDelete: 'cascade' }),
+    creatorId: uuid('creator_id').references(() => users.id, { onDelete: 'set null' }),
     question: text('question').notNull(),
     allowMultiple: boolean('allow_multiple').notNull().default(false),
     isAnonymous: boolean('is_anonymous').notNull().default(false),
@@ -28,9 +36,7 @@ export const polls = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [
-    index('polls_conversation_idx').on(table.conversationId),
-  ]
+  (table) => [index('polls_conversation_idx').on(table.conversationId)]
 );
 
 export const pollOptions = pgTable(
@@ -46,9 +52,7 @@ export const pollOptions = pgTable(
     orderIndex: integer('order_index').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [
-    index('poll_options_poll_idx').on(table.pollId),
-  ]
+  (table) => [index('poll_options_poll_idx').on(table.pollId)]
 );
 
 export const pollVotes = pgTable(

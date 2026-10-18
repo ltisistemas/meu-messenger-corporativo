@@ -19,9 +19,15 @@ if (!process.env.VERCEL) {
 const { Pool } = pg;
 
 const connectionString =
-  (process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== '' ? process.env.DATABASE_URL : undefined) ||
-  (process.env.POSTGRES_URL && process.env.POSTGRES_URL.trim() !== '' ? process.env.POSTGRES_URL : undefined) ||
-  (process.env.PRISMA_DATABASE_URL && process.env.PRISMA_DATABASE_URL.trim() !== '' ? process.env.PRISMA_DATABASE_URL : undefined) ||
+  (process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== ''
+    ? process.env.DATABASE_URL
+    : undefined) ||
+  (process.env.POSTGRES_URL && process.env.POSTGRES_URL.trim() !== ''
+    ? process.env.POSTGRES_URL
+    : undefined) ||
+  (process.env.PRISMA_DATABASE_URL && process.env.PRISMA_DATABASE_URL.trim() !== ''
+    ? process.env.PRISMA_DATABASE_URL
+    : undefined) ||
   'postgresql://nextmsg_user:nextmsg_password@localhost:5432/nextmsg_db';
 
 const isServerless = Boolean(process.env.VERCEL);

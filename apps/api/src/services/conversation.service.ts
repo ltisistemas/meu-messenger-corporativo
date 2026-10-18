@@ -1,12 +1,7 @@
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import { Server } from 'socket.io';
 import { db as defaultDb } from '../db/index';
-import {
-  conversations,
-  conversationMembers,
-  users,
-  messages,
-} from '../db/schema/index';
+import { conversations, conversationMembers, users, messages } from '../db/schema/index';
 import { CreateGroupConversationDto } from '@corpchat/shared';
 import { GroupExpirationService } from '../jobs/group-expiration.job';
 import { WS_EVENTS } from '../ws/events';
@@ -260,10 +255,7 @@ export class ConversationService {
     conversationId: string
   ): Promise<FormattedConversation> {
     const conversation = await this.db.query.conversations.findFirst({
-      where: and(
-        eq(conversations.id, conversationId),
-        eq(conversations.accountId, accountId)
-      ),
+      where: and(eq(conversations.id, conversationId), eq(conversations.accountId, accountId)),
       with: {
         members: {
           with: {
@@ -319,7 +311,9 @@ export class ConversationService {
     }
 
     // Check caller permission: must be group admin or account owner/admin
-    const callerMembership = conversation.members.find((m: FormattedMember) => m.userId === callerId);
+    const callerMembership = conversation.members.find(
+      (m: FormattedMember) => m.userId === callerId
+    );
     const isGroupAdmin = callerMembership?.role === 'admin';
     const isAccountAdmin = callerRole === 'owner' || callerRole === 'admin';
 
@@ -371,7 +365,9 @@ export class ConversationService {
     }
 
     const isSelf = callerId === targetUserId;
-    const callerMembership = conversation.members.find((m: FormattedMember) => m.userId === callerId);
+    const callerMembership = conversation.members.find(
+      (m: FormattedMember) => m.userId === callerId
+    );
     const isGroupAdmin = callerMembership?.role === 'admin';
     const isAccountAdmin = callerRole === 'owner' || callerRole === 'admin';
 
@@ -406,7 +402,9 @@ export class ConversationService {
       throw new Error('Apenas conversas em grupo podem ser excluídas.');
     }
 
-    const callerMembership = conversation.members.find((m: FormattedMember) => m.userId === callerId);
+    const callerMembership = conversation.members.find(
+      (m: FormattedMember) => m.userId === callerId
+    );
     const isGroupAdmin = callerMembership?.role === 'admin';
     const isAccountAdmin = callerRole === 'owner' || callerRole === 'admin';
 
@@ -414,9 +412,9 @@ export class ConversationService {
       throw new Error('Apenas administradores do grupo ou da organização podem excluir o grupo.');
     }
 
-    await this.db.delete(conversations).where(
-      and(eq(conversations.id, conversationId), eq(conversations.accountId, accountId))
-    );
+    await this.db
+      .delete(conversations)
+      .where(and(eq(conversations.id, conversationId), eq(conversations.accountId, accountId)));
 
     if (this.io) {
       this.io.to(`conversation:${conversationId}`).emit(WS_EVENTS.CONVERSATION_DELETED, {

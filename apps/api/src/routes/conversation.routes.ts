@@ -16,8 +16,7 @@ export const conversationRoutes: FastifyPluginAsync<ConversationRoutesOptions> =
   fastify: FastifyInstance,
   options
 ) => {
-  const groupExpirationService =
-    options.groupExpirationService || new GroupExpirationService();
+  const groupExpirationService = options.groupExpirationService || new GroupExpirationService();
   const conversationService =
     options.conversationService || new ConversationService(undefined, groupExpirationService);
 
@@ -30,81 +29,69 @@ export const conversationRoutes: FastifyPluginAsync<ConversationRoutesOptions> =
   });
 
   // 1. GET /api/conversations - List user conversations
-  fastify.get(
-    '/',
-    { preHandler: [fastify.authenticate] },
-    async (request, reply) => {
-      const { accountId, userId } = request.user;
-      const list = await conversationService.listUserConversations(accountId, userId);
-      return reply.status(200).send({ conversations: list });
-    }
-  );
+  fastify.get('/', { preHandler: [fastify.authenticate] }, async (request, reply) => {
+    const { accountId, userId } = request.user;
+    const list = await conversationService.listUserConversations(accountId, userId);
+    return reply.status(200).send({ conversations: list });
+  });
 
   // 2. POST /api/conversations/direct - Get or create direct 1:1 conversation
-  fastify.post(
-    '/direct',
-    { preHandler: [fastify.authenticate] },
-    async (request, reply) => {
-      const { accountId, userId } = request.user;
-      const parseResult = CreateDirectConversationDtoSchema.safeParse(request.body);
+  fastify.post('/direct', { preHandler: [fastify.authenticate] }, async (request, reply) => {
+    const { accountId, userId } = request.user;
+    const parseResult = CreateDirectConversationDtoSchema.safeParse(request.body);
 
-      if (!parseResult.success) {
-        return reply.status(400).send({
-          statusCode: 400,
-          error: 'Bad Request',
-          message: parseResult.error.errors[0]?.message || 'Dados inválidos.',
-        });
-      }
-
-      try {
-        const conversation = await conversationService.getOrCreateDirectConversation(
-          accountId,
-          userId,
-          parseResult.data.targetUserId
-        );
-        return reply.status(200).send(conversation);
-      } catch (err: any) {
-        return reply.status(400).send({
-          statusCode: 400,
-          error: 'Bad Request',
-          message: err.message || 'Falha ao iniciar conversa direta.',
-        });
-      }
+    if (!parseResult.success) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: parseResult.error.errors[0]?.message || 'Dados inválidos.',
+      });
     }
-  );
+
+    try {
+      const conversation = await conversationService.getOrCreateDirectConversation(
+        accountId,
+        userId,
+        parseResult.data.targetUserId
+      );
+      return reply.status(200).send(conversation);
+    } catch (err: any) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: err.message || 'Falha ao iniciar conversa direta.',
+      });
+    }
+  });
 
   // 3. POST /api/conversations/group - Create a group conversation (fixed or temporary - T-24)
-  fastify.post(
-    '/group',
-    { preHandler: [fastify.authenticate] },
-    async (request, reply) => {
-      const { accountId, userId } = request.user;
-      const parseResult = CreateGroupConversationDtoSchema.safeParse(request.body);
+  fastify.post('/group', { preHandler: [fastify.authenticate] }, async (request, reply) => {
+    const { accountId, userId } = request.user;
+    const parseResult = CreateGroupConversationDtoSchema.safeParse(request.body);
 
-      if (!parseResult.success) {
-        return reply.status(400).send({
-          statusCode: 400,
-          error: 'Bad Request',
-          message: parseResult.error.errors[0]?.message || 'Dados inválidos.',
-        });
-      }
-
-      try {
-        const conversation = await conversationService.createGroup(
-          accountId,
-          userId,
-          parseResult.data
-        );
-        return reply.status(201).send(conversation);
-      } catch (err: any) {
-        return reply.status(400).send({
-          statusCode: 400,
-          error: 'Bad Request',
-          message: err.message || 'Falha ao criar grupo.',
-        });
-      }
+    if (!parseResult.success) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: parseResult.error.errors[0]?.message || 'Dados inválidos.',
+      });
     }
-  );
+
+    try {
+      const conversation = await conversationService.createGroup(
+        accountId,
+        userId,
+        parseResult.data
+      );
+      return reply.status(201).send(conversation);
+    } catch (err: any) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: err.message || 'Falha ao criar grupo.',
+      });
+    }
+  });
 
   // 4. POST /api/conversations/sweep-expired - Sweep all expired temporary groups (T-24)
   fastify.post(
@@ -240,12 +227,7 @@ export const conversationRoutes: FastifyPluginAsync<ConversationRoutesOptions> =
       const { id } = request.params;
 
       try {
-        const result = await conversationService.deleteGroup(
-          accountId,
-          callerId,
-          role,
-          id
-        );
+        const result = await conversationService.deleteGroup(accountId, callerId, role, id);
         return reply.status(200).send(result);
       } catch (err: any) {
         return reply.status(400).send({

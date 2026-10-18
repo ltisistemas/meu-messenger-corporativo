@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  BarChart2,
-  Plus,
-  Trash2,
-  Clock,
-  AlertTriangle,
-} from 'lucide-react';
+import { BarChart2, Plus, Trash2, Clock, AlertTriangle } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -58,7 +52,9 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({
     setError(null);
 
     if (isFreePlan) {
-      setError('O recurso de enquetes é exclusivo dos planos Pro e Enterprise. Faça upgrade para desbloquear.');
+      setError(
+        'O recurso de enquetes é exclusivo dos planos Pro e Enterprise. Faça upgrade para desbloquear.'
+      );
       return;
     }
 
@@ -108,7 +104,8 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({
             <div>
               <p className="font-semibold mb-0.5">Recurso do Plano Pro / Enterprise</p>
               <p>
-                Sua organização está no plano Free. Faça upgrade para o Pro para criar enquetes com votação em tempo real e resultados analíticos.
+                Sua organização está no plano Free. Faça upgrade para o Pro para criar enquetes com
+                votação em tempo real e resultados analíticos.
               </p>
             </div>
           </div>
@@ -140,9 +137,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({
           <div className="space-y-2">
             {options.map((option, idx) => (
               <div key={idx} className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400 w-4 text-center">
-                  {idx + 1}.
-                </span>
+                <span className="text-xs font-bold text-slate-400 w-4 text-center">{idx + 1}.</span>
                 <input
                   type="text"
                   placeholder={`Opção ${idx + 1}`}
@@ -223,7 +218,10 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({
 
           {/* Expiration Dropdown */}
           <div>
-            <label htmlFor="poll-expiration-select" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1">
+            <label
+              htmlFor="poll-expiration-select"
+              className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1"
+            >
               <Clock className="w-3.5 h-3.5 text-amber-500" />
               Prazo para Votação
             </label>

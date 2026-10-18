@@ -38,8 +38,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     const title = isBroadcast
       ? c.title || 'Comunicados Oficiais'
       : isGroup
-      ? c.title || 'Grupo sem título'
-      : c.otherUser?.name || 'Conversa';
+        ? c.title || 'Grupo sem título'
+        : c.otherUser?.name || 'Conversa';
 
     const lastMsg = c.lastMessage?.content || '';
     const matchesSearch =
@@ -169,9 +169,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       {/* List */}
       <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
         {filteredConversations.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm">
-            Nenhuma conversa encontrada.
-          </div>
+          <div className="p-8 text-center text-slate-400 text-sm">Nenhuma conversa encontrada.</div>
         ) : (
           filteredConversations.map((conv) => {
             const isSelected = conv.id === activeConversationId;
@@ -181,17 +179,20 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             const name = isBroadcast
               ? conv.title || 'Comunicados Oficiais'
               : isGroup
-              ? conv.title || 'Grupo sem título'
-              : conv.otherUser?.name || 'Colaborador';
+                ? conv.title || 'Grupo sem título'
+                : conv.otherUser?.name || 'Colaborador';
 
             const avatarUrl = isGroup || isBroadcast ? undefined : conv.otherUser?.avatarUrl;
-            const isOnline = !isGroup && !isBroadcast && conv.otherUser ? onlineUsers[conv.otherUser.id] : false;
+            const isOnline =
+              !isGroup && !isBroadcast && conv.otherUser ? onlineUsers[conv.otherUser.id] : false;
 
             const isExpiredGroup =
               conv.status === 'archived_readonly' ||
               (conv.isTemporary && conv.expiresAt && new Date(conv.expiresAt) <= new Date());
 
-            const remainingGroupTime = conv.isTemporary ? calculateGroupRemainingTime(conv.expiresAt) : null;
+            const remainingGroupTime = conv.isTemporary
+              ? calculateGroupRemainingTime(conv.expiresAt)
+              : null;
 
             const convTyping = typingUsers[conv.id];
             const typingUserNames = convTyping ? Object.values(convTyping).map((u) => u.name) : [];
@@ -199,7 +200,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
             const lastMessageText = isTyping
               ? `${typingUserNames[0]} está digitando...`
-              : conv.lastMessage?.content || (isBroadcast ? 'Canal oficial de transmissão' : 'Nenhuma mensagem');
+              : conv.lastMessage?.content ||
+                (isBroadcast ? 'Canal oficial de transmissão' : 'Nenhuma mensagem');
 
             return (
               <div
@@ -248,8 +250,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         isTyping
                           ? 'text-brand-500 font-medium italic'
                           : (conv.unreadCount || 0) > 0
-                          ? 'text-slate-900 dark:text-slate-100 font-medium'
-                          : 'text-slate-500 dark:text-slate-400'
+                            ? 'text-slate-900 dark:text-slate-100 font-medium'
+                            : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       {lastMessageText}
